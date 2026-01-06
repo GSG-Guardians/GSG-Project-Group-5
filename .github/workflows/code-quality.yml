@@ -1,0 +1,57 @@
+name: Code Quality Checks
+
+on:
+  pull_request:
+    branches: [ main, development ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  block_pr_to_main:
+    name: Block PR to main
+    if: ${{ github.base_ref == 'main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Stop PR to main
+        run: |
+          echo "❌ PRs to 'main' are not allowed."
+          echo "✅ Please open the PR to 'development' instead."
+          exit 1
+
+  checks:
+    name: Lint / Format / Type Check
+    if: ${{ github.base_ref != 'main' }} # runs for development PRs only
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prettier Check
+        run: npm run check-format
+
+      - name: ESLint Check
+        run: npm run lint
+
+      - name: TypeScript Type Check
+        run: npm run type-check
+
+      - name: Build
+        run: npm run build
