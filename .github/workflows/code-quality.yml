@@ -2,7 +2,7 @@ name: Code Quality Checks
 
 on:
   pull_request:
-    branches: [ main, development ]
+    branches: [main, development]
 
 permissions:
   contents: read
@@ -12,46 +12,63 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  block_pr_to_main:
-    name: Block PR to main
-    if: ${{ github.base_ref == 'main' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Stop PR to main
-        run: |
-          echo "❌ PRs to 'main' are not allowed."
-          echo "✅ Please open the PR to 'development' instead."
-          exit 1
-
   checks:
-    name: Lint / Format / Type Check
-    if: ${{ github.base_ref != 'main' }} # runs for development PRs only
+    name: PR Gate + Quality Checks
     runs-on: ubuntu-latest
 
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
     steps:
+      # ---------------------------
+      # 1) Gate: block PRs to main (except Moamen-Yazouri)
+      # ---------------------------
+      - name: Gate - block PRs to main (except Moamen-Yazouri)
+        if: ${{ github.base_ref == 'main' && github.event.pull_request.user.login != 'Moamen-Yazouri' }}
+        run: |
+          echo "❌ PRs to 'main' are not allowed."
+          echo "✅ Please open the PR to 'development' instead."
+          echo "ℹ️ Exception: Moamen-Yazouri can open PRs to 'main'."
+          exit 1
+
+      # If PR is to main AND allowed user => skip checks (optional)
+      - name: Skip checks for allowed PR to main
+        if: ${{ github.base_ref == 'main' && github.event.pull_request.user.login == 'Moamen-Yazouri' }}
+        run: |
+          echo "✅ Allowed: Moamen-Yazouri PR to main."
+          echo "⏭️ Skipping quality checks (you can remove this step to run checks on main PRs too)."
+          exit 0
+
+      # ---------------------------
+      # 2) Quality checks (development PRs only)
+      # ---------------------------
       - name: Checkout code
+        if: ${{ github.base_ref != 'main' }}
         uses: actions/checkout@v4
 
       - name: Setup Node.js
+        if: ${{ github.base_ref != 'main' }}
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "npm"
+          cache: npm
 
       - name: Install dependencies
+        if: ${{ github.base_ref != 'main' }}
         run: npm ci
 
       - name: Prettier Check
+        if: ${{ github.base_ref != 'main' }}
         run: npm run check-format
 
       - name: ESLint Check
+        if: ${{ github.base_ref != 'main' }}
         run: npm run lint
 
       - name: TypeScript Type Check
+        if: ${{ github.base_ref != 'main' }}
         run: npm run type-check
 
       - name: Build
+        if: ${{ github.base_ref != 'main' }}
         run: npm run build
