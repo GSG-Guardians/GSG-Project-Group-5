@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { ConfigService } from '@nestjs/config';
+import { join } from 'path';
 import { DataSource } from 'typeorm';
 
 export const AppDataSource = {
@@ -7,8 +9,8 @@ export const AppDataSource = {
       type: 'postgres',
       url: configService.getOrThrow<string>('DATABASE_URL'),
       ssl: { rejectUnauthorized: false },
-      entities: ['dist/**/*.entity.js'],
-      migrations: ['dist/database/migrations/*.js'],
+      entities: [join(__dirname, 'entities', '*.entities.{ts,js}')],
+      migrations: [join(__dirname, 'migrations', '*.{ts,js}')],
       synchronize: false,
     }),
   inject: [ConfigService],
