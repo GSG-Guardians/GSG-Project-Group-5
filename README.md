@@ -1,6 +1,7 @@
 # Personal Finance & Bill Splitting Assistance 🧾💰
 
 ## 📌 Project Overview
+
 This project is developed as part of the **Career to Career Bootcamp**.  
 The focus of this project is on building the **backend system** for a **Personal Finance & Bill Splitting Assistance** platform that enables users to manage personal and shared expenses efficiently.
 
@@ -13,6 +14,7 @@ The focus of this project is on building the **backend system** for a **Personal
 **Team Lead:** **Moamen Yazouri**
 
 ### 🛡️ Guardians Team Members
+
 - **Moamen Yazouri** (Team Lead)  
   https://github.com/Moamen-Yazouri
 
@@ -31,6 +33,7 @@ The focus of this project is on building the **backend system** for a **Personal
 ---
 
 ## 🚀 Project Scope
+
 - Backend development only
 - Design and implementation of APIs
 - Database modeling and relationships
@@ -41,11 +44,13 @@ The focus of this project is on building the **backend system** for a **Personal
 ---
 
 ## 🧩 Project Details
-- **Project Name:** Personal Finance & Bill Splitting Assistance  
-- **Project Number:** Project-3  
-- **Bootcamp:** Career to Career Bootcamp  
+
+- **Project Name:** Personal Finance & Bill Splitting Assistance
+- **Project Number:** Project-3
+- **Bootcamp:** Career to Career Bootcamp
 
 ---
 
 ## 📄 License
+
 This project is developed for educational purposes as part of the Career to Career Bootcamp.
