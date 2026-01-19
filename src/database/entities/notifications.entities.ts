@@ -10,7 +10,7 @@ import { NotificationType } from '../enums';
 import { User } from './user.entities';
 
 @Entity({ name: 'notifications' })
-@Index(['userId', 'readAt'])
+@Index(['userId', 'isRead'])
 @Index(['userId', 'sentAt'])
 @Index(['entityType', 'entityId'])
 @Index(['type'])
@@ -18,7 +18,7 @@ export class Notification {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'user_id', type: 'uuid' })
+  @Column('uuid', { name: 'user_id' })
   userId: string;
 
   @ManyToOne(() => User, (u) => u.notifications, { onDelete: 'CASCADE' })
@@ -27,27 +27,38 @@ export class Notification {
   @Column({ type: 'enum', enum: NotificationType })
   type: NotificationType;
 
-  @Column({ type: 'varchar', length: 160 })
+  @Column('varchar', { length: 160 })
   title: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column('text', { nullable: true })
   body: string | null;
 
-  @Column({ name: 'entity_type', type: 'varchar', length: 40, nullable: true })
+  @Column('varchar', { name: 'entity_type', length: 40, nullable: true })
   entityType: string | null;
 
-  @Column({ name: 'entity_id', type: 'uuid', nullable: true })
+  @Column('uuid', { name: 'entity_id', nullable: true })
   entityId: string | null;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column('jsonb', { nullable: true })
   data: Record<string, any> | null;
 
-  @Column({ name: 'sent_at', type: 'timestamptz', default: () => 'now()' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'sent_at',
+    default: () => 'now()',
+  })
   sentAt: Date;
 
-  @Column({ name: 'read_at', type: 'timestamptz', nullable: true })
+  @Column('boolean', { name: 'is_read', default: false })
+  isRead: boolean;
+
+  @Column({ type: 'timestamptz', name: 'read_at', nullable: true })
   readAt: Date | null;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
   createdAt: Date;
 }

@@ -5,7 +5,7 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
-  OneToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -22,38 +22,45 @@ export class Income {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'user_id', type: 'uuid' })
+  @Column('uuid', { name: 'user_id' })
   userId: string;
 
   @ManyToOne(() => User, (u) => u.incomes, { onDelete: 'CASCADE' })
   user: User;
 
-  @Column({ type: 'numeric', precision: 14, scale: 2 })
+  @Column('numeric', { precision: 14, scale: 2 })
   amount: string;
 
   @Column({ type: 'enum', enum: IncomeSource, default: IncomeSource.SALARY })
   source: IncomeSource;
 
-  @Column({ type: 'text', nullable: true })
+  @Column('text', { nullable: true })
   description: string | null;
 
-  @Column({ name: 'income_date', type: 'date' })
+  @Column({ type: 'date', name: 'income_date' })
   incomeDate: string;
 
-  @Column({ name: 'asset_id', type: 'uuid', nullable: true })
+  @Column('uuid', { name: 'asset_id', nullable: true })
   assetId: string | null;
 
   @ManyToOne(() => Asset, { nullable: true })
   @JoinColumn({ name: 'asset_id' })
-  asset: Asset | null;
+  asset?: Asset | null;
 
-  // If you want 1 rule per income (recommended):
-  @OneToOne(() => IncomeRecurringRule, (r) => r.income)
-  recurringRule: IncomeRecurringRule | null;
-
-  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    name: 'updated_at',
+    default: () => 'now()',
+  })
   updatedAt: Date;
+
+  @OneToMany(() => IncomeRecurringRule, (r) => r.income)
+  recurringRules: IncomeRecurringRule[];
 }

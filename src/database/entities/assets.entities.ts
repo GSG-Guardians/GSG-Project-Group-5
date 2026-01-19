@@ -6,8 +6,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from './user.entities';
 import { AssetOwnerType } from '../enums';
+import { User } from './user.entities';
 
 @Entity({ name: 'assets' })
 @Index(['userId'])
@@ -16,35 +16,39 @@ export class Asset {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'user_id', type: 'uuid' })
+  @Column('uuid', { name: 'user_id' })
   userId: string;
 
   @ManyToOne(() => User, (u) => u.assets, { onDelete: 'CASCADE' })
   user: User;
 
-  @Column({ type: 'text' })
+  @Column('text')
   url: string;
 
-  @Column({ name: 'file_name', type: 'varchar', length: 255, nullable: true })
+  @Column('varchar', { name: 'file_name', length: 255, nullable: true })
   fileName: string | null;
 
-  @Column({ name: 'mime_type', type: 'varchar', length: 120, nullable: true })
+  @Column('varchar', { name: 'mime_type', length: 120, nullable: true })
   mimeType: string | null;
 
-  @Column({ name: 'size_bytes', type: 'bigint', nullable: true })
+  @Column('bigint', { name: 'size_bytes', nullable: true })
   sizeBytes: string | null;
 
   @Column({
-    name: 'owner_type',
     type: 'enum',
     enum: AssetOwnerType,
+    name: 'owner_type',
     nullable: true,
   })
   ownerType: AssetOwnerType | null;
 
-  @Column({ name: 'owner_id', type: 'uuid', nullable: true })
+  @Column('uuid', { name: 'owner_id', nullable: true })
   ownerId: string | null;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
   createdAt: Date;
 }

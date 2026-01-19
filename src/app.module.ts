@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -18,6 +19,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
           url: config.getOrThrow('DATABASE_URL'),
           autoLoadEntities: true,
           synchronize: false,
+          migrationsRun: true,
         };
       },
     }),

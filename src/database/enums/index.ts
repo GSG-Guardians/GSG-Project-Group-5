@@ -11,7 +11,6 @@ export enum UserStatus {
 
 export enum GroupInvoiceStatus {
   PAID = 'PAID',
-  OVERDUE = 'OVERDUE',
   UNPAID = 'UNPAID',
 }
 
@@ -22,6 +21,7 @@ export enum AssetOwnerType {
   EXPENSE = 'EXPENSE',
   GROUP_INVOICE = 'GROUP_INVOICE',
   INCOME = 'INCOME',
+  REWARD = 'REWARD',
 }
 
 export enum DebtDirection {
@@ -37,8 +37,7 @@ export enum DebtStatus {
 
 export enum BillStatus {
   PAID = 'PAID',
-  OVERDUE = 'OVERDUE',
-  PENDING = 'PENDING',
+  UNPAID = 'UNPAID',
 }
 
 export enum ReminderFrequency {
@@ -98,4 +97,9 @@ export enum BalanceTransactionType {
   DEBT_RECEIVED = 'DEBT_RECEIVED',
   BILL_PAYMENT = 'BILL_PAYMENT',
   GROUP_INVOICE_PAYMENT = 'GROUP_INVOICE_PAYMENT',
+}
+
+export enum RewardStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
 }

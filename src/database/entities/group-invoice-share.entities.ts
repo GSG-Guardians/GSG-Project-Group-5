@@ -6,8 +6,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from './user.entities';
 import { GroupInvoice } from './group-invoice.entities';
+import { User } from './user.entities';
 
 @Entity({ name: 'group_invoice_shares' })
 @Index(['groupInvoiceId', 'userId'], { unique: true })
@@ -16,27 +16,31 @@ export class GroupInvoiceShare {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'group_invoice_id', type: 'uuid' })
+  @Column('uuid', { name: 'group_invoice_id' })
   groupInvoiceId: string;
 
   @ManyToOne(() => GroupInvoice, (gi) => gi.shares, { onDelete: 'CASCADE' })
   groupInvoice: GroupInvoice;
 
-  @Column({ name: 'user_id', type: 'uuid' })
+  @Column('uuid', { name: 'user_id' })
   userId: string;
 
-  @ManyToOne(() => User, (u) => u.groupInvoiceShares, { onDelete: 'NO ACTION' })
+  @ManyToOne(() => User, (u) => u.groupInvoiceShares)
   user: User;
 
-  @Column({ name: 'amount_share', type: 'numeric', precision: 14, scale: 2 })
+  @Column('numeric', { name: 'amount_share', precision: 14, scale: 2 })
   amountShare: string;
 
-  @Column({ type: 'numeric', precision: 5, scale: 2, nullable: true })
+  @Column('numeric', { precision: 5, scale: 2, nullable: true })
   percentage: string | null;
 
-  @Column({ name: 'paid_at', type: 'timestamptz', nullable: true })
+  @Column({ type: 'timestamptz', name: 'paid_at', nullable: true })
   paidAt: Date | null;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
   createdAt: Date;
 }

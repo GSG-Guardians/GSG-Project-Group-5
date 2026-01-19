@@ -3,43 +3,43 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  JoinColumn,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRole, UserStatus } from '../enums';
+import { Asset } from './assets.entities';
 import { EmailVerificationCode } from './email-verification-code.entities';
 import { PasswordResetCode } from './password-reset-code.entities';
 import { BalanceHistory } from './balance-history.entities';
-import { Asset } from './assets.entities';
 import { Debt } from './debts.entities';
 import { Bill } from './bills.entities';
 import { Expense } from './expense.entities';
 import { Income } from './income.entities';
-import { Notification } from './notifications.entities';
 import { GroupInvoice } from './group-invoice.entities';
 import { GroupInvoiceShare } from './group-invoice-share.entities';
+import { Notification } from './notifications.entities';
+import { UserReward } from './user-rewards.entities';
 
 @Entity({ name: 'users' })
+@Index(['email'], { unique: true })
 @Index(['status'])
 @Index(['role'])
+@Index(['points'])
+@Index(['avatarAssetId'])
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'full_name', type: 'varchar', length: 120 })
+  @Column('varchar', { name: 'full_name', length: 120 })
   fullName: string;
 
-  @Column({ type: 'varchar', length: 255, unique: true })
-  @Index()
+  @Column('varchar', { length: 255, unique: true })
   email: string;
 
-  @Column({
-    name: 'password_hash',
-    type: 'varchar',
-    length: 255,
-    nullable: true,
-  })
+  @Column('varchar', { name: 'password_hash', length: 255, nullable: true })
   passwordHash: string | null;
 
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
@@ -48,60 +48,69 @@ export class User {
   @Column({ type: 'enum', enum: UserStatus, default: UserStatus.PENDING })
   status: UserStatus;
 
-  @Column({ name: 'default_currency', type: 'char', length: 3, default: 'USD' })
+  @Column('char', { name: 'default_currency', length: 3, default: 'USD' })
   defaultCurrency: string;
 
-  @Column({
+  @Column('numeric', {
     name: 'current_balance',
-    type: 'numeric',
     precision: 14,
     scale: 2,
     default: 0,
   })
   currentBalance: string;
 
-  @Column({ type: 'varchar', length: 20, default: 'LOCAL' })
+  @Column('bigint', { default: 0 })
+  points: string;
+
+  @Column('uuid', { name: 'avatar_asset_id', nullable: true })
+  avatarAssetId: string | null;
+
+  @OneToOne(() => Asset, { nullable: true })
+  @JoinColumn({ name: 'avatar_asset_id' })
+  avatarAsset?: Asset | null;
+
+  @Column('varchar', { length: 20, default: 'LOCAL' })
   provider: string;
 
-  @Column({ name: 'provider_id', type: 'varchar', length: 255, nullable: true })
+  @Column('varchar', { name: 'provider_id', length: 255, nullable: true })
   providerId: string | null;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    name: 'updated_at',
+    default: () => 'now()',
+  })
   updatedAt: Date;
 
-  @OneToMany(() => EmailVerificationCode, (x) => x.user)
-  emailVerificationCodes: EmailVerificationCode[];
+  // relations
+  @OneToMany(() => Asset, (a) => a.user) assets: Asset[];
 
-  @OneToMany(() => PasswordResetCode, (x) => x.user)
-  passwordResetCodes: PasswordResetCode[];
+  @OneToMany(() => EmailVerificationCode, (c) => c.user)
+  emailCodes: EmailVerificationCode[];
+  @OneToMany(() => PasswordResetCode, (c) => c.user)
+  resetCodes: PasswordResetCode[];
 
-  @OneToMany(() => BalanceHistory, (x) => x.user)
+  @OneToMany(() => BalanceHistory, (b) => b.user)
   balanceHistory: BalanceHistory[];
 
-  @OneToMany(() => Asset, (x) => x.user)
-  assets: Asset[];
+  @OneToMany(() => Debt, (d) => d.user) debts: Debt[];
+  @OneToMany(() => Bill, (b) => b.user) bills: Bill[];
+  @OneToMany(() => Expense, (e) => e.user) expenses: Expense[];
+  @OneToMany(() => Income, (i) => i.user) incomes: Income[];
 
-  @OneToMany(() => Debt, (x) => x.user)
-  debts: Debt[];
-
-  @OneToMany(() => Bill, (x) => x.user)
-  bills: Bill[];
-
-  @OneToMany(() => Expense, (x) => x.user)
-  expenses: Expense[];
-
-  @OneToMany(() => Income, (x) => x.user)
-  incomes: Income[];
-
-  @OneToMany(() => Notification, (x) => x.user)
-  notifications: Notification[];
-
-  @OneToMany(() => GroupInvoice, (x) => x.createdByUser)
-  groupInvoicesCreated: GroupInvoice[];
-
-  @OneToMany(() => GroupInvoiceShare, (x) => x.user)
+  @OneToMany(() => GroupInvoice, (gi) => gi.createdByUser)
+  createdGroupInvoices: GroupInvoice[];
+  @OneToMany(() => GroupInvoiceShare, (s) => s.user)
   groupInvoiceShares: GroupInvoiceShare[];
+
+  @OneToMany(() => Notification, (n) => n.user) notifications: Notification[];
+
+  @OneToMany(() => UserReward, (ur) => ur.user) rewards: UserReward[];
 }

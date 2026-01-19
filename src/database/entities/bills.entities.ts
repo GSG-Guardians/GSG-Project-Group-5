@@ -21,57 +21,65 @@ export class Bill {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'user_id', type: 'uuid' })
+  @Column('uuid', { name: 'user_id' })
   userId: string;
 
   @ManyToOne(() => User, (u) => u.bills, { onDelete: 'CASCADE' })
   user: User;
 
-  @Column({ type: 'varchar', length: 160 })
+  @Column('varchar', { length: 160 })
   name: string;
 
-  @Column({ type: 'numeric', precision: 14, scale: 2 })
+  @Column('numeric', { precision: 14, scale: 2 })
   amount: string;
 
-  @Column({ type: 'char', length: 3 })
+  @Column('char', { length: 3 })
   currency: string;
 
-  @Column({ type: 'enum', enum: BillStatus, default: BillStatus.PENDING })
+  @Column({ type: 'enum', enum: BillStatus, default: BillStatus.UNPAID })
   status: BillStatus;
 
-  @Column({ name: 'due_date', type: 'date' })
+  @Column({ type: 'date', name: 'due_date' })
   dueDate: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column('text', { nullable: true })
   description: string | null;
 
-  @Column({ name: 'reminder_enabled', type: 'boolean', default: false })
+  @Column('boolean', { name: 'reminder_enabled', default: false })
   reminderEnabled: boolean;
 
   @Column({
-    name: 'reminder_frequency',
     type: 'enum',
     enum: ReminderFrequency,
+    name: 'reminder_frequency',
     default: ReminderFrequency.NONE,
   })
   reminderFrequency: ReminderFrequency;
 
-  @Column({ name: 'next_remind_at', type: 'timestamptz', nullable: true })
+  @Column({ type: 'timestamptz', name: 'next_remind_at', nullable: true })
   nextRemindAt: Date | null;
 
-  @Column({ name: 'paid_at', type: 'timestamptz', nullable: true })
+  @Column({ type: 'timestamptz', name: 'paid_at', nullable: true })
   paidAt: Date | null;
 
-  @Column({ name: 'asset_id', type: 'uuid', nullable: true })
+  @Column('uuid', { name: 'asset_id', nullable: true })
   assetId: string | null;
 
   @ManyToOne(() => Asset, { nullable: true })
   @JoinColumn({ name: 'asset_id' })
-  asset: Asset | null;
+  asset?: Asset | null;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    name: 'updated_at',
+    default: () => 'now()',
+  })
   updatedAt: Date;
 }

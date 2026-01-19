@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import {
   Column,
   CreateDateColumn,
@@ -16,24 +15,28 @@ export class PasswordResetCode {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'user_id', type: 'uuid' })
+  @Column('uuid', { name: 'user_id' })
   userId: string;
 
-  @ManyToOne(() => User, (u) => u.passwordResetCodes, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (u) => u.resetCodes, { onDelete: 'CASCADE' })
   user: User;
 
-  @Column({ name: 'code_hash', type: 'varchar', length: 255 })
+  @Column('varchar', { name: 'code_hash', length: 255 })
   codeHash: string;
 
-  @Column({ name: 'expires_at', type: 'timestamptz' })
+  @Column({ type: 'timestamptz', name: 'expires_at' })
   expiresAt: Date;
 
-  @Column({ name: 'used_at', type: 'timestamptz', nullable: true })
+  @Column({ type: 'timestamptz', name: 'used_at', nullable: true })
   usedAt: Date | null;
 
-  @Column({ name: 'attempt_count', type: 'int', default: 0 })
+  @Column('int', { name: 'attempt_count', default: 0 })
   attemptCount: number;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
   createdAt: Date;
 }

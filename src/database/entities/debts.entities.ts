@@ -21,50 +21,57 @@ export class Debt {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'user_id', type: 'uuid' })
+  @Column('uuid', { name: 'user_id' })
   userId: string;
 
   @ManyToOne(() => User, (u) => u.debts, { onDelete: 'CASCADE' })
   user: User;
 
-  @Column({ name: 'personal_name', type: 'varchar', length: 160 })
+  @Column('varchar', { name: 'personal_name', length: 160 })
   personalName: string;
 
   @Column({ type: 'enum', enum: DebtDirection, default: DebtDirection.I_OWE })
   direction: DebtDirection;
 
-  @Column({ type: 'numeric', precision: 14, scale: 2 })
+  @Column('numeric', { precision: 14, scale: 2 })
   amount: string;
 
-  @Column({ type: 'char', length: 3 })
+  @Column('char', { length: 3 })
   currency: string;
 
-  @Column({ name: 'due_date', type: 'date' })
-  dueDate: string; // YYYY-MM-DD
+  @Column({ type: 'date', name: 'due_date' })
+  dueDate: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column('text', { nullable: true })
   description: string | null;
 
-  // NOTE: DBML default was 'OPEN' but enum doesn't include it
   @Column({ type: 'enum', enum: DebtStatus, default: DebtStatus.UNPAID })
   status: DebtStatus;
 
-  @Column({ name: 'reminder_enabled', type: 'boolean', default: false })
+  @Column('boolean', { name: 'reminder_enabled', default: false })
   reminderEnabled: boolean;
 
-  @Column({ name: 'remind_at', type: 'timestamptz', nullable: true })
+  @Column({ type: 'timestamptz', name: 'remind_at', nullable: true })
   remindAt: Date | null;
 
-  @Column({ name: 'asset_id', type: 'uuid', nullable: true })
+  @Column('uuid', { name: 'asset_id', nullable: true })
   assetId: string | null;
 
   @ManyToOne(() => Asset, { nullable: true })
   @JoinColumn({ name: 'asset_id' })
-  asset: Asset | null;
+  asset?: Asset | null;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    name: 'updated_at',
+    default: () => 'now()',
+  })
   updatedAt: Date;
 }

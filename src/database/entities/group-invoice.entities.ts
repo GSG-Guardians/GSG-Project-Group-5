@@ -23,20 +23,20 @@ export class GroupInvoice {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'created_by_user_id', type: 'uuid' })
+  @Column('uuid', { name: 'created_by_user_id' })
   createdByUserId: string;
 
-  @ManyToOne(() => User, (u) => u.groupInvoicesCreated, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (u) => u.createdGroupInvoices, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'created_by_user_id' })
   createdByUser: User;
 
-  @Column({ type: 'varchar', length: 160 })
+  @Column('varchar', { length: 160 })
   title: string;
 
-  @Column({ name: 'amount_total', type: 'numeric', precision: 14, scale: 2 })
+  @Column('numeric', { name: 'amount_total', precision: 14, scale: 2 })
   amountTotal: string;
 
-  @Column({ type: 'char', length: 3 })
+  @Column('char', { length: 3 })
   currency: string;
 
   @Column({
@@ -46,47 +46,55 @@ export class GroupInvoice {
   })
   status: GroupInvoiceStatus;
 
-  @Column({ name: 'due_date', type: 'date' })
+  @Column({ type: 'date', name: 'due_date' })
   dueDate: string;
 
   @Column({
-    name: 'split_method',
     type: 'enum',
     enum: SplitMethod,
+    name: 'split_method',
     default: SplitMethod.EQUAL,
   })
   splitMethod: SplitMethod;
 
-  @Column({ type: 'text', nullable: true })
+  @Column('text', { nullable: true })
   description: string | null;
 
-  @Column({ name: 'reminder_enabled', type: 'boolean', default: false })
+  @Column('boolean', { name: 'reminder_enabled', default: false })
   reminderEnabled: boolean;
 
   @Column({
-    name: 'reminder_frequency',
     type: 'enum',
     enum: ReminderFrequency,
+    name: 'reminder_frequency',
     default: ReminderFrequency.NONE,
   })
   reminderFrequency: ReminderFrequency;
 
-  @Column({ name: 'next_remind_at', type: 'timestamptz', nullable: true })
+  @Column({ type: 'timestamptz', name: 'next_remind_at', nullable: true })
   nextRemindAt: Date | null;
 
-  @Column({ name: 'asset_id', type: 'uuid', nullable: true })
+  @Column('uuid', { name: 'asset_id', nullable: true })
   assetId: string | null;
 
   @ManyToOne(() => Asset, { nullable: true })
   @JoinColumn({ name: 'asset_id' })
-  asset: Asset | null;
+  asset?: Asset | null;
+
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
+  createdAt: Date;
+
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    name: 'updated_at',
+    default: () => 'now()',
+  })
+  updatedAt: Date;
 
   @OneToMany(() => GroupInvoiceShare, (s) => s.groupInvoice)
   shares: GroupInvoiceShare[];
-
-  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
-  updatedAt: Date;
 }
