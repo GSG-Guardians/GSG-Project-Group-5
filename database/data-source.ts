@@ -23,7 +23,7 @@ export const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',
   url: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
-  entities: [            
+  entities: [
     User,
     Asset,
     BalanceHistory,
@@ -38,10 +38,10 @@ export const dataSourceOptions: DataSourceOptions = {
     Notification,
     PasswordResetCode,
     Reward,
-    UserReward
+    UserReward,
   ],
   migrations: [join(__dirname, 'migrations', '*.{js,ts}')],
   synchronize: false,
 };
-const AppDataSource = new DataSource(dataSourceOptions)
+const AppDataSource = new DataSource(dataSourceOptions);
 export default AppDataSource;
