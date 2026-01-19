@@ -34,12 +34,21 @@ export class Asset {
   @Column('bigint', { name: 'size_bytes', nullable: true })
   sizeBytes: string | null;
 
-  @Column({ type: 'enum', enum: AssetOwnerType, name: 'owner_type', nullable: true })
+  @Column({
+    type: 'enum',
+    enum: AssetOwnerType,
+    name: 'owner_type',
+    nullable: true,
+  })
   ownerType: AssetOwnerType | null;
 
   @Column('uuid', { name: 'owner_id', nullable: true })
   ownerId: string | null;
 
-  @CreateDateColumn({ type: 'timestamptz', name: 'created_at', default: () => 'now()' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
   createdAt: Date;
 }

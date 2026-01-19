@@ -1,4 +1,11 @@
-import { Column, CreateDateColumn, Entity, Index, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { GroupInvoice } from './group-invoice.entities';
 import { User } from './user.entities';
 
@@ -30,6 +37,10 @@ export class GroupInvoiceShare {
   @Column({ type: 'timestamptz', name: 'paid_at', nullable: true })
   paidAt: Date | null;
 
-  @CreateDateColumn({ type: 'timestamptz', name: 'created_at', default: () => 'now()' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
   createdAt: Date;
 }

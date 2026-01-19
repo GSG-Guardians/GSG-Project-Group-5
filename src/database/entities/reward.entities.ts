@@ -1,4 +1,14 @@
-import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { RewardStatus } from '../enums';
 import { Asset } from './assets.entities';
 import { UserReward } from './user-rewards.entities';
@@ -30,10 +40,18 @@ export class Reward {
   @Column({ type: 'enum', enum: RewardStatus, default: RewardStatus.ACTIVE })
   status: RewardStatus;
 
-  @CreateDateColumn({ type: 'timestamptz', name: 'created_at', default: () => 'now()' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamptz', name: 'updated_at', default: () => 'now()' })
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    name: 'updated_at',
+    default: () => 'now()',
+  })
   updatedAt: Date;
 
   @OneToMany(() => UserReward, (ur) => ur.reward)

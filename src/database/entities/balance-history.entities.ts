@@ -1,4 +1,11 @@
-import { Column, CreateDateColumn, Entity, Index, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { BalanceTransactionType } from '../enums';
 import { User } from './user.entities';
 
@@ -40,6 +47,10 @@ export class BalanceHistory {
   @Column('text', { nullable: true })
   description: string | null;
 
-  @CreateDateColumn({ type: 'timestamptz', name: 'created_at', default: () => 'now()' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
   createdAt: Date;
 }

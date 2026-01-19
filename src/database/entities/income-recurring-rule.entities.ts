@@ -1,4 +1,11 @@
-import { Column, CreateDateColumn, Entity, Index, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { IncomeFrequency } from '../enums';
 import { Income } from './income.entities';
 
@@ -15,7 +22,11 @@ export class IncomeRecurringRule {
   @ManyToOne(() => Income, (i) => i.recurringRules, { onDelete: 'CASCADE' })
   income: Income;
 
-  @Column({ type: 'enum', enum: IncomeFrequency, default: IncomeFrequency.ONE_TIME })
+  @Column({
+    type: 'enum',
+    enum: IncomeFrequency,
+    default: IncomeFrequency.ONE_TIME,
+  })
   frequency: IncomeFrequency;
 
   @Column({ type: 'date', name: 'next_run_at' })
@@ -27,6 +38,10 @@ export class IncomeRecurringRule {
   @Column('boolean', { default: true })
   active: boolean;
 
-  @CreateDateColumn({ type: 'timestamptz', name: 'created_at', default: () => 'now()' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
   createdAt: Date;
 }

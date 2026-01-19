@@ -1,4 +1,13 @@
-import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { BillStatus, ReminderFrequency } from '../enums';
 import { User } from './user.entities';
 import { Asset } from './assets.entities';
@@ -39,7 +48,12 @@ export class Bill {
   @Column('boolean', { name: 'reminder_enabled', default: false })
   reminderEnabled: boolean;
 
-  @Column({ type: 'enum', enum: ReminderFrequency, name: 'reminder_frequency', default: ReminderFrequency.NONE })
+  @Column({
+    type: 'enum',
+    enum: ReminderFrequency,
+    name: 'reminder_frequency',
+    default: ReminderFrequency.NONE,
+  })
   reminderFrequency: ReminderFrequency;
 
   @Column({ type: 'timestamptz', name: 'next_remind_at', nullable: true })
@@ -55,9 +69,17 @@ export class Bill {
   @JoinColumn({ name: 'asset_id' })
   asset?: Asset | null;
 
-  @CreateDateColumn({ type: 'timestamptz', name: 'created_at', default: () => 'now()' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamptz', name: 'updated_at', default: () => 'now()' })
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    name: 'updated_at',
+    default: () => 'now()',
+  })
   updatedAt: Date;
 }

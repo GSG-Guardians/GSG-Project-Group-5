@@ -1,4 +1,11 @@
-import { Column, CreateDateColumn, Entity, Index, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { User } from './user.entities';
 
 @Entity({ name: 'password_reset_codes' })
@@ -26,6 +33,10 @@ export class PasswordResetCode {
   @Column('int', { name: 'attempt_count', default: 0 })
   attemptCount: number;
 
-  @CreateDateColumn({ type: 'timestamptz', name: 'created_at', default: () => 'now()' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
   createdAt: Date;
 }

@@ -23,7 +23,6 @@ import { GroupInvoiceShare } from './group-invoice-share.entities';
 import { Notification } from './notifications.entities';
 import { UserReward } from './user-rewards.entities';
 
-
 @Entity({ name: 'users' })
 @Index(['email'], { unique: true })
 @Index(['status'])
@@ -52,7 +51,12 @@ export class User {
   @Column('char', { name: 'default_currency', length: 3, default: 'USD' })
   defaultCurrency: string;
 
-  @Column('numeric', { name: 'current_balance', precision: 14, scale: 2, default: 0 })
+  @Column('numeric', {
+    name: 'current_balance',
+    precision: 14,
+    scale: 2,
+    default: 0,
+  })
   currentBalance: string;
 
   @Column('bigint', { default: 0 })
@@ -71,27 +75,40 @@ export class User {
   @Column('varchar', { name: 'provider_id', length: 255, nullable: true })
   providerId: string | null;
 
-  @CreateDateColumn({ type: 'timestamptz', name: 'created_at', default: () => 'now()' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamptz', name: 'updated_at', default: () => 'now()' })
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    name: 'updated_at',
+    default: () => 'now()',
+  })
   updatedAt: Date;
 
   // relations
   @OneToMany(() => Asset, (a) => a.user) assets: Asset[];
 
-  @OneToMany(() => EmailVerificationCode, (c) => c.user) emailCodes: EmailVerificationCode[];
-  @OneToMany(() => PasswordResetCode, (c) => c.user) resetCodes: PasswordResetCode[];
+  @OneToMany(() => EmailVerificationCode, (c) => c.user)
+  emailCodes: EmailVerificationCode[];
+  @OneToMany(() => PasswordResetCode, (c) => c.user)
+  resetCodes: PasswordResetCode[];
 
-  @OneToMany(() => BalanceHistory, (b) => b.user) balanceHistory: BalanceHistory[];
+  @OneToMany(() => BalanceHistory, (b) => b.user)
+  balanceHistory: BalanceHistory[];
 
   @OneToMany(() => Debt, (d) => d.user) debts: Debt[];
   @OneToMany(() => Bill, (b) => b.user) bills: Bill[];
   @OneToMany(() => Expense, (e) => e.user) expenses: Expense[];
   @OneToMany(() => Income, (i) => i.user) incomes: Income[];
 
-  @OneToMany(() => GroupInvoice, (gi) => gi.createdByUser) createdGroupInvoices: GroupInvoice[];
-  @OneToMany(() => GroupInvoiceShare, (s) => s.user) groupInvoiceShares: GroupInvoiceShare[];
+  @OneToMany(() => GroupInvoice, (gi) => gi.createdByUser)
+  createdGroupInvoices: GroupInvoice[];
+  @OneToMany(() => GroupInvoiceShare, (s) => s.user)
+  groupInvoiceShares: GroupInvoiceShare[];
 
   @OneToMany(() => Notification, (n) => n.user) notifications: Notification[];
 

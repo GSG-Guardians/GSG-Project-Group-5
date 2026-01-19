@@ -1,4 +1,11 @@
-import { Column, CreateDateColumn, Entity, Index, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { User } from './user.entities';
 import { Reward } from './reward.entities';
 
@@ -25,6 +32,10 @@ export class UserReward {
   @Column('int', { name: 'points_spent' })
   pointsSpent: number;
 
-  @CreateDateColumn({ type: 'timestamptz', name: 'claimed_at', default: () => 'now()' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'claimed_at',
+    default: () => 'now()',
+  })
   claimedAt: Date;
 }

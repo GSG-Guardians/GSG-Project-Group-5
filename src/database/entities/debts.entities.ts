@@ -1,4 +1,13 @@
-import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { DebtDirection, DebtStatus } from '../enums';
 import { User } from './user.entities';
 import { Asset } from './assets.entities';
@@ -52,9 +61,17 @@ export class Debt {
   @JoinColumn({ name: 'asset_id' })
   asset?: Asset | null;
 
-  @CreateDateColumn({ type: 'timestamptz', name: 'created_at', default: () => 'now()' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamptz', name: 'updated_at', default: () => 'now()' })
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    name: 'updated_at',
+    default: () => 'now()',
+  })
   updatedAt: Date;
 }

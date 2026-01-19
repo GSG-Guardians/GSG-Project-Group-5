@@ -1,4 +1,11 @@
-import { Column, CreateDateColumn, Entity, Index, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { NotificationType } from '../enums';
 import { User } from './user.entities';
 
@@ -35,7 +42,11 @@ export class Notification {
   @Column('jsonb', { nullable: true })
   data: Record<string, any> | null;
 
-  @CreateDateColumn({ type: 'timestamptz', name: 'sent_at', default: () => 'now()' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'sent_at',
+    default: () => 'now()',
+  })
   sentAt: Date;
 
   @Column('boolean', { name: 'is_read', default: false })
@@ -44,6 +55,10 @@ export class Notification {
   @Column({ type: 'timestamptz', name: 'read_at', nullable: true })
   readAt: Date | null;
 
-  @CreateDateColumn({ type: 'timestamptz', name: 'created_at', default: () => 'now()' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
   createdAt: Date;
 }

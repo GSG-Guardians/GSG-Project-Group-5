@@ -1,4 +1,14 @@
-import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { IncomeSource } from '../enums';
 import { User } from './user.entities';
 import { Asset } from './assets.entities';
@@ -37,10 +47,18 @@ export class Income {
   @JoinColumn({ name: 'asset_id' })
   asset?: Asset | null;
 
-  @CreateDateColumn({ type: 'timestamptz', name: 'created_at', default: () => 'now()' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'now()',
+  })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamptz', name: 'updated_at', default: () => 'now()' })
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    name: 'updated_at',
+    default: () => 'now()',
+  })
   updatedAt: Date;
 
   @OneToMany(() => IncomeRecurringRule, (r) => r.income)
