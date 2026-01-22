@@ -103,3 +103,4 @@ export enum RewardStatus {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
 }
+

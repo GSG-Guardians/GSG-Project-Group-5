@@ -5,17 +5,18 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { DebtDirection, DebtStatus } from '../enums';
 import { User } from './user.entities';
 import { Asset } from './assets.entities';
+import { Reminder } from './reminders.entities';
 
 @Entity({ name: 'debts' })
 @Index(['userId', 'status'])
 @Index(['userId', 'dueDate'])
-@Index(['reminderEnabled', 'remindAt'])
 @Index(['assetId'])
 export class Debt {
   @PrimaryGeneratedColumn('uuid')
@@ -53,6 +54,9 @@ export class Debt {
 
   @Column({ type: 'timestamptz', name: 'remind_at', nullable: true })
   remindAt: Date | null;
+
+  @OneToOne(() => Reminder, (reminder) => reminder.debt, { nullable: true })
+  reminder: Reminder | null;
 
   @Column('uuid', { name: 'asset_id', nullable: true })
   assetId: string | null;

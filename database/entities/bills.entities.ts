@@ -5,17 +5,18 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { BillStatus, ReminderFrequency } from '../enums';
 import { User } from './user.entities';
 import { Asset } from './assets.entities';
+import { Reminder } from './reminders.entities';
 
 @Entity({ name: 'bills' })
 @Index(['userId', 'dueDate'])
 @Index(['userId', 'status'])
-@Index(['reminderEnabled', 'nextRemindAt'])
 @Index(['assetId'])
 export class Bill {
   @PrimaryGeneratedColumn('uuid')
@@ -45,16 +46,8 @@ export class Bill {
   @Column('text', { nullable: true })
   description: string | null;
 
-  @Column('boolean', { name: 'reminder_enabled', default: false })
-  reminderEnabled: boolean;
-
-  @Column({
-    type: 'enum',
-    enum: ReminderFrequency,
-    name: 'reminder_frequency',
-    default: ReminderFrequency.NONE,
-  })
-  reminderFrequency: ReminderFrequency;
+  @OneToOne(() => Reminder, (reminder) => reminder.bill, { nullable: true })
+  reminder: Reminder | null;
 
   @Column({ type: 'timestamptz', name: 'next_remind_at', nullable: true })
   nextRemindAt: Date | null;

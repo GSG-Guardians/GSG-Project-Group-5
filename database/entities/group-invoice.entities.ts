@@ -6,6 +6,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -13,11 +14,11 @@ import { GroupInvoiceStatus, ReminderFrequency, SplitMethod } from '../enums';
 import { User } from './user.entities';
 import { Asset } from './assets.entities';
 import { GroupInvoiceShare } from './group-invoice-share.entities';
+import { Reminder } from './reminders.entities';
 
 @Entity({ name: 'group_invoices' })
 @Index(['createdByUserId', 'dueDate'])
 @Index(['createdByUserId', 'status'])
-@Index(['reminderEnabled', 'nextRemindAt'])
 @Index(['assetId'])
 export class GroupInvoice {
   @PrimaryGeneratedColumn('uuid')
@@ -60,16 +61,8 @@ export class GroupInvoice {
   @Column('text', { nullable: true })
   description: string | null;
 
-  @Column('boolean', { name: 'reminder_enabled', default: false })
-  reminderEnabled: boolean;
-
-  @Column({
-    type: 'enum',
-    enum: ReminderFrequency,
-    name: 'reminder_frequency',
-    default: ReminderFrequency.NONE,
-  })
-  reminderFrequency: ReminderFrequency;
+  @OneToOne(() => Reminder, (reminder) => reminder.groupInvoice, { nullable: true })
+  reminder: Reminder | null;
 
   @Column({ type: 'timestamptz', name: 'next_remind_at', nullable: true })
   nextRemindAt: Date | null;
