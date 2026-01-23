@@ -54,4 +54,16 @@ export const DB_ERROR_MAP: Record<
     status: HttpStatus.BAD_REQUEST,
     message: 'Invalid data format',
   },
+  [PostgresErrorCode.CHECK_VIOLATION]: {
+    status: HttpStatus.BAD_REQUEST,
+    message: 'Validation rule failed',
+  },
+  [PostgresErrorCode.STRING_DATA_RIGHT_TRUNCATION]: {
+    status: HttpStatus.BAD_REQUEST,
+    message: 'Value is too long',
+  },
+  [PostgresErrorCode.DEADLOCK_DETECTED]: {
+    status: HttpStatus.CONFLICT,
+    message: 'Transaction conflict, please retry',
+  },
 };

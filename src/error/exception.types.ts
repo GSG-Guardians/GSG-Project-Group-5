@@ -1,8 +1,7 @@
-export type TPostgresDriverError = {
-  code?: string; // SQLSTATE (e.g. 23505)
+export interface IPostgresDriverError extends Error {
+  code: string;
   detail?: string;
   table?: string;
   column?: string;
   constraint?: string;
-  schema?: string;
-};
+}

@@ -6,7 +6,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { ApiErrorResponse } from 'src/types/api';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import {
   EntityMetadataNotFoundError,
   QueryFailedError,
@@ -15,6 +15,7 @@ import {
 import { buildApiErrorResponse, parseUniqueDetail } from './exception.utils';
 import { DB_ERROR_MAP } from './exception.utils';
 import { PostgresErrorCode } from './exception.constants';
+import { IPostgresDriverError } from './exception.types';
 
 @Catch(
   QueryFailedError,
@@ -24,7 +25,7 @@ import { PostgresErrorCode } from './exception.constants';
 export class TypeOrmExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger('DatabaseException');
 
-  catch(exception: any, host: ArgumentsHost) {
+  catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
@@ -45,7 +46,7 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
         defaultError.message = exception.message;
       }
     } else if (exception instanceof QueryFailedError) {
-      const driverErr = exception.driverError || {};
+      const driverErr = exception.driverError as IPostgresDriverError;
       const code = driverErr.code;
 
       const mappedError = DB_ERROR_MAP[code];
