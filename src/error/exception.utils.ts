@@ -1,4 +1,6 @@
 import { ApiErrorResponse } from 'src/types/api';
+import { PostgresErrorCode } from './exception.constants';
+import { HttpStatus } from '@nestjs/common';
 
 export function buildApiErrorResponse(args: {
   statusCode: number;
@@ -31,3 +33,10 @@ export function parseUniqueDetail(detail?: string) {
     value,
   };
 }
+
+export const DB_ERROR_MAP: Record<string, { status: HttpStatus; message: string }> = {
+  [PostgresErrorCode.UNIQUE_VIOLATION]: { status: HttpStatus.CONFLICT, message: 'Resource already exists' },
+  [PostgresErrorCode.FOREIGN_KEY_VIOLATION]: { status: HttpStatus.CONFLICT, message: 'Invalid relation reference' },
+  [PostgresErrorCode.NOT_NULL_VIOLATION]: { status: HttpStatus.BAD_REQUEST, message: 'Missing required fields' },
+  [PostgresErrorCode.INVALID_TEXT_REPRESENTATION]: { status: HttpStatus.BAD_REQUEST, message: 'Invalid data format' },
+};
