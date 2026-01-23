@@ -34,9 +34,24 @@ export function parseUniqueDetail(detail?: string) {
   };
 }
 
-export const DB_ERROR_MAP: Record<string, { status: HttpStatus; message: string }> = {
-  [PostgresErrorCode.UNIQUE_VIOLATION]: { status: HttpStatus.CONFLICT, message: 'Resource already exists' },
-  [PostgresErrorCode.FOREIGN_KEY_VIOLATION]: { status: HttpStatus.CONFLICT, message: 'Invalid relation reference' },
-  [PostgresErrorCode.NOT_NULL_VIOLATION]: { status: HttpStatus.BAD_REQUEST, message: 'Missing required fields' },
-  [PostgresErrorCode.INVALID_TEXT_REPRESENTATION]: { status: HttpStatus.BAD_REQUEST, message: 'Invalid data format' },
+export const DB_ERROR_MAP: Record<
+  string,
+  { status: HttpStatus; message: string }
+> = {
+  [PostgresErrorCode.UNIQUE_VIOLATION]: {
+    status: HttpStatus.CONFLICT,
+    message: 'Resource already exists',
+  },
+  [PostgresErrorCode.FOREIGN_KEY_VIOLATION]: {
+    status: HttpStatus.CONFLICT,
+    message: 'Invalid relation reference',
+  },
+  [PostgresErrorCode.NOT_NULL_VIOLATION]: {
+    status: HttpStatus.BAD_REQUEST,
+    message: 'Missing required fields',
+  },
+  [PostgresErrorCode.INVALID_TEXT_REPRESENTATION]: {
+    status: HttpStatus.BAD_REQUEST,
+    message: 'Invalid data format',
+  },
 };
