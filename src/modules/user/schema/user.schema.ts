@@ -19,9 +19,9 @@ const userBaseObjectSchema = z.object({
   providerId: z.string().max(255).nullable().optional(),
 
   defaultCurrencyId: z.string().uuid().nullable().optional(),
+  avatarAssetId: z.uuid().optional(),
 });
 
-// create schema (with refinement)
 export const userValidationSchema = userBaseObjectSchema.superRefine(
   (val, ctx) => {
     const provider = val.provider ?? 'LOCAL';
@@ -35,17 +35,13 @@ export const userValidationSchema = userBaseObjectSchema.superRefine(
   },
 ) satisfies ZodType<CreateUserDto>;
 
-// update schema
+
 export const updateUserValidationSchema = userBaseObjectSchema
   .pick({
     fullName: true,
     email: true,
     phone: true,
     defaultCurrencyId: true,
-    provider: true,
-    providerId: true,
+    avatarAssetId: true,
   })
-  .partial()
-  .extend({
-    avatarAssetId: z.string().uuid().nullable().optional(),
-  }) satisfies ZodType<UpdateUserDto>;
+  .partial() satisfies ZodType<UpdateUserDto>;
