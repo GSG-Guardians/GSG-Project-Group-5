@@ -1,4 +1,9 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
@@ -8,7 +13,10 @@ import { Currency } from '../../../database/entities/currency.entities';
 
 import { CreateUserDto, UpdateUserDto } from './dto/request.dto';
 import { UserResponseDto } from './dto/response.dto';
-import { IPaginationQuery, IPaginationResult } from '../../types/pagination.types';
+import {
+  IPaginationQuery,
+  IPaginationResult,
+} from '../../types/pagination.types';
 
 import { toUserResponse } from './mappers/user.mapper';
 
@@ -18,7 +26,7 @@ export class UserService {
     @InjectRepository(User) private readonly userRepo: Repository<User>,
     @InjectRepository(Currency)
     private readonly currencyRepo: Repository<Currency>,
-  ) { }
+  ) {}
 
   async create(dto: CreateUserDto): Promise<UserResponseDto> {
     const email = dto.email.toLowerCase();
@@ -53,7 +61,7 @@ export class UserService {
       defaultCurrencyId: dto.defaultCurrencyId ?? null,
       role: dto.role ?? undefined,
       status: dto.status ?? undefined,
-    })
+    });
 
     const saved = await this.userRepo.save(user);
     return toUserResponse(saved);
@@ -102,7 +110,7 @@ export class UserService {
       }
     }
 
-    // phone change 
+    // phone change
     if (dto.phone !== undefined) {
       if (dto.phone) {
         const phoneExists = await this.userRepo.findOne({
@@ -118,7 +126,8 @@ export class UserService {
         const currency = await this.currencyRepo.findOne({
           where: { id: dto.defaultCurrencyId },
         });
-        if (!currency) throw new BadRequestException('Invalid defaultCurrencyId');
+        if (!currency)
+          throw new BadRequestException('Invalid defaultCurrencyId');
       }
       user.defaultCurrencyId = dto.defaultCurrencyId ?? null;
     }
