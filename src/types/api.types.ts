@@ -23,11 +23,14 @@ export type ApiErrorResponse = {
   fields?: { field: string; message: string }[];
 };
 
-import { IPaginationResult } from "./pagination.types";
+import { IPaginationResult } from './pagination.types';
 
 export interface IGenericResponse<T> {
   message?: string;
   data: T;
 }
 
-export type TReturnedResponse<T> = IPaginationResult<T> | IGenericResponse<T> | T;
+export type TReturnedResponse<T> =
+  | IPaginationResult<T>
+  | IGenericResponse<T>
+  | T;
