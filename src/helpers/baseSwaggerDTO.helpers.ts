@@ -4,7 +4,7 @@ export class MetaPaginationSwaggerDto {
   @ApiProperty({ example: 1 }) page: number;
   @ApiProperty({ example: 10 }) limit: number;
   @ApiProperty({ example: 5 }) totalPages: number;
-  @ApiProperty({ example: 47 }) totalItems: number;
+  @ApiProperty({ example: 47 }) total: number;
 }
 
 export class SuccessOneSwaggerDto<T> {
