@@ -3,7 +3,7 @@ import z, { ZodType } from 'zod';
 import { CreateUserDto, UpdateUserDto } from '../dto/request.dto';
 
 // base schema object
-const userBaseObjectSchema = z.object({
+export const userBaseObjectSchema = z.object({
   fullName: z.string().min(2).max(120),
   email: z.string().email().toLowerCase(),
   phone: z
@@ -18,7 +18,7 @@ const userBaseObjectSchema = z.object({
   provider: z.enum(['LOCAL', 'GOOGLE', 'FACEBOOK']).optional(),
   providerId: z.string().max(255).nullable().optional(),
 
-  defaultCurrencyId: z.string().uuid().nullable().optional(),
+  defaultCurrencyId: z.string().uuid().optional(),
   avatarAssetId: z.uuid().optional(),
 });
 

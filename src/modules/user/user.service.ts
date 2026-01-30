@@ -35,11 +35,21 @@ export class UserService {
     const emailExists = await this.userRepo.findOne({ where: { email } });
     if (emailExists) throw new ConflictException('Email already exists');
 
-    if (dto.defaultCurrencyId) {
+    let currencyId = dto.defaultCurrencyId;
+
+    if (currencyId) {
       const currency = await this.currencyRepo.findOne({
-        where: { id: dto.defaultCurrencyId },
+        where: { id: currencyId },
       });
       if (!currency) throw new BadRequestException('Invalid defaultCurrencyId');
+    } else {
+      const usdCurrency = await this.currencyRepo.findOne({
+        where: { code: 'USD' },
+      });
+      if (!usdCurrency) {
+        throw new BadRequestException('Default currency USD not found');
+      }
+      currencyId = usdCurrency.id;
     }
 
     const provider = dto.provider ?? 'LOCAL';
@@ -54,7 +64,7 @@ export class UserService {
       passwordHash,
       provider,
       providerId: dto.providerId ?? null,
-      defaultCurrencyId: dto.defaultCurrencyId ?? null,
+      defaultCurrencyId: currencyId,
       role: dto.role ?? undefined,
       status: dto.status ?? undefined,
     });

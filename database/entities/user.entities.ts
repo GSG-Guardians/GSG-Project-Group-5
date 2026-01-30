@@ -54,8 +54,8 @@ export class User {
   @Column({ type: 'enum', enum: UserStatus, default: UserStatus.PENDING })
   status: UserStatus;
 
-  @Column('uuid', { name: 'default_currency_id', nullable: true })
-  defaultCurrencyId: string | null;
+  @Column('uuid', { name: 'default_currency_id', nullable: false })
+  defaultCurrencyId: string;
 
   @ManyToOne(() => Currency)
   @JoinColumn({ name: 'default_currency_id' })

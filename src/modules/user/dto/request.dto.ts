@@ -7,7 +7,7 @@ export type CreateUserDto = {
   password?: string;
   provider?: 'LOCAL' | 'GOOGLE' | 'FACEBOOK';
   providerId?: string | null;
-  defaultCurrencyId?: string | null;
+  defaultCurrencyId?: string;
   role?: UserRole;
   status?: UserStatus;
   avatarAssetId?: string;

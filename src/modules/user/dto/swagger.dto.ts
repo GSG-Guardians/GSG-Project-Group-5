@@ -15,8 +15,8 @@ export class CreateUserRequestSwaggerDto implements CreateUserDto {
   @ApiPropertyOptional({ example: '+970592497292', nullable: true })
   phone?: string | null;
 
-  @ApiPropertyOptional({ format: 'uuid', nullable: true })
-  defaultCurrencyId?: string | null;
+  @ApiPropertyOptional({ format: 'uuid' })
+  defaultCurrencyId: string;
 
   @ApiPropertyOptional({ example: 'LOCAL' })
   provider?: 'LOCAL' | 'GOOGLE' | 'FACEBOOK';
@@ -52,7 +52,7 @@ export class UpdateUserRequestSwaggerDto implements UpdateUserDto {
   phone?: string | null;
 
   @ApiPropertyOptional({ format: 'uuid', nullable: true })
-  defaultCurrencyId?: string | null;
+  defaultCurrencyId: string;
 
   @ApiPropertyOptional({ format: 'uuid', nullable: true })
   avatarAssetId?: string;
@@ -79,8 +79,8 @@ export class UserResponseSwaggerDto implements UserResponseDto {
   @ApiProperty({ example: 'ACTIVE' })
   status: UserStatus;
 
-  @ApiProperty({ format: 'uuid', nullable: true })
-  defaultCurrencyId: string | null;
+  @ApiProperty({ format: 'uuid' })
+  defaultCurrencyId: string;
 
   @ApiProperty({ example: '0.00' })
   currentBalance: string;
