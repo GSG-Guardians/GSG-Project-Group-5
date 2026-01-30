@@ -1,29 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-import { IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
+import { createZodDto } from 'nestjs-zod';
+import { z } from 'zod';
 
-export class UpdateBillDto {
-  @IsString()
-  @IsOptional()
-  name?: string;
+export const UpdateBillSchema = z.object({
+  name: z.string().min(1).optional(),
+  amount: z.number().positive().optional(),
+  date: z.string().min(1).optional(),
+  currencyId: z.string().uuid().optional(),
+  description: z.string().nullable().optional(),
+  assetId: z.string().uuid().nullable().optional(),
+});
 
-  @IsNumber()
-  @IsOptional()
-  amount?: number;
-
-  @IsString()
-  @IsOptional()
-  date?: string;
-
-  @IsUUID()
-  @IsOptional()
-  currencyId?: string;
-
-  @IsString()
-  @IsOptional()
-  description?: string | null;
-
-  @IsUUID()
-  @IsOptional()
-  assetId?: string | null;
-}
-/* eslint-enable @typescript-eslint/no-unsafe-call */
+export class UpdateBillDto extends createZodDto(UpdateBillSchema) { }

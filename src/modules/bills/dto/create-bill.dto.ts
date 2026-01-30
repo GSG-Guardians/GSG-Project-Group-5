@@ -1,42 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-import {
-  IsIn,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-  IsUUID,
-} from 'class-validator';
+import { createZodDto } from 'nestjs-zod';
+import { z } from 'zod';
 
-export class CreateBillDto {
-  @IsString()
-  @IsNotEmpty()
-  name: string;
+export const CreateBillSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  amount: z.number().positive('Amount must be positive'),
+  date: z.string().min(1, 'Date is required'),
+  type: z.enum(['individual', 'group']),
+  userId: z.string().uuid().optional(),
+  currencyId: z.string().uuid().optional(),
+  description: z.string().nullable().optional(),
+  assetId: z.string().uuid().nullable().optional(),
+});
 
-  @IsNumber()
-  amount: number;
-
-  @IsString()
-  @IsNotEmpty()
-  date: string;
-
-  @IsIn(['individual', 'group'])
-  type: 'individual' | 'group';
-
-  @IsUUID()
-  @IsOptional()
-  userId?: string;
-
-  @IsUUID()
-  @IsOptional()
-  currencyId?: string;
-
-  @IsString()
-  @IsOptional()
-  description?: string | null;
-
-  @IsUUID()
-  @IsOptional()
-  assetId?: string | null;
-}
-/* eslint-enable @typescript-eslint/no-unsafe-call */
+export class CreateBillDto extends createZodDto(CreateBillSchema) { }

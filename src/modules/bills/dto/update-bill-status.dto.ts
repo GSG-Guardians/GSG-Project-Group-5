@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-import { IsIn } from 'class-validator';
+import { createZodDto } from 'nestjs-zod';
+import { z } from 'zod';
 
-export class UpdateBillStatusDto {
-    @IsIn(['paid', 'unpaid'])
-    status: 'paid' | 'unpaid';
-}
-/* eslint-enable @typescript-eslint/no-unsafe-call */
+export const UpdateBillStatusSchema = z.object({
+    status: z.enum(['paid', 'unpaid']),
+});
+
+export class UpdateBillStatusDto extends createZodDto(UpdateBillStatusSchema) { }
