@@ -30,7 +30,6 @@ export class SignUpRequestSwaggerDto implements TSignUpRequest {
 
   @ApiPropertyOptional({ example: '+213654321098' })
   phone: string;
-
 }
 
 export class AuthResponseSwaggerDto {

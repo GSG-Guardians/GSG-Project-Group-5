@@ -27,7 +27,7 @@ export class UserService {
     @InjectRepository(Currency)
     private readonly currencyRepo: Repository<Currency>,
     private readonly databaseService: DatabaseService,
-  ) { }
+  ) {}
 
   async create(dto: CreateUserDto): Promise<UserResponseDto> {
     const email = dto.email.toLowerCase();

@@ -4,4 +4,3 @@ export type TAuthResponse = {
   user: UserResponseDto;
   token: string;
 };
-
