@@ -8,7 +8,7 @@ import {
   Body,
   Query,
 } from '@nestjs/common';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 
 import { UserService } from './user.service';
 import type { CreateUserDto, UpdateUserDto } from './dto/request.dto';
@@ -30,7 +30,7 @@ import type { IPaginationQuery } from '../../types/pagination.types';
 import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
 
 @ApiTags('Users')
-@Controller('users')
+@Controller('v1/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -47,6 +47,20 @@ export class UserController {
   @ApiSuccessPaginated(UserResponseSwaggerDto)
   findAll(@Query() query: IPaginationQuery) {
     return this.userService.findAll(query);
+  }
+
+  @Get('search')
+  @ApiOperation({
+    summary: 'Search users',
+    description: 'Search users to add participants for group bills',
+  })
+  @ApiQuery({
+    name: 'name',
+    required: true,
+    description: 'Search query (name or email)',
+  })
+  searchUsers(@Query('name') name: string) {
+    return this.userService.searchUsers(name);
   }
 
   @Get(':id')
