@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 
 import { User } from '../../../database/entities/user.entities';
 import { Currency } from '../../../database/entities/currency.entities';
@@ -144,5 +144,19 @@ export class UserService {
 
     await this.userRepo.delete({ id });
     return { data: null, message: 'User deleted' };
+  }
+
+  async searchUsers(name: string) {
+    if (!name || name.trim().length === 0) {
+      return [];
+    }
+
+    const users = await this.userRepo.find({
+      where: [{ fullName: Like(`%${name}%`) }, { email: Like(`%${name}%`) }],
+      select: ['id', 'fullName', 'email'],
+      take: 20,
+    });
+
+    return users;
   }
 }
