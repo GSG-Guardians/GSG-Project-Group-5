@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
 import { FinancialInsight } from '../entities/financial-insight.entities';
-import { BudgetCategory } from '../enums/budget-category.enum';
+import { BudgetCategory } from '../enums';
 
 export async function seedFinancialInsights(
   dataSource: DataSource,
@@ -50,8 +50,8 @@ export async function seedFinancialInsights(
       insight_type: 'RECOMMENDATION',
       title: 'Budget Optimization',
       message:
-        'Consider increasing your Healthcare budget. You have consistently spent more than allocated.',
-      category: BudgetCategory.HEALTHCARE,
+        'Consider increasing your Health budget. You have consistently spent more than allocated.',
+      category: BudgetCategory.HEALTH,
       period: 'quarterly',
       is_read: true,
       created_at: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000),
@@ -72,8 +72,8 @@ export async function seedFinancialInsights(
       insight_type: 'RECOMMENDATION',
       title: 'Great Progress!',
       message:
-        'You are within budget for Transportation this month. Keep up the good work!',
-      category: BudgetCategory.TRANSPORTATION,
+        'You are within budget for Transport this month. Keep up the good work!',
+      category: BudgetCategory.TRANSPORT,
       period: 'monthly',
       is_read: false,
       created_at: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000),
@@ -81,10 +81,10 @@ export async function seedFinancialInsights(
     {
       user_id: 'temp-user-id',
       insight_type: 'ALERT',
-      title: 'Utilities Near Limit',
+      title: 'Others Category Near Limit',
       message:
-        'You have spent 98% of your Utilities budget. Consider monitoring usage.',
-      category: BudgetCategory.UTILITIES,
+        'You have spent 98% of your Others budget. Consider monitoring usage.',
+      category: BudgetCategory.OTHERS,
       period: 'monthly',
       is_read: true,
       created_at: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),

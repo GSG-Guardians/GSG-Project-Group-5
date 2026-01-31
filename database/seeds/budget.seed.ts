@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
 import { Budget } from '../entities/budget.entities';
-import { BudgetCategory } from '../enums/budget-category.enum';
+import { BudgetCategory } from '../enums';
 
 export async function seedBudgets(dataSource: DataSource): Promise<void> {
   const budgetRepo = dataSource.getRepository(Budget);
@@ -27,7 +27,7 @@ export async function seedBudgets(dataSource: DataSource): Promise<void> {
     },
     {
       user_id: 'temp-user-id',
-      category: BudgetCategory.TRANSPORTATION,
+      category: BudgetCategory.TRANSPORT,
       allocated_amount: 300,
       spent_amount: 180.75,
       start_date: currentMonth,
@@ -47,7 +47,7 @@ export async function seedBudgets(dataSource: DataSource): Promise<void> {
     },
     {
       user_id: 'temp-user-id',
-      category: BudgetCategory.HEALTHCARE,
+      category: BudgetCategory.HEALTH,
       allocated_amount: 400,
       spent_amount: 120.0,
       start_date: currentMonth,
@@ -67,22 +67,12 @@ export async function seedBudgets(dataSource: DataSource): Promise<void> {
     },
     {
       user_id: 'temp-user-id',
-      category: BudgetCategory.UTILITIES,
+      category: BudgetCategory.OTHERS,
       allocated_amount: 250,
       spent_amount: 245.0,
       start_date: currentMonth,
       end_date: new Date(now.getFullYear(), now.getMonth() + 1, 0),
-      notes: 'Electricity, water, internet',
-      is_active: true,
-    },
-    {
-      user_id: 'temp-user-id',
-      category: BudgetCategory.EDUCATION,
-      allocated_amount: 600,
-      spent_amount: 450.0,
-      start_date: currentMonth,
-      end_date: new Date(now.getFullYear(), now.getMonth() + 1, 0),
-      notes: 'Online courses and books',
+      notes: 'Utilities and miscellaneous',
       is_active: true,
     },
 
@@ -99,7 +89,7 @@ export async function seedBudgets(dataSource: DataSource): Promise<void> {
     },
     {
       user_id: 'temp-user-id',
-      category: BudgetCategory.TRANSPORTATION,
+      category: BudgetCategory.TRANSPORT,
       allocated_amount: 320,
       spent_amount: 0,
       start_date: nextMonth,
