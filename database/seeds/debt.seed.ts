@@ -20,5 +20,7 @@ export async function seedDebts(dataSource: DataSource): Promise<void> {
   console.log(
     '⚠️  Debt seed skipped - requires currency UUIDs to be present in database',
   );
-  console.log('   Run currency seed first, then update debt seed with actual UUIDs');
+  console.log(
+    '   Run currency seed first, then update debt seed with actual UUIDs',
+  );
 }

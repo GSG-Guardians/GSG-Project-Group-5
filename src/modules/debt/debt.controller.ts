@@ -10,18 +10,29 @@ import {
   Req,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
+import type { Request } from 'express';
 
 import { DebtService } from './debt.service';
-import { CreateDebtDto, UpdateDebtDto, FilterDebtDto } from './dto/request.dto';
-import { DebtResponseDto } from './dto/response.dto';
-import { ZodValidationPipe } from '../../../pipes/zod-validation.pipe';
-import { debtValidationSchema } from './schema/debt.validation.schema';
+import type {
+  CreateDebtDto,
+  UpdateDebtDto,
+  FilterDebtDto,
+} from './dto/request.dto';
 import {
-  IPaginationQuery,
-  IPaginationResult,
-} from '../../types/pagination.types';
-import { ApiSuccess } from '../../../decorators/api-success.decorator';
+  CreateDebtRequestSwaggerDto,
+  UpdateDebtRequestSwaggerDto,
+  DebtResponseSwaggerDto,
+} from './dto/swagger.dto';
+import {
+  debtValidationSchema,
+  updateDebtValidationSchema,
+} from './schema/debt.schema';
+import {
+  ApiSuccess,
+  ApiSuccessPaginated,
+} from '../../helpers/swaggerDTOWrapper.helpers';
+import type { IPaginationQuery } from '../../types/pagination.types';
+import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
 
 @ApiTags('Debts')
 @Controller('debts')
@@ -30,61 +41,58 @@ export class DebtController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new debt' })
-  @ApiSuccess(DebtResponseDto, { status: 201 })
+  @ApiSuccess(DebtResponseSwaggerDto)
   async create(
     @Body(new ZodValidationPipe(debtValidationSchema)) dto: CreateDebtDto,
     @Req() req: Request,
-  ): Promise<DebtResponseDto> {
-    const userId = (req.user as any)?.userId || 'temp-user-id';
+  ) {
+    const userId = req.user?.id || 'temp-user-id';
     return this.debtService.create(userId, dto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all debts with pagination' })
-  @ApiSuccess(DebtResponseDto, { isArray: true })
+  @ApiSuccessPaginated(DebtResponseSwaggerDto)
   async findAll(
     @Query() query: IPaginationQuery,
     @Query() filter: FilterDebtDto,
     @Req() req: Request,
-  ): Promise<IPaginationResult<DebtResponseDto>> {
-    const userId = (req.user as any)?.userId || 'temp-user-id';
+  ) {
+    const userId = req.user?.id || 'temp-user-id';
     return this.debtService.findAll(userId, query, filter);
   }
 
   @Get('summary')
   @ApiOperation({ summary: 'Get debt summary' })
   async getSummary(@Req() req: Request) {
-    const userId = (req.user as any)?.userId || 'temp-user-id';
+    const userId = req.user?.id || 'temp-user-id';
     return this.debtService.getDebtSummary(userId);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a debt by ID' })
-  @ApiSuccess(DebtResponseDto)
-  async findOne(
-    @Param('id') id: string,
-    @Req() req: Request,
-  ): Promise<DebtResponseDto> {
+  @ApiSuccess(DebtResponseSwaggerDto)
+  async findOne(@Param('id') id: string, @Req() req: Request) {
     const userId = (req.user as any)?.userId || 'temp-user-id';
     return this.debtService.findOne(id, userId);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a debt' })
-  @ApiSuccess(DebtResponseDto)
+  @ApiSuccess(DebtResponseSwaggerDto)
   async update(
     @Param('id') id: string,
-    @Body() dto: UpdateDebtDto,
+    @Body(new ZodValidationPipe(updateDebtValidationSchema)) dto: UpdateDebtDto,
     @Req() req: Request,
-  ): Promise<DebtResponseDto> {
-    const userId = (req.user as any)?.userId || 'temp-user-id';
+  ) {
+    const userId = req.user?.id || 'temp-user-id';
     return this.debtService.update(id, userId, dto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a debt' })
   async remove(@Param('id') id: string, @Req() req: Request) {
-    const userId = (req.user as any)?.userId || 'temp-user-id';
+    const userId = req.user?.id || 'temp-user-id';
     return this.debtService.remove(id, userId);
   }
 }

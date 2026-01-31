@@ -9,15 +9,15 @@ import {
   Req,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
+import type { Request } from 'express';
 
 import { FinancialReportService } from './financial-report.service';
-import { GetFinancialReportDto } from './dto/request.dto';
-import { FinancialReportResponseDto } from './dto/response.dto';
-import { ZodValidationPipe } from '../../../pipes/zod-validation.pipe';
-import { financialReportValidationSchema } from './schema/financial-report.validation.schema';
-import { ApiSuccess } from '../../../decorators/api-success.decorator';
-import { BudgetCategory } from '../../../database/enums/budget-category.enum';
+import type { GetFinancialReportDto } from './dto/request.dto';
+import { FinancialReportResponseSwaggerDto } from './dto/swagger.dto';
+import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
+import { getFinancialReportValidationSchema } from './schema/financial-report.schema';
+import { ApiSuccess } from '../../helpers/swaggerDTOWrapper.helpers';
+import { BudgetCategory } from '../../../database/enums';
 
 @ApiTags('Financial Reports')
 @Controller('financial-reports')
@@ -28,13 +28,13 @@ export class FinancialReportController {
 
   @Get()
   @ApiOperation({ summary: 'Get financial report for a period' })
-  @ApiSuccess(FinancialReportResponseDto)
+  @ApiSuccess(FinancialReportResponseSwaggerDto)
   async getReport(
-    @Query(new ZodValidationPipe(financialReportValidationSchema))
+    @Query(new ZodValidationPipe(getFinancialReportValidationSchema))
     dto: GetFinancialReportDto,
     @Req() req: Request,
-  ): Promise<FinancialReportResponseDto> {
-    const userId = (req.user as any)?.userId || 'temp-user-id';
+  ) {
+    const userId = req.user?.id || 'temp-user-id';
     return this.financialReportService.getFinancialReport(userId, dto);
   }
 
@@ -51,14 +51,14 @@ export class FinancialReportController {
     },
     @Req() req: Request,
   ) {
-    const userId = (req.user as any)?.userId || 'temp-user-id';
+    const userId = req.user?.id || 'temp-user-id';
     return this.financialReportService.createInsight(userId, data);
   }
 
   @Patch('insights/:id/read')
   @ApiOperation({ summary: 'Mark an insight as read' })
   async markInsightAsRead(@Param('id') id: string, @Req() req: Request) {
-    const userId = (req.user as any)?.userId || 'temp-user-id';
+    const userId = req.user?.id || 'temp-user-id';
     return this.financialReportService.markInsightAsRead(id, userId);
   }
 }
