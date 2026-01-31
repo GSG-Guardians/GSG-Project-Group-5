@@ -9,8 +9,7 @@ import { Repository, Between } from 'typeorm';
 import { Debt } from '../../../database/entities/debts.entities';
 import { Currency } from '../../../database/entities/currency.entities';
 import { DatabaseService } from '../database/database.service';
-import { DebtDirection } from '../../../database/enums/debt-direction.enum';
-import { DebtStatus } from '../../../database/enums/debt-status.enum';
+import { DebtDirection, DebtStatus } from '../../../database/enums';
 
 import { CreateDebtDto, UpdateDebtDto, FilterDebtDto } from './dto/request.dto';
 import { DebtResponseDto } from './dto/response.dto';
@@ -50,7 +49,6 @@ export class DebtService {
       currencyId: dto.currencyId,
       dueDate: dto.dueDate,
       description: dto.description ?? null,
-      status: dto.status,
       reminderEnabled: dto.reminderEnabled ?? false,
       remindAt: dto.remindAt ?? null,
       assetId: dto.assetId ?? null,

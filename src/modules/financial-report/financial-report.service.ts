@@ -5,8 +5,7 @@ import { Repository, Between, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
 import { Budget } from '../../../database/entities/budget.entities';
 import { Debt } from '../../../database/entities/debts.entities';
 import { FinancialInsight } from '../../../database/entities/financial-insight.entities';
-import { BudgetCategory } from '../../../database/enums/budget-category.enum';
-import { DebtDirection } from '../../../database/enums/debt-direction.enum';
+import { BudgetCategory, DebtDirection } from '../../../database/enums';
 
 import { GetFinancialReportDto } from './dto/request.dto';
 import { FinancialReportResponseDto } from './dto/response.dto';

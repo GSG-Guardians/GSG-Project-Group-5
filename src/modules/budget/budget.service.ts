@@ -44,7 +44,7 @@ export class BudgetService {
       spent_amount: 0,
       start_date: dto.startDate,
       end_date: dto.endDate,
-      notes: dto.notes ?? null,
+      notes: dto.description ?? null,
       is_active: true,
     });
 
@@ -123,8 +123,8 @@ export class BudgetService {
       }
     }
 
-    if (dto.notes !== undefined) {
-      budget.notes = dto.notes ?? null;
+    if (dto.description !== undefined) {
+      budget.notes = dto.description ?? null;
     }
 
     const saved = await this.budgetRepo.save(budget);
