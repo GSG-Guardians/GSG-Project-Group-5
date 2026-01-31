@@ -9,6 +9,9 @@ import { UnifiedResponseInterceptor } from './interceptors/unifiedResponse.inter
 import { UserModule } from './modules/user/user.module';
 import { DatabaseModule } from './modules/database/database.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { BudgetModule } from './modules/budget/budget.module';
+import { DebtModule } from './modules/debt/debt.module';
+import { FinancialReportModule } from './modules/financial-report/financial-report.module';
 
 @Module({
   imports: [
@@ -20,6 +23,9 @@ import { AuthModule } from './modules/auth/auth.module';
     DatabaseModule,
     UserModule,
     AuthModule,
+    BudgetModule,
+    DebtModule,
+    FinancialReportModule,
   ],
   controllers: [AppController],
   providers: [
