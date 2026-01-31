@@ -8,10 +8,9 @@ async function bootstrap() {
   app.enableCors();
 
   const config = new DocumentBuilder()
-    .setTitle('Finance Assistance API')
+    .setTitle('Trackly API')
     .setDescription('API documentation')
     .setVersion('1.0')
-    // If you use Bearer JWT:
     .addBearerAuth()
     .build();
 
