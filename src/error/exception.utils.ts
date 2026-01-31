@@ -1,4 +1,4 @@
-import { ApiErrorResponse } from 'src/types/api';
+import { ApiErrorResponse } from 'src/types/api.types';
 import { PostgresErrorCode } from './exception.constants';
 import { HttpStatus } from '@nestjs/common';
 

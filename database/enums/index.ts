@@ -104,3 +104,24 @@ export enum RewardStatus {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
 }
+
+export enum PaymentStatus {
+  PAID = 'PAID',
+  UNPAID = 'UNPAID',
+  OVERDUE = 'OVERDUE',
+  PARTIAL = 'PARTIAL',
+}
+
+export enum BudgetCategory {
+  FOOD = 'FOOD',
+  TRANSPORT = 'TRANSPORT',
+  ENTERTAINMENT = 'ENTERTAINMENT',
+  HEALTH = 'HEALTH',
+  SHOPPING = 'SHOPPING',
+  OTHERS = 'OTHERS',
+}
+
+export enum DebtType {
+  INDIVIDUAL = 'INDIVIDUAL',
+  GROUP = 'GROUP',
+}

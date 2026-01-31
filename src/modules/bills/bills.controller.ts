@@ -13,8 +13,9 @@ import {
     UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiOperation, ApiQuery, ApiParam, ApiConsumes, ApiResponse } from '@nestjs/swagger';
 import { BillsService } from './bills.service';
-import { CreateBillDto, UpdateBillDto, UpdateBillStatusDto } from './dto';
+import { CreateBillDto, UpdateBillDto, UpdateBillStatusDto, SmartParseResponseDto } from './dto';
 
 type UploadedFilePayload = {
     originalname: string;
@@ -23,11 +24,16 @@ type UploadedFilePayload = {
     buffer?: Buffer;
 };
 
+@ApiTags('Bills')
 @Controller('v1/bills')
 export class BillsController {
     constructor(private readonly billsService: BillsService) { }
 
     @Get()
+    @ApiOperation({ summary: 'List bills', description: 'Fetches the list of bills with optional filtering and pagination' })
+    @ApiQuery({ name: 'type', required: false, enum: ['individual', 'group'], description: 'Filter by bill type' })
+    @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number for pagination' })
+    @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of items per page' })
     async listBills(
         @Query('type') type?: 'individual' | 'group',
         @Query('page') page?: string,
@@ -41,26 +47,35 @@ export class BillsController {
     }
 
     @Get(':id')
+    @ApiOperation({ summary: 'Get bill details', description: 'Retrieves full details of a specific bill, including participants for group bills' })
+    @ApiParam({ name: 'id', description: 'Bill ID' })
     async getBill(@Param('id') id: string) {
         return this.billsService.getBillDetails(id);
     }
 
     @Post()
+    @ApiOperation({ summary: 'Create a new bill', description: 'Create a new bill record (individual or group)' })
     async createBill(@Body() dto: CreateBillDto) {
         return this.billsService.createBill(dto);
     }
 
     @Put(':id')
+    @ApiOperation({ summary: 'Update bill', description: 'Update bill name, amount, or settings' })
+    @ApiParam({ name: 'id', description: 'Bill ID' })
     async updateBill(@Param('id') id: string, @Body() dto: UpdateBillDto) {
         return this.billsService.updateBill(id, dto);
     }
 
     @Delete(':id')
+    @ApiOperation({ summary: 'Delete bill', description: 'Delete a bill record' })
+    @ApiParam({ name: 'id', description: 'Bill ID' })
     async deleteBill(@Param('id') id: string) {
         return this.billsService.deleteBill(id);
     }
 
     @Patch(':id/status')
+    @ApiOperation({ summary: 'Update payment status', description: 'Update payment status (paid/unpaid)' })
+    @ApiParam({ name: 'id', description: 'Bill ID' })
     async updateStatus(
         @Param('id') id: string,
         @Body() dto: UpdateBillStatusDto,
@@ -69,6 +84,9 @@ export class BillsController {
     }
 
     @Post('smart-parse')
+    @ApiOperation({ summary: 'Smart Bill Parser (AI)', description: 'Auto-fills form from image, PDF, or text' })
+    @ApiConsumes('multipart/form-data')
+    @ApiResponse({ type: SmartParseResponseDto })
     @UseInterceptors(FileInterceptor('file'))
     smartParse(
         @UploadedFile() file?: UploadedFilePayload,

@@ -41,6 +41,10 @@ export class User {
   @Column('varchar', { length: 255, unique: true })
   email: string;
 
+  @Column('varchar', { length: 20, nullable: true })
+  @Index()
+  phone: string | null;
+
   @Column('varchar', { name: 'password_hash', length: 255, nullable: true })
   passwordHash: string | null;
 
@@ -50,7 +54,7 @@ export class User {
   @Column({ type: 'enum', enum: UserStatus, default: UserStatus.PENDING })
   status: UserStatus;
 
-  @Column('uuid', { name: 'default_currency_id', nullable: true })
+  @Column('uuid', { name: 'default_currency_id', nullable: false })
   defaultCurrencyId: string;
 
   @ManyToOne(() => Currency)
