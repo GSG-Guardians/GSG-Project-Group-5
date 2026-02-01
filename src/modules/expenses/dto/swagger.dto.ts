@@ -9,9 +9,7 @@ import type {
 } from './response.dto';
 import type { TCreateExpenseRequest } from './request.dto';
 
-export class ExpenseOverviewResponseSwaggerDto
-  implements ExpenseOverviewResponse
-{
+export class ExpenseOverviewResponseSwaggerDto implements ExpenseOverviewResponse {
   @ApiProperty({ example: '1200.50' })
   totalBalance: string;
 
@@ -22,9 +20,7 @@ export class ExpenseOverviewResponseSwaggerDto
   totalExpenses: string;
 }
 
-export class ExpenseCategoryBreakdownSwaggerDto
-  implements ExpenseCategoryBreakdown
-{
+export class ExpenseCategoryBreakdownSwaggerDto implements ExpenseCategoryBreakdown {
   @ApiProperty({ enum: CategoryName, example: CategoryName.FOOD })
   category: CategoryName;
 

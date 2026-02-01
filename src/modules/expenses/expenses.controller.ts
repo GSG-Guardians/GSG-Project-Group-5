@@ -43,7 +43,11 @@ export class ExpensesController {
   @ApiSuccess(ExpenseOverviewResponseSwaggerDto)
   @ApiQuery({ name: 'from', required: false, type: String })
   @ApiQuery({ name: 'to', required: false, type: String })
-  @ApiQuery({ name: 'period', required: false, enum: ['day', 'week', 'month', 'year'] })
+  @ApiQuery({
+    name: 'period',
+    required: false,
+    enum: ['day', 'week', 'month', 'year'],
+  })
   @ApiQuery({ name: 'month', required: false, type: Number })
   @ApiQuery({ name: 'currencyId', required: false, type: String })
   getOverview(
@@ -59,7 +63,11 @@ export class ExpensesController {
   @ApiSuccessArray(ExpenseCategoryBreakdownSwaggerDto)
   @ApiQuery({ name: 'from', required: false, type: String })
   @ApiQuery({ name: 'to', required: false, type: String })
-  @ApiQuery({ name: 'period', required: false, enum: ['day', 'week', 'month', 'year'] })
+  @ApiQuery({
+    name: 'period',
+    required: false,
+    enum: ['day', 'week', 'month', 'year'],
+  })
   @ApiQuery({ name: 'month', required: false, type: Number })
   @ApiQuery({ name: 'currencyId', required: false, type: String })
   getCategoryBreakdown(
@@ -75,7 +83,11 @@ export class ExpensesController {
   @ApiSuccessArray(ExpenseDonutSegmentSwaggerDto)
   @ApiQuery({ name: 'from', required: false, type: String })
   @ApiQuery({ name: 'to', required: false, type: String })
-  @ApiQuery({ name: 'period', required: false, enum: ['day', 'week', 'month', 'year'] })
+  @ApiQuery({
+    name: 'period',
+    required: false,
+    enum: ['day', 'week', 'month', 'year'],
+  })
   @ApiQuery({ name: 'month', required: false, type: Number })
   @ApiQuery({ name: 'currencyId', required: false, type: String })
   getDonutChart(
