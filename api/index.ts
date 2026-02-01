@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from '../src/app.module';
 import express from 'express';
 
@@ -16,6 +17,18 @@ async function bootstrap() {
 
   nestApp.setGlobalPrefix('api');
   nestApp.enableCors();
+
+  const config = new DocumentBuilder()
+    .setTitle('Trackly API')
+    .setDescription('API documentation')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(nestApp, config);
+  SwaggerModule.setup('docs', nestApp, document, {
+    useGlobalPrefix: true,
+  });
 
   await nestApp.init();
 
