@@ -1,9 +1,11 @@
+import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../src/app.module';
 
 let app;
 
 export default async function handler(req, res) {
+    console.log('Serverless Handler Invoked');
     try {
         if (!app) {
             app = await NestFactory.create(AppModule);
@@ -24,6 +26,6 @@ export default async function handler(req, res) {
             env: {
                 DATABASE_URL_DEFINED: !!process.env.DATABASE_URL
             }
-        }));                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+        }));
     }
 }
