@@ -1,31 +1,31 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
+import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from '../src/app.module';
+import express from 'express';
 
-let app;
+let cachedServer: any;
 
-export default async function handler(req, res) {
-    console.log('Serverless Handler Invoked');
-    try {
-        if (!app) {
-            app = await NestFactory.create(AppModule);
-            app.setGlobalPrefix('api');
-            app.enableCors();
-            await app.init();
-        }
-        const instance = app.getHttpAdapter().getInstance();
-        return instance(req, res);
-    } catch (error) {
-        console.error('Serverless Bootstrap Error:', error);
-        res.statusCode = 500;
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({
-            message: 'Critical error during serverless bootstrap',
-            error: error.message || error.toString(),
-            stack: error.stack,
-            env: {
-                DATABASE_URL_DEFINED: !!process.env.DATABASE_URL
-            }
-        }));
-    }
+async function bootstrap() {
+  const expressApp = express();
+
+  const nestApp = await NestFactory.create(
+    AppModule,
+    new ExpressAdapter(expressApp),
+  );
+
+  nestApp.setGlobalPrefix('api');
+  nestApp.enableCors();
+
+  await nestApp.init();
+
+  return expressApp;
+}
+
+export default async function handler(req: any, res: any) {
+  if (!cachedServer) {
+    cachedServer = await bootstrap();
+  }
+
+  return cachedServer(req, res);
 }
