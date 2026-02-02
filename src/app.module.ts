@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { dataSourceOptions } from '../database/data-source';
+import { BillsModule } from './modules/bills/bills.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { UnifiedResponseInterceptor } from './interceptors/unifiedResponse.interceptor';
 import { UserModule } from './modules/user/user.module';
@@ -21,6 +22,7 @@ import { CurrencyModule } from './modules/currency/currency.module';
       envFilePath: '.env',
     }),
     TypeOrmModule.forRoot(dataSourceOptions),
+    BillsModule,
     DatabaseModule,
     UserModule,
     AuthModule,

@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { TSignInRequest, TSignUpRequest } from './request.dto';
-import { UserResponseSwaggerDto } from 'src/modules/user/dto';
+import { UserResponseSwaggerDto } from '../../user/dto';
 
 export class SignInRequestSwaggerDto implements TSignInRequest {
   @ApiProperty({ example: 'moamen@example.com' })
