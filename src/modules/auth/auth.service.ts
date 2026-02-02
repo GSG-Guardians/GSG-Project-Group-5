@@ -11,6 +11,7 @@ import axios from 'axios';
 import { GoogleIdTokenPayload, GoogleTokenResponse } from './types/googletypes';
 import { UserResponseDto } from '../user/dto';
 import { User } from 'database/entities/user.entities';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -106,6 +107,53 @@ export class AuthService {
     return { token };
   }
 
+  async processGoogleCallback(res: Response, code?: string, error?: string) {
+    const frontendUrl = this.configService.getOrThrow<string>('FRONTEND_URL');
+
+    if (error) {
+      return res.redirect(
+        `${frontendUrl}/login?error=${encodeURIComponent(error)}`,
+      );
+    }
+
+    if (!code) {
+      return res.redirect(`${frontendUrl}/login?error=missing_code`);
+    }
+
+    try {
+      const { token } = await this.handleGoogleCallback(code);
+
+      res.cookie('access_token', token, {
+        httpOnly: true,
+        secure: this.configService.getOrThrow('NODE_ENV') === 'production',
+        sameSite:
+          this.configService.getOrThrow('NODE_ENV') === 'production'
+            ? 'none'
+            : 'lax',
+        path: '/',
+      });
+
+      return res.redirect(`${frontendUrl}`);
+    } catch (e: unknown) {
+      let errorMessage = 'Unknown error';
+      if (e && typeof e === 'object' && 'message' in e) {
+        errorMessage = (e as Error).message;
+      }
+
+      if (e && typeof e === 'object' && 'response' in e) {
+        const errorObj = e as {
+          response?: { data?: { error_description?: string } };
+        };
+        if (errorObj.response?.data?.error_description) {
+          errorMessage = errorObj.response.data.error_description;
+        }
+      }
+
+      return res.redirect(
+        `${frontendUrl}/login?error=google_auth_failed&details=${encodeURIComponent(errorMessage)}`,
+      );
+    }
+  }
   me(user: UserResponseDto) {
     const userForToken = this.mapUserToToken(user);
     const token = this.generateToken(userForToken);

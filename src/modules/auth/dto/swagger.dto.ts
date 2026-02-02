@@ -41,3 +41,37 @@ export class AuthResponseSwaggerDto {
   })
   token: string;
 }
+
+export class PasswordResetRequestSwaggerDto {
+  @ApiProperty({ example: 'user@example.com' })
+  email: string;
+}
+
+export class PasswordResetVerifySwaggerDto {
+  @ApiProperty({ example: 'user@example.com' })
+  email: string;
+
+  @ApiProperty({ example: '1234', description: '4-digit verification code' })
+  code: string;
+}
+
+export class PasswordResetConfirmSwaggerDto {
+  @ApiProperty({ example: 'eyJ...' })
+  resetToken: string;
+
+  @ApiProperty({ example: 'NewStrongP@ssw0rd', minLength: 6 })
+  newPassword: string;
+}
+
+export class PasswordResetGenericResponseSwaggerDto {
+  @ApiProperty({ example: true })
+  success: boolean;
+}
+
+export class PasswordResetVerifyResponseSwaggerDto {
+  @ApiProperty({ example: true })
+  success: boolean;
+
+  @ApiProperty({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })
+  resetToken: string;
+}

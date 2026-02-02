@@ -7,29 +7,47 @@ import {
   Query,
   UseGuards,
   Req,
+  Patch,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   AuthResponseSwaggerDto,
   SignUpRequestSwaggerDto,
   SignInRequestSwaggerDto,
+  PasswordResetRequestSwaggerDto,
+  PasswordResetVerifySwaggerDto,
+  PasswordResetConfirmSwaggerDto,
+  PasswordResetGenericResponseSwaggerDto,
+  PasswordResetVerifyResponseSwaggerDto,
   type TSignUpRequest,
   type TSignInRequest,
 } from './dto';
 import { ZodValidationPipe } from 'src/pipes/zodValidation.pipe';
 import { SignUpSchema, SignInSchema } from './schemas/auth.schema';
+import {
+  PasswordResetConfirmSchema,
+  PasswordResetRequestSchema,
+  PasswordResetVerifySchema,
+} from './schemas/password-reset.schema';
 import { ApiBody, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { ApiSuccess } from 'src/helpers/swaggerDTOWrapper.helpers';
 import type { Response } from 'express';
 import { JwtCookieGuard } from './guards/cookies.guard';
 import { type Request } from 'express';
 import { ConfigService } from '@nestjs/config';
+import type {
+  PasswordResetConfirmDto,
+  PasswordResetRequestDto,
+  PasswordResetVerifyDto,
+} from './dto/password-reset.dto';
+import { PasswordResetService } from './password-reset.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
+    private readonly passwordResetService: PasswordResetService,
   ) {}
 
   @Post('sign-up')
@@ -78,51 +96,7 @@ export class AuthController {
     @Query('error') googleError: string | undefined,
     @Res() res: Response,
   ) {
-    const frontendUrl = this.configService.getOrThrow<string>('FRONTEND_URL');
-    if (googleError) {
-      return res.redirect(
-        `${frontendUrl}/login?error=${encodeURIComponent(googleError)}`,
-      );
-    }
-
-    if (!code) {
-      return res.redirect(`${frontendUrl}/login?error=missing_code`);
-    }
-
-    try {
-      const { token } = await this.authService.handleGoogleCallback(code);
-
-      res.cookie('access_token', token, {
-        httpOnly: true,
-        secure: this.configService.getOrThrow('NODE_ENV') === 'production',
-        sameSite:
-          this.configService.getOrThrow('NODE_ENV') === 'production'
-            ? 'none'
-            : 'lax',
-        path: '/',
-      });
-
-      return res.redirect(`${frontendUrl}`);
-    } catch (e: unknown) {
-      let errorMessage = 'Unknown error';
-      if (e && typeof e === 'object' && 'message' in e) {
-        errorMessage = (e as Error).message;
-      }
-
-      // Check for Axios/Google error structure
-      if (e && typeof e === 'object' && 'response' in e) {
-        const errorObj = e as {
-          response?: { data?: { error_description?: string } };
-        };
-        if (errorObj.response?.data?.error_description) {
-          errorMessage = errorObj.response.data.error_description;
-        }
-      }
-
-      return res.redirect(
-        `${frontendUrl}/login?error=google_auth_failed&details=${encodeURIComponent(errorMessage)}`,
-      );
-    }
+    return this.authService.processGoogleCallback(res, code, googleError);
   }
 
   @Get('me')
@@ -131,5 +105,41 @@ export class AuthController {
   @ApiSuccess(AuthResponseSwaggerDto)
   me(@Req() req: Request) {
     return this.authService.me(req.user!);
+  }
+
+  @Post('password-reset/request')
+  @ApiOperation({ summary: 'Request password reset code' })
+  @ApiBody({ type: PasswordResetRequestSwaggerDto })
+  @ApiSuccess(PasswordResetGenericResponseSwaggerDto)
+  requestReset(
+    @Body(new ZodValidationPipe(PasswordResetRequestSchema))
+    dto: PasswordResetRequestDto,
+  ) {
+    return this.passwordResetService.requestReset(dto.email);
+  }
+
+  @Post('password-reset/verify')
+  @ApiOperation({ summary: 'Verify reset code and get reset token' })
+  @ApiBody({ type: PasswordResetVerifySwaggerDto })
+  @ApiSuccess(PasswordResetVerifyResponseSwaggerDto)
+  verifyReset(
+    @Body(new ZodValidationPipe(PasswordResetVerifySchema))
+    dto: PasswordResetVerifyDto,
+  ) {
+    return this.passwordResetService.verifyResetCode(dto.email, dto.code);
+  }
+
+  @Patch('password-reset/confirm')
+  @ApiOperation({ summary: 'Set new password using reset token' })
+  @ApiBody({ type: PasswordResetConfirmSwaggerDto })
+  @ApiSuccess(PasswordResetGenericResponseSwaggerDto)
+  confirmReset(
+    @Body(new ZodValidationPipe(PasswordResetConfirmSchema))
+    dto: PasswordResetConfirmDto,
+  ) {
+    return this.passwordResetService.confirmReset(
+      dto.resetToken,
+      dto.newPassword,
+    );
   }
 }
