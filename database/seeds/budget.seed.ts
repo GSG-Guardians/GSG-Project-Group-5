@@ -1,12 +1,24 @@
-import { DataSource } from 'typeorm';
+﻿import { DataSource } from 'typeorm';
 import { Budget } from '../entities/budget.entities';
+import { User } from '../entities/user.entities';
 import { BudgetCategory } from '../enums';
 
 export async function seedBudgets(dataSource: DataSource): Promise<void> {
   const budgetRepo = dataSource.getRepository(Budget);
+  const userRepo = dataSource.getRepository(User);
 
-  // Clear existing budgets
-  await budgetRepo.delete({});
+  // Get the admin user to associate budgets
+  const adminUser = await userRepo.findOne({
+    where: { email: 'admin@email.com' },
+  });
+
+  if (!adminUser) {
+    console.log('âڑ ï¸ڈ  Budget seed skipped - admin user not found');
+    return;
+  }
+
+  // Clear existing budgets for admin user
+  await budgetRepo.delete({ user_id: adminUser.id });
 
   const now = new Date();
   const currentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -16,7 +28,7 @@ export async function seedBudgets(dataSource: DataSource): Promise<void> {
   const budgets = [
     // Current month budgets
     {
-      user_id: 'temp-user-id',
+      user_id: adminUser.id,
       category: BudgetCategory.FOOD,
       allocated_amount: 500,
       spent_amount: 320.5,
@@ -26,7 +38,7 @@ export async function seedBudgets(dataSource: DataSource): Promise<void> {
       is_active: true,
     },
     {
-      user_id: 'temp-user-id',
+      user_id: adminUser.id,
       category: BudgetCategory.TRANSPORT,
       allocated_amount: 300,
       spent_amount: 180.75,
@@ -36,7 +48,7 @@ export async function seedBudgets(dataSource: DataSource): Promise<void> {
       is_active: true,
     },
     {
-      user_id: 'temp-user-id',
+      user_id: adminUser.id,
       category: BudgetCategory.ENTERTAINMENT,
       allocated_amount: 200,
       spent_amount: 150.0,
@@ -46,7 +58,7 @@ export async function seedBudgets(dataSource: DataSource): Promise<void> {
       is_active: true,
     },
     {
-      user_id: 'temp-user-id',
+      user_id: adminUser.id,
       category: BudgetCategory.HEALTH,
       allocated_amount: 400,
       spent_amount: 120.0,
@@ -56,7 +68,7 @@ export async function seedBudgets(dataSource: DataSource): Promise<void> {
       is_active: true,
     },
     {
-      user_id: 'temp-user-id',
+      user_id: adminUser.id,
       category: BudgetCategory.SHOPPING,
       allocated_amount: 350,
       spent_amount: 280.3,
@@ -66,7 +78,7 @@ export async function seedBudgets(dataSource: DataSource): Promise<void> {
       is_active: true,
     },
     {
-      user_id: 'temp-user-id',
+      user_id: adminUser.id,
       category: BudgetCategory.OTHERS,
       allocated_amount: 250,
       spent_amount: 245.0,
@@ -78,7 +90,7 @@ export async function seedBudgets(dataSource: DataSource): Promise<void> {
 
     // Next month budgets
     {
-      user_id: 'temp-user-id',
+      user_id: adminUser.id,
       category: BudgetCategory.FOOD,
       allocated_amount: 550,
       spent_amount: 0,
@@ -88,7 +100,7 @@ export async function seedBudgets(dataSource: DataSource): Promise<void> {
       is_active: true,
     },
     {
-      user_id: 'temp-user-id',
+      user_id: adminUser.id,
       category: BudgetCategory.TRANSPORT,
       allocated_amount: 320,
       spent_amount: 0,
@@ -100,7 +112,7 @@ export async function seedBudgets(dataSource: DataSource): Promise<void> {
 
     // Last month budgets (completed)
     {
-      user_id: 'temp-user-id',
+      user_id: adminUser.id,
       category: BudgetCategory.FOOD,
       allocated_amount: 480,
       spent_amount: 465.8,
@@ -110,7 +122,7 @@ export async function seedBudgets(dataSource: DataSource): Promise<void> {
       is_active: false,
     },
     {
-      user_id: 'temp-user-id',
+      user_id: adminUser.id,
       category: BudgetCategory.ENTERTAINMENT,
       allocated_amount: 180,
       spent_amount: 195.5,
@@ -122,5 +134,5 @@ export async function seedBudgets(dataSource: DataSource): Promise<void> {
   ];
 
   await budgetRepo.save(budgets);
-  console.log('✅ Budget seed data created successfully!');
+  console.log('âœ… Budget seed data created successfully!');
 }
