@@ -1,6 +1,7 @@
 # Financial Report Module API Reference
 
 ## 🔐 Authentication Required
+
 All endpoints require JWT cookie authentication (login first at `/api/auth/sign-in`)
 
 ---
@@ -8,13 +9,16 @@ All endpoints require JWT cookie authentication (login first at `/api/auth/sign-
 ## 📋 Endpoints
 
 ### 1. Get Financial Report
+
 **GET** `/api/financial-reports?startDate=2026-02-01&endDate=2026-02-28`
 
 **Query Parameters (REQUIRED):**
+
 - `startDate` - Start date in YYYY-MM-DD format
 - `endDate` - End date in YYYY-MM-DD format
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -56,6 +60,7 @@ All endpoints require JWT cookie authentication (login first at `/api/auth/sign-
 ```
 
 **Report Includes:**
+
 - Period summary with income/expenses/savings
 - Budget utilization percentage
 - Category-wise spending breakdown
@@ -65,6 +70,7 @@ All endpoints require JWT cookie authentication (login first at `/api/auth/sign-
 ---
 
 ### 2. Create Financial Insight
+
 **POST** `/api/financial-reports/insights`
 
 ```json
@@ -80,6 +86,7 @@ All endpoints require JWT cookie authentication (login first at `/api/auth/sign-
 **Insight Types:** `alert`, `warning`, `recommendation`, `info`
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -101,11 +108,13 @@ All endpoints require JWT cookie authentication (login first at `/api/auth/sign-
 ---
 
 ### 3. Mark Insight as Read
+
 **PATCH** `/api/financial-reports/insights/:id/read`
 
 **Example:** `/api/financial-reports/insights/ce603a25-c86a-4715-b524-0e05a14ca451/read`
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -122,6 +131,7 @@ All endpoints require JWT cookie authentication (login first at `/api/auth/sign-
 ## ✅ Test Results Summary
 
 All endpoints tested and working:
+
 - ✅ Get Financial Report: Returns comprehensive report with 6 category breakdowns, 4-week trends, and 5 insights
 - ✅ Category Breakdown: Shows allocated vs spent amounts with percentages
 - ✅ Weekly Trends: Displays spending patterns week by week
@@ -130,6 +140,7 @@ All endpoints tested and working:
 - ✅ Mark as Read: Updates insight read status
 
 **Insights Generated:**
+
 - 🔴 Alerts: Budget limits, upcoming payments
 - ⚠️ Warnings: Overdue debts
 - 💡 Recommendations: Savings opportunities, good budget management
@@ -153,19 +164,23 @@ All endpoints tested and working:
 ## 📊 Report Features
 
 **Summary Section:**
+
 - Total income, expenses, net savings
 - Budget utilization percentage
 
 **Category Breakdown:**
+
 - All 6 budget categories (FOOD, TRANSPORT, ENTERTAINMENT, HEALTH, SHOPPING, OTHERS)
 - Allocated amount vs spent amount
 - Usage percentage for each category
 
 **Weekly Trend:**
+
 - 4-week spending breakdown
 - Track spending patterns over time
 
 **Insights:**
+
 - Auto-generated based on spending patterns
 - Manual insights created by users
 - Read/unread status tracking

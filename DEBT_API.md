@@ -1,6 +1,7 @@
 # Debt Module API Reference
 
 ## 🔐 Authentication Required
+
 All endpoints require JWT cookie authentication (login first at `/api/auth/sign-in`)
 
 ---
@@ -8,11 +9,13 @@ All endpoints require JWT cookie authentication (login first at `/api/auth/sign-
 ## 📋 Endpoints
 
 ### 0. Get Available Currencies (REQUIRED FIRST!)
+
 **GET** `/api/currencies`
 
 Returns all available currencies with their UUIDs. **You need a currency UUID to create debts!**
 
 **Response:**
+
 ```json
 [
   {
@@ -27,6 +30,7 @@ Returns all available currencies with their UUIDs. **You need a currency UUID to
 ---
 
 ### 1. Create Debt
+
 **POST** `/api/debts`
 
 ```json
@@ -45,9 +49,11 @@ Returns all available currencies with their UUIDs. **You need a currency UUID to
 ---
 
 ### 2. Get All Debts
+
 **GET** `/api/debts?page=1&limit=10&direction=I_OWE&status=UNPAID`
 
 **Query Parameters:**
+
 - `page` (optional) - Page number, default: 1
 - `limit` (optional) - Items per page, default: 10
 - `direction` (optional) - Filter: `I_OWE` or `OWED_TO_ME`
@@ -56,6 +62,7 @@ Returns all available currencies with their UUIDs. **You need a currency UUID to
 ---
 
 ### 3. Get Debt Summary
+
 **GET** `/api/debts/summary`
 
 Returns: total owed to you, total you owe, net balance, unpaid count.
@@ -63,6 +70,7 @@ Returns: total owed to you, total you owe, net balance, unpaid count.
 ---
 
 ### 4. Get Single Debt
+
 **GET** `/api/debts/:id`
 
 Example: `/api/debts/72184f21-04e0-49e9-ad5a-1b72a9714d93`
@@ -70,6 +78,7 @@ Example: `/api/debts/72184f21-04e0-49e9-ad5a-1b72a9714d93`
 ---
 
 ### 5. Update Debt
+
 **PATCH** `/api/debts/:id`
 
 ```json
@@ -86,6 +95,7 @@ All fields are optional.
 ---
 
 ### 6. Delete Debt
+
 **DELETE** `/api/debts/:id`
 
 Returns: `{ "success": true, "data": null, "message": "Debt deleted successfully" }`
@@ -95,6 +105,7 @@ Returns: `{ "success": true, "data": null, "message": "Debt deleted successfully
 ## ✅ Test Results Summary
 
 All endpoints tested and working:
+
 - ✅ Get Currencies: Returns 7 currencies with UUIDs
 - ✅ Create Debt: Returns 201 with debt data (includes reminder fields)
 - ✅ Get All Debts: Returns paginated list (9 total debts)
