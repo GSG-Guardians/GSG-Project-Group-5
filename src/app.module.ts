@@ -12,6 +12,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { BudgetModule } from './modules/budget/budget.module';
 import { DebtModule } from './modules/debt/debt.module';
 import { FinancialReportModule } from './modules/financial-report/financial-report.module';
+import { CurrencyModule } from './modules/currency/currency.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { FinancialReportModule } from './modules/financial-report/financial-repo
     DatabaseModule,
     UserModule,
     AuthModule,
+    CurrencyModule,
     BudgetModule,
     DebtModule,
     FinancialReportModule,
