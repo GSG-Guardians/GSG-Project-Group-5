@@ -8,7 +8,7 @@ import { Bill } from './entities/bills.entities';
 import { Budget } from './entities/budget.entities';
 import { Currency } from './entities/currency.entities';
 import { Debt } from './entities/debts.entities';
-import { EmailVerificationCode } from './entities/email-verification-code.entities';
+
 import { Expense } from './entities/expense.entities';
 import { FinancialInsight } from './entities/financial-insight.entities';
 import { GroupInvoice } from './entities/group-invoice.entities';
@@ -35,7 +35,6 @@ export const dataSourceOptions: DataSourceOptions = {
     Budget,
     Currency,
     Debt,
-    EmailVerificationCode,
     Expense,
     FinancialInsight,
     GroupInvoice,
