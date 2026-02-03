@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { TSignInRequest, TSignUpRequest } from './request.dto';
-import { UserResponseSwaggerDto } from 'src/modules/user/dto';
+import { UserResponseSwaggerDto } from '../../user/dto';
 
 export class SignInRequestSwaggerDto implements TSignInRequest {
   @ApiProperty({ example: 'moamen@example.com' })
@@ -40,4 +40,38 @@ export class AuthResponseSwaggerDto {
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
   token: string;
+}
+
+export class PasswordResetRequestSwaggerDto {
+  @ApiProperty({ example: 'user@example.com' })
+  email: string;
+}
+
+export class PasswordResetVerifySwaggerDto {
+  @ApiProperty({ example: 'user@example.com' })
+  email: string;
+
+  @ApiProperty({ example: '1234', description: '4-digit verification code' })
+  code: string;
+}
+
+export class PasswordResetConfirmSwaggerDto {
+  @ApiProperty({ example: 'eyJ...' })
+  resetToken: string;
+
+  @ApiProperty({ example: 'NewStrongP@ssw0rd', minLength: 6 })
+  newPassword: string;
+}
+
+export class PasswordResetGenericResponseSwaggerDto {
+  @ApiProperty({ example: true })
+  success: boolean;
+}
+
+export class PasswordResetVerifyResponseSwaggerDto {
+  @ApiProperty({ example: true })
+  success: boolean;
+
+  @ApiProperty({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })
+  resetToken: string;
 }
