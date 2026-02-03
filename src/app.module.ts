@@ -10,6 +10,7 @@ import { UnifiedResponseInterceptor } from './interceptors/unifiedResponse.inter
 import { UserModule } from './modules/user/user.module';
 import { DatabaseModule } from './modules/database/database.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { ExpensesModule } from './modules/expenses/expenses.module';
 import { MailModule } from './modules/mail/mail.module';
 
 @Module({
@@ -23,6 +24,7 @@ import { MailModule } from './modules/mail/mail.module';
     DatabaseModule,
     UserModule,
     AuthModule,
+    ExpensesModule,
     MailModule,
   ],
   controllers: [AppController],

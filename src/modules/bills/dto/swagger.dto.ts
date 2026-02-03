@@ -99,3 +99,86 @@ export class SmartParseResponseSwaggerDto implements TSmartParseResponse {
   })
   type: 'individual' | 'group' | null;
 }
+
+export class BillListItemSwaggerDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty({ nullable: true })
+  name: string;
+
+  @ApiProperty()
+  amount: string;
+
+  @ApiProperty()
+  date: Date;
+
+  @ApiProperty({ enum: ['paid', 'unpaid'] })
+  status: 'paid' | 'unpaid';
+
+  @ApiProperty({ enum: ['individual', 'group'] })
+  type: 'individual' | 'group';
+
+  @ApiProperty()
+  currencyId: string;
+}
+
+export class BillListMetaSwaggerDto {
+  @ApiProperty()
+  page: number;
+
+  @ApiProperty()
+  limit: number;
+
+  @ApiProperty()
+  total: number;
+}
+
+export class BillListResponseSwaggerDto {
+  @ApiProperty({ type: [BillListItemSwaggerDto] })
+  items: BillListItemSwaggerDto[];
+
+  @ApiProperty({ type: BillListMetaSwaggerDto })
+  meta: BillListMetaSwaggerDto;
+}
+
+export class BillResponseSwaggerDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty({ enum: ['individual', 'group'] })
+  type: 'individual' | 'group';
+
+  @ApiProperty({ enum: ['paid', 'unpaid'] })
+  status: 'paid' | 'unpaid';
+
+  @ApiProperty({ description: 'Due date of the bill' })
+  dueDate: Date;
+
+  @ApiProperty()
+  currencyId: string;
+
+  @ApiPropertyOptional({ description: 'Name (for individual bills)' })
+  name?: string;
+
+  @ApiPropertyOptional({ description: 'Amount (for individual bills)' })
+  amount?: string;
+
+  @ApiPropertyOptional({ description: 'Title (for group bills)' })
+  title?: string;
+
+  @ApiPropertyOptional({ description: 'Total Amount (for group bills)' })
+  amountTotal?: string;
+
+  @ApiPropertyOptional()
+  description?: string;
+
+  @ApiPropertyOptional()
+  assetId?: string;
+
+  @ApiPropertyOptional()
+  createdAt: Date;
+
+  @ApiPropertyOptional()
+  updatedAt: Date;
+}
