@@ -7,6 +7,8 @@ import express from 'express';
 
 let cachedServer: any;
 
+import { RequestMethod } from '@nestjs/common';
+
 async function bootstrap() {
   const expressApp = express();
 
@@ -15,7 +17,9 @@ async function bootstrap() {
     new ExpressAdapter(expressApp),
   );
 
-  nestApp.setGlobalPrefix('api');
+  nestApp.setGlobalPrefix('api', {
+    exclude: [{ path: '/', method: RequestMethod.GET }],
+  });
   nestApp.enableCors();
 
   const config = new DocumentBuilder()
