@@ -26,6 +26,8 @@ import {
   UpdateBillSwaggerDto,
   UpdateBillStatusSwaggerDto,
   SmartParseResponseSwaggerDto,
+  BillResponseSwaggerDto,
+  BillListResponseSwaggerDto,
   type TCreateBillRequest,
   type TUpdateBillRequest,
   type TUpdateBillStatusRequest,
@@ -37,6 +39,7 @@ import {
   UpdateBillStatusSchema,
 } from './schemas/bills.schema';
 import { ApiBody } from '@nestjs/swagger';
+import { ApiSuccess } from 'src/helpers/swaggerDTOWrapper.helpers';
 
 type UploadedFilePayload = {
   originalname: string;
@@ -74,6 +77,7 @@ export class BillsController {
     type: Number,
     description: 'Number of items per page',
   })
+  @ApiSuccess(BillListResponseSwaggerDto)
   async listBills(
     @Query('type') type?: 'individual' | 'group',
     @Query('page') page?: string,
@@ -93,6 +97,7 @@ export class BillsController {
       'Retrieves full details of a specific bill, including participants for group bills',
   })
   @ApiParam({ name: 'id', description: 'Bill ID' })
+  @ApiSuccess(BillResponseSwaggerDto)
   async getBill(@Param('id') id: string) {
     return this.billsService.getBillDetails(id);
   }
@@ -103,6 +108,7 @@ export class BillsController {
     description: 'Create a new bill record (individual or group)',
   })
   @ApiBody({ type: CreateBillSwaggerDto })
+  @ApiSuccess(BillResponseSwaggerDto)
   async createBill(
     @Body(new ZodValidationPipe(CreateBillSchema)) dto: TCreateBillRequest,
   ) {
@@ -116,6 +122,7 @@ export class BillsController {
   })
   @ApiParam({ name: 'id', description: 'Bill ID' })
   @ApiBody({ type: UpdateBillSwaggerDto })
+  @ApiSuccess(BillResponseSwaggerDto)
   async updateBill(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(UpdateBillSchema)) dto: TUpdateBillRequest,
@@ -126,6 +133,7 @@ export class BillsController {
   @Delete(':id')
   @ApiOperation({ summary: 'Delete bill', description: 'Delete a bill record' })
   @ApiParam({ name: 'id', description: 'Bill ID' })
+  @ApiResponse({ status: 200, description: 'Bill deleted successfully' })
   async deleteBill(@Param('id') id: string) {
     return this.billsService.deleteBill(id);
   }
@@ -137,6 +145,7 @@ export class BillsController {
   })
   @ApiParam({ name: 'id', description: 'Bill ID' })
   @ApiBody({ type: UpdateBillStatusSwaggerDto })
+  @ApiSuccess(BillResponseSwaggerDto)
   async updateStatus(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(UpdateBillStatusSchema))
