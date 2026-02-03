@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 import { UserRole, UserStatus } from '../enums';
 import { Asset } from './assets.entities';
-import { EmailVerificationCode } from './email-verification-code.entities';
+
 import { PasswordResetCode } from './password-reset-code.entities';
 import { BalanceHistory } from './balance-history.entities';
 import { Debt } from './debts.entities';
@@ -102,8 +102,6 @@ export class User {
   // relations
   @OneToMany(() => Asset, (a) => a.user) assets: Asset[];
 
-  @OneToMany(() => EmailVerificationCode, (c) => c.user)
-  emailCodes: EmailVerificationCode[];
   @OneToMany(() => PasswordResetCode, (c) => c.user)
   resetCodes: PasswordResetCode[];
 

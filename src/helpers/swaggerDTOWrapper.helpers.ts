@@ -23,6 +23,26 @@ export const ApiSuccess = <TModel extends Type<any>>(model: TModel) =>
     }),
   );
 
+export const ApiSuccessArray = <TModel extends Type<any>>(model: TModel) =>
+  applyDecorators(
+    ApiExtraModels(SuccessOneSwaggerDto, model),
+    ApiOkResponse({
+      schema: {
+        allOf: [
+          { $ref: getSchemaPath(SuccessOneSwaggerDto) },
+          {
+            properties: {
+              data: {
+                type: 'array',
+                items: { $ref: getSchemaPath(model) },
+              },
+            },
+          },
+        ],
+      },
+    }),
+  );
+
 export const ApiSuccessPaginated = <TModel extends Type<any>>(model: TModel) =>
   applyDecorators(
     ApiExtraModels(SuccessPaginatedSwaggerDto, MetaPaginationSwaggerDto, model),

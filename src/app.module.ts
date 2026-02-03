@@ -14,6 +14,8 @@ import { BudgetModule } from './modules/budget/budget.module';
 import { DebtModule } from './modules/debt/debt.module';
 import { FinancialReportModule } from './modules/financial-report/financial-report.module';
 import { CurrencyModule } from './modules/currency/currency.module';
+import { ExpensesModule } from './modules/expenses/expenses.module';
+import { MailModule } from './modules/mail/mail.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { CurrencyModule } from './modules/currency/currency.module';
     BudgetModule,
     DebtModule,
     FinancialReportModule,
+    ExpensesModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [

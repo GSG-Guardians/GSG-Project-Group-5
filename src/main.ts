@@ -3,6 +3,8 @@ import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
+import { RequestMethod } from '@nestjs/common';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
@@ -11,6 +13,10 @@ async function bootstrap() {
     origin: true, // Allow all origins in development
     credentials: true, // Allow cookies to be sent
   });
+  app.setGlobalPrefix('api', {
+    exclude: [{ path: '/', method: RequestMethod.GET }],
+  });
+  app.enableCors();
 
   const config = new DocumentBuilder()
     .setTitle('Trackly API')
