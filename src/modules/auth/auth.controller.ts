@@ -47,7 +47,7 @@ import type {
   PasswordResetVerifyDto,
 } from './dto/password-reset.dto';
 import { PasswordResetService } from './password-reset.service';
-import { IsPublic } from 'src/decorators/isPublic.decorator';
+import { IsPublic } from '../../decorators/isPublic.decorator';
 
 @ApiTags('Auth')
 @IsPublic()
