@@ -38,7 +38,7 @@ import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
 @Controller('debts')
 @UseGuards(JwtCookieGuard)
 export class DebtController {
-  constructor(private readonly debtService: DebtService) { }
+  constructor(private readonly debtService: DebtService) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new debt' })

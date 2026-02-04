@@ -31,7 +31,7 @@ import { ApiSuccess } from '../../helpers/swaggerDTOWrapper.helpers';
 export class FinancialReportController {
   constructor(
     private readonly financialReportService: FinancialReportService,
-  ) { }
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Get financial report for a period' })

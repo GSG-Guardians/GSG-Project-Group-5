@@ -19,7 +19,7 @@ import { ExpenseCategoryQuerySchema } from './schema/expenses.schema';
 @Controller('v1/categories')
 @UseGuards(JwtCookieGuard)
 export class CategoriesController {
-  constructor(private readonly expensesService: ExpensesService) { }
+  constructor(private readonly expensesService: ExpensesService) {}
 
   @Get()
   @ApiOperation({ summary: 'Expense categories' })

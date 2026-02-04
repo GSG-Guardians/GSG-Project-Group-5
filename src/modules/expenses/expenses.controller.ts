@@ -43,7 +43,7 @@ import {
 @Controller('v1/expenses')
 @UseGuards(JwtCookieGuard)
 export class ExpensesController {
-  constructor(private readonly expensesService: ExpensesService) { }
+  constructor(private readonly expensesService: ExpensesService) {}
 
   @Get('overview')
   @ApiOperation({ summary: 'Expenses overview' })

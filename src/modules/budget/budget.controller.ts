@@ -49,7 +49,7 @@ import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
 @Controller('budgets')
 @UseGuards(JwtCookieGuard)
 export class BudgetController {
-  constructor(private readonly budgetService: BudgetService) { }
+  constructor(private readonly budgetService: BudgetService) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new budget' })
