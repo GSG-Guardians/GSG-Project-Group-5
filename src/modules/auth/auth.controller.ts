@@ -29,7 +29,13 @@ import {
   PasswordResetRequestSchema,
   PasswordResetVerifySchema,
 } from './schemas/password-reset.schema';
-import { ApiBody, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ApiSuccess } from 'src/helpers/swaggerDTOWrapper.helpers';
 import type { Response } from 'express';
 import { JwtCookieGuard } from './guards/cookies.guard';
@@ -41,8 +47,11 @@ import type {
   PasswordResetVerifyDto,
 } from './dto/password-reset.dto';
 import { PasswordResetService } from './password-reset.service';
+import { IsPublic } from 'src/decorators/isPublic.decorator';
 
-@Controller('auth')
+@ApiTags('Auth')
+@IsPublic()
+@Controller('v1/auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
@@ -83,7 +92,6 @@ export class AuthController {
   ) {
     const result = await this.authService.signIn(data);
 
-    // Set cookie with the token
     res.cookie('access_token', result.token, {
       httpOnly: true,
       secure: this.configService.getOrThrow('NODE_ENV') === 'production',
@@ -92,7 +100,7 @@ export class AuthController {
           ? 'none'
           : 'lax',
       path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return result;
