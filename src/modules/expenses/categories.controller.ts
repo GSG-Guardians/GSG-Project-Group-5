@@ -1,5 +1,10 @@
 import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import type { Request } from 'express';
 import { ZodValidationPipe } from 'src/pipes/zodValidation.pipe';
 import { ApiSuccessArray } from 'src/helpers/swaggerDTOWrapper.helpers';
@@ -10,6 +15,7 @@ import { ExpenseCategoryOptionSwaggerDto } from './dto/swagger.dto';
 import { ExpenseCategoryQuerySchema } from './schema/expenses.schema';
 
 @ApiTags('Categories')
+@ApiBearerAuth()
 @Controller('v1/categories')
 @UseGuards(JwtCookieGuard)
 export class CategoriesController {

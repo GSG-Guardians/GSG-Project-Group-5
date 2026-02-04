@@ -1,10 +1,11 @@
 import { Controller, Get } from '@nestjs/common';
 import { CurrencyService } from './currency.service';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ApiSuccessArray } from '../../helpers/swaggerDTOWrapper.helpers';
 import { CurrencyResponseSwaggerDto } from './dto/swagger.dto';
 
 @ApiTags('Currencies')
+@ApiBearerAuth()
 @Controller('currencies')
 export class CurrencyController {
   constructor(private readonly currencyService: CurrencyService) {}
