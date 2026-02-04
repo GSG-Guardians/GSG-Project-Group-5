@@ -7,7 +7,6 @@ import { RequestMethod } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
   app.use(cookieParser());
   app.enableCors({
     origin: true, // Allow all origins in development
@@ -16,7 +15,6 @@ async function bootstrap() {
   app.setGlobalPrefix('api', {
     exclude: [{ path: '/', method: RequestMethod.GET }],
   });
-  app.enableCors();
 
   const config = new DocumentBuilder()
     .setTitle('Trackly API')

@@ -16,7 +16,10 @@ import { JwtCookieGuard } from '../auth/guards/cookies.guard';
 
 import { FinancialReportService } from './financial-report.service';
 import type { GetFinancialReportDto } from './dto/request.dto';
-import { FinancialReportResponseSwaggerDto } from './dto/swagger.dto';
+import {
+  FinancialReportResponseSwaggerDto,
+  FinancialInsightResponseSwaggerDto,
+} from './dto/swagger.dto';
 import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
 import { getFinancialReportValidationSchema } from './schema/financial-report.schema';
 import { ApiSuccess } from '../../helpers/swaggerDTOWrapper.helpers';
@@ -27,7 +30,7 @@ import { ApiSuccess } from '../../helpers/swaggerDTOWrapper.helpers';
 export class FinancialReportController {
   constructor(
     private readonly financialReportService: FinancialReportService,
-  ) {}
+  ) { }
 
   @Get()
   @ApiOperation({ summary: 'Get financial report for a period' })
@@ -43,6 +46,7 @@ export class FinancialReportController {
 
   @Post('insights')
   @ApiOperation({ summary: 'Create a financial insight' })
+  @ApiSuccess(FinancialInsightResponseSwaggerDto)
   async createInsight(
     @Body()
     data: {
@@ -60,6 +64,7 @@ export class FinancialReportController {
 
   @Patch('insights/:id/read')
   @ApiOperation({ summary: 'Mark an insight as read' })
+  @ApiSuccess(FinancialInsightResponseSwaggerDto)
   async markInsightAsRead(@Param('id') id: string, @Req() req: Request) {
     const userId = req.user!.id;
     return this.financialReportService.markInsightAsRead(id, userId);

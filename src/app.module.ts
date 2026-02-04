@@ -24,7 +24,6 @@ import { MailModule } from './modules/mail/mail.module';
       envFilePath: '.env',
     }),
     TypeOrmModule.forRoot(dataSourceOptions),
-    BillsModule,
     DatabaseModule,
     UserModule,
     AuthModule,
@@ -33,6 +32,7 @@ import { MailModule } from './modules/mail/mail.module';
     DebtModule,
     FinancialReportModule,
     ExpensesModule,
+    BillsModule,
     MailModule,
   ],
   controllers: [AppController],
@@ -44,4 +44,4 @@ import { MailModule } from './modules/mail/mail.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }
