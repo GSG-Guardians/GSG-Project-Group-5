@@ -40,7 +40,7 @@ import {
 
 @ApiTags('Expenses')
 @ApiBearerAuth()
-@Controller('v1/expenses')
+@Controller('expenses')
 @UseGuards(JwtCookieGuard)
 export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}

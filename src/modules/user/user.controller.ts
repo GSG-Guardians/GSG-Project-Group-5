@@ -37,7 +37,7 @@ import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
 
 @ApiTags('Users')
 @ApiBearerAuth()
-@Controller('v1/users')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
