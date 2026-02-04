@@ -19,6 +19,7 @@ import {
   ApiParam,
   ApiConsumes,
   ApiResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { BillsService } from './bills.service';
 import {
@@ -49,9 +50,10 @@ type UploadedFilePayload = {
 };
 
 @ApiTags('Bills')
+@ApiBearerAuth()
 @Controller('v1/bills')
 export class BillsController {
-  constructor(private readonly billsService: BillsService) {}
+  constructor(private readonly billsService: BillsService) { }
 
   @Get()
   @ApiOperation({

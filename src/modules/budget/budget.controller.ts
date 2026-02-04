@@ -10,7 +10,13 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBody, ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiTags,
+  ApiOperation,
+  ApiQuery,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import type { Request } from 'express';
 
 import { JwtCookieGuard } from '../auth/guards/cookies.guard';
@@ -39,10 +45,11 @@ import type { IPaginationQuery } from '../../types/pagination.types';
 import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
 
 @ApiTags('Budgets')
+@ApiBearerAuth()
 @Controller('budgets')
 @UseGuards(JwtCookieGuard)
 export class BudgetController {
-  constructor(private readonly budgetService: BudgetService) {}
+  constructor(private readonly budgetService: BudgetService) { }
 
   @Post()
   @ApiOperation({ summary: 'Create a new budget' })

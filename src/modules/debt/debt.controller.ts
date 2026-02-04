@@ -10,7 +10,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import type { Request } from 'express';
 
 import { JwtCookieGuard } from '../auth/guards/cookies.guard';
@@ -34,10 +34,11 @@ import type { IPaginationQuery } from '../../types/pagination.types';
 import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
 
 @ApiTags('Debts')
+@ApiBearerAuth()
 @Controller('debts')
 @UseGuards(JwtCookieGuard)
 export class DebtController {
-  constructor(private readonly debtService: DebtService) {}
+  constructor(private readonly debtService: DebtService) { }
 
   @Post()
   @ApiOperation({ summary: 'Create a new debt' })

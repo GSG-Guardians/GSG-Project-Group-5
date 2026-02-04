@@ -8,7 +8,13 @@ import {
   Body,
   Query,
 } from '@nestjs/common';
-import { ApiBody, ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiTags,
+  ApiOperation,
+  ApiQuery,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 
 import { UserService } from './user.service';
 import type { CreateUserDto, UpdateUserDto } from './dto/request.dto';
@@ -30,9 +36,10 @@ import type { IPaginationQuery } from '../../types/pagination.types';
 import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
 
 @ApiTags('Users')
+@ApiBearerAuth()
 @Controller('v1/users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post()
   @ApiBody({ type: CreateUserRequestSwaggerDto })

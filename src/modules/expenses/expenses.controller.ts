@@ -7,7 +7,13 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import type { Request } from 'express';
 import { ZodValidationPipe } from 'src/pipes/zodValidation.pipe';
 import { JwtCookieGuard } from '../auth/guards/cookies.guard';
@@ -33,10 +39,11 @@ import {
 } from 'src/helpers/swaggerDTOWrapper.helpers';
 
 @ApiTags('Expenses')
+@ApiBearerAuth()
 @Controller('v1/expenses')
 @UseGuards(JwtCookieGuard)
 export class ExpensesController {
-  constructor(private readonly expensesService: ExpensesService) {}
+  constructor(private readonly expensesService: ExpensesService) { }
 
   @Get('overview')
   @ApiOperation({ summary: 'Expenses overview' })

@@ -9,7 +9,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import type { Request } from 'express';
 
 import { JwtCookieGuard } from '../auth/guards/cookies.guard';
@@ -25,12 +25,13 @@ import { getFinancialReportValidationSchema } from './schema/financial-report.sc
 import { ApiSuccess } from '../../helpers/swaggerDTOWrapper.helpers';
 
 @ApiTags('Financial Reports')
+@ApiBearerAuth()
 @Controller('financial-reports')
 @UseGuards(JwtCookieGuard)
 export class FinancialReportController {
   constructor(
     private readonly financialReportService: FinancialReportService,
-  ) {}
+  ) { }
 
   @Get()
   @ApiOperation({ summary: 'Get financial report for a period' })
