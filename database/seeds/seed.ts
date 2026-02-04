@@ -1,6 +1,9 @@
 import { DataSource } from 'typeorm';
 import { dataSourceOptions } from '../data-source';
 import { seedUsers } from './user.seed';
+import { seedBudgets } from './budget.seed';
+import { seedDebts } from './debt.seed';
+import { seedFinancialInsights } from './financial-insight.seed';
 
 const main = async () => {
   const dataSource = new DataSource(dataSourceOptions);
@@ -10,6 +13,9 @@ const main = async () => {
   try {
     // Run all seeds here (except currency)
     await seedUsers(dataSource);
+    await seedBudgets(dataSource);
+    await seedDebts(dataSource);
+    await seedFinancialInsights(dataSource);
 
     console.log('Main seed completed successfully!');
   } catch (err) {
