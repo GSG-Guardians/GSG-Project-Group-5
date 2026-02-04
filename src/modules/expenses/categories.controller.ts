@@ -16,7 +16,7 @@ import { ExpenseCategoryQuerySchema } from './schema/expenses.schema';
 
 @ApiTags('Categories')
 @ApiBearerAuth()
-@Controller('v1/categories')
+@Controller('categories')
 @UseGuards(JwtCookieGuard)
 export class CategoriesController {
   constructor(private readonly expensesService: ExpensesService) {}

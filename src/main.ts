@@ -12,7 +12,7 @@ async function bootstrap() {
     origin: true, // Allow all origins in development
     credentials: true, // Allow cookies to be sent
   });
-  app.setGlobalPrefix('api', {
+  app.setGlobalPrefix('api/v1', {
     exclude: [{ path: '/', method: RequestMethod.GET }],
   });
 

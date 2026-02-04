@@ -17,7 +17,7 @@ async function bootstrap() {
     new ExpressAdapter(expressApp),
   );
 
-  nestApp.setGlobalPrefix('api', {
+  nestApp.setGlobalPrefix('api/v1', {
     exclude: [{ path: '/', method: RequestMethod.GET }],
   });
   nestApp.enableCors();
