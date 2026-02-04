@@ -116,3 +116,14 @@ export class FinancialReportResponseSwaggerDto implements FinancialReportRespons
   @ApiProperty({ type: [FinancialInsightSwaggerDto] })
   insights: FinancialInsight[];
 }
+
+export class FinancialInsightResponseSwaggerDto extends FinancialInsightSwaggerDto {
+  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
+  id: string;
+
+  @ApiProperty()
+  createdAt: Date;
+
+  @ApiProperty()
+  updatedAt: Date;
+}

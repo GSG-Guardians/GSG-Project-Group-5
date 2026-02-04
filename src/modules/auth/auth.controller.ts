@@ -53,15 +53,49 @@ export class AuthController {
   @Post('sign-up')
   @ApiBody({ type: SignUpRequestSwaggerDto })
   @ApiSuccess(AuthResponseSwaggerDto)
-  signUp(@Body(new ZodValidationPipe(SignUpSchema)) data: TSignUpRequest) {
-    return this.authService.signUp(data);
+  async signUp(
+    @Body(new ZodValidationPipe(SignUpSchema)) data: TSignUpRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.signUp(data);
+
+    // Set cookie with the token
+    res.cookie('access_token', result.token, {
+      httpOnly: true,
+      secure: this.configService.getOrThrow('NODE_ENV') === 'production',
+      sameSite:
+        this.configService.getOrThrow('NODE_ENV') === 'production'
+          ? 'none'
+          : 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    return result;
   }
 
   @Post('sign-in')
   @ApiBody({ type: SignInRequestSwaggerDto })
   @ApiSuccess(AuthResponseSwaggerDto)
-  signIn(@Body(new ZodValidationPipe(SignInSchema)) data: TSignInRequest) {
-    return this.authService.signIn(data);
+  async signIn(
+    @Body(new ZodValidationPipe(SignInSchema)) data: TSignInRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.signIn(data);
+
+    // Set cookie with the token
+    res.cookie('access_token', result.token, {
+      httpOnly: true,
+      secure: this.configService.getOrThrow('NODE_ENV') === 'production',
+      sameSite:
+        this.configService.getOrThrow('NODE_ENV') === 'production'
+          ? 'none'
+          : 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    return result;
   }
 
   @Get('google')
