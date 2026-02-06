@@ -1,0 +1,432 @@
+
+// Enums
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
+enum GroupInvoiceStatus {
+  PAID
+  UNPAID
+}
+
+enum AssetOwnerType {
+  USER
+  DEBT
+  BILL
+  EXPENSE
+  GROUP_INVOICE
+  INCOME
+  REWARD
+}
+
+enum DebtDirection {
+  I_OWE
+  OWED_TO_ME
+}
+
+enum DebtStatus {
+  PAID
+  OVERDUE
+  UNPAID
+}
+
+enum BillStatus {
+  PAID
+  UNPAID
+}
+
+enum ReminderFrequency {
+  NONE
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+enum SplitMethod {
+  EQUAL
+  CUSTOM_AMOUNT
+  PERCENTAGE
+  ONE_PAYS
+  EXACT
+}
+
+enum CategoryName {
+  FOOD
+  HEALTH
+  ENTERTAINMENT
+  TRANSPORT
+  HOUSING
+  OTHER
+}
+
+enum IncomeSource {
+  SALARY
+  FREELANCE
+  BUSINESS
+  INVESTMENT
+  BONUS
+  GIFT
+  OTHER
+}
+
+enum IncomeFrequency {
+  ONE_TIME
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum NotificationType {
+  BILL_REMINDER
+  DEBT_REMINDER
+  GROUP_INVOICE_REMINDER
+  INCOME_REMINDER
+  PASSWORD_RESET
+  EMAIL_VERIFICATION
+  SYSTEM
+}
+
+enum BalanceTransactionType {
+  INCOME
+  EXPENSE
+  DEBT_PAYMENT
+  DEBT_RECEIVED
+  BILL_PAYMENT
+  GROUP_INVOICE_PAYMENT
+}
+
+enum RewardStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum PaymentStatus {
+  PAID
+  UNPAID
+  OVERDUE
+  PARTIAL
+}
+
+enum BudgetCategory {
+  FOOD
+  TRANSPORT
+  ENTERTAINMENT
+  HEALTH
+  SHOPPING
+  OTHERS
+}
+
+enum DebtType {
+  INDIVIDUAL
+  GROUP
+}
+
+// Tables
+
+Table users {
+  id uuid [pk]
+  full_name varchar(120)
+  email varchar(255) [unique]
+  phone varchar(20) [unique, null]
+  password_hash varchar(255) [null]
+  role UserRole [default: 'USER']
+  status UserStatus [default: 'PENDING']
+  default_currency_id uuid
+  current_balance numeric(14, 2) [default: 0]
+  points bigint [default: 0]
+  avatar_asset_id uuid [null]
+  provider varchar(20) [default: 'LOCAL']
+  provider_id varchar(255) [null]
+  created_at timestamptz [default: `now()`]
+  updated_at timestamptz [default: `now()`]
+}
+
+Table assets {
+  id uuid [pk]
+  user_id uuid
+  url text
+  file_name varchar(255) [null]
+  mime_type varchar(120) [null]
+  size_bytes bigint [null]
+  owner_type AssetOwnerType [null]
+  owner_id uuid [null]
+  created_at timestamptz [default: `now()`]
+}
+
+Table balance_history {
+  id uuid [pk]
+  user_id uuid
+  type BalanceTransactionType
+  amount numeric(14, 2)
+  balance_before numeric(14, 2)
+  balance_after numeric(14, 2)
+  currency_id uuid
+  entity_type varchar(40) [null]
+  entity_id uuid [null]
+  description text [null]
+  created_at timestamptz [default: `now()`]
+}
+
+Table bills {
+  id uuid [pk]
+  user_id uuid
+  name varchar(160)
+  amount numeric(14, 2)
+  currency_id uuid
+  status BillStatus [default: 'UNPAID']
+  due_date date
+  description text [null]
+  next_remind_at timestamptz [null]
+  paid_at timestamptz [null]
+  asset_id uuid [null]
+  created_at timestamptz [default: `now()`]
+  updated_at timestamptz [default: `now()`]
+}
+
+Table budget {
+  id uuid [pk]
+  category BudgetCategory
+  allocated_amount decimal(12, 2)
+  spent_amount decimal(12, 2) [default: 0]
+  start_date date
+  end_date date
+  is_active boolean [default: true]
+  notes text [null]
+  user_id uuid
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz [null]
+}
+
+Table currencies {
+  id uuid [pk]
+  code varchar(3) [unique]
+  symbol varchar(10) [null]
+  name varchar(100)
+}
+
+Table debts {
+  id uuid [pk]
+  user_id uuid
+  personal_name varchar(160)
+  direction DebtDirection [default: 'I_OWE']
+  amount numeric(14, 2)
+  currency_id uuid
+  due_date date
+  description text [null]
+  status DebtStatus [default: 'UNPAID']
+  reminder_enabled boolean [default: false]
+  remind_at timestamptz [null]
+  asset_id uuid [null]
+  created_at timestamptz [default: `now()`]
+  updated_at timestamptz [default: `now()`]
+}
+
+Table expenses {
+  id uuid [pk]
+  user_id uuid
+  name varchar(160)
+  amount numeric(14, 2)
+  currency_id uuid
+  category CategoryName [default: 'OTHER']
+  due_date date
+  description text [null]
+  next_remind_at timestamptz [null]
+  asset_id uuid [null]
+  created_at timestamptz [default: `now()`]
+  updated_at timestamptz [default: `now()`]
+}
+
+Table financial_insight {
+  id uuid [pk]
+  insight_type varchar(50)
+  title varchar(200)
+  message text
+  period_start date
+  period_end date
+  is_read boolean [default: false]
+  user_id uuid
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+Table group_invoice_share_items {
+  id uuid [pk]
+  share_id uuid
+  item_name varchar(160)
+  amount numeric(14, 2)
+}
+
+Table group_invoice_shares {
+  id uuid [pk]
+  group_invoice_id uuid
+  user_id uuid
+  amount_share numeric(14, 2)
+  percentage numeric(5, 2) [null]
+  paid_at timestamptz [null]
+  created_at timestamptz [default: `now()`]
+}
+
+Table group_invoices {
+  id uuid [pk]
+  created_by_user_id uuid
+  title varchar(160)
+  amount_total numeric(14, 2)
+  currency_id uuid
+  status GroupInvoiceStatus [default: 'UNPAID']
+  due_date date
+  split_method SplitMethod [default: 'EQUAL']
+  description text [null]
+  next_remind_at timestamptz [null]
+  asset_id uuid [null]
+  created_at timestamptz [default: `now()`]
+  updated_at timestamptz [default: `now()`]
+}
+
+Table income_recurring_rules {
+  id uuid [pk]
+  income_id uuid
+  frequency IncomeFrequency [default: 'ONE_TIME']
+  next_run_at date
+  end_at date [null]
+  active boolean [default: true]
+  created_at timestamptz [default: `now()`]
+}
+
+Table incomes {
+  id uuid [pk]
+  user_id uuid
+  amount numeric(14, 2)
+  currency_id uuid
+  source IncomeSource [default: 'SALARY']
+  description text [null]
+  income_date date
+  asset_id uuid [null]
+  created_at timestamptz [default: `now()`]
+  updated_at timestamptz [default: `now()`]
+}
+
+Table notifications {
+  id uuid [pk]
+  user_id uuid
+  type NotificationType
+  title varchar(160)
+  body text [null]
+  entity_type varchar(40) [null]
+  entity_id uuid [null]
+  data jsonb [null]
+  sent_at timestamptz [default: `now()`]
+  is_read boolean [default: false]
+  read_at timestamptz [null]
+  created_at timestamptz [default: `now()`]
+}
+
+Table password_reset_codes {
+  id uuid [pk]
+  user_id uuid
+  code_hash varchar(255)
+  expires_at timestamptz
+  used_at timestamptz [null]
+  attempt_count int [default: 0]
+  created_at timestamptz [default: `now()`]
+}
+
+Table reminders {
+  id uuid [pk]
+  user_id uuid
+  due_date date
+  description text [null]
+  is_active boolean [default: true]
+  frequency ReminderFrequency [default: 'NONE']
+  next_remind_at timestamptz [null]
+  last_sent_at timestamptz [null]
+  completed_at timestamptz [null]
+  debt_id uuid [null]
+  bill_id uuid [null]
+  expense_id uuid [null]
+  group_invoice_id uuid [null]
+  created_at timestamptz [default: `now()`]
+  updated_at timestamptz [default: `now()`]
+}
+
+Table rewards {
+  id uuid [pk]
+  title varchar(160)
+  description text [null]
+  points_cost int
+  icon_asset_id uuid [null]
+  status RewardStatus [default: 'ACTIVE']
+  created_at timestamptz [default: `now()`]
+  updated_at timestamptz [default: `now()`]
+}
+
+Table user_rewards {
+  id uuid [pk]
+  user_id uuid
+  reward_id uuid
+  points_spent int
+  claimed_at timestamptz [default: `now()`]
+}
+
+// Relationships
+
+Ref: users.default_currency_id > currencies.id
+Ref: users.avatar_asset_id - assets.id
+
+Ref: assets.user_id > users.id
+
+Ref: balance_history.user_id > users.id [delete: cascade]
+Ref: balance_history.currency_id > currencies.id
+
+Ref: bills.user_id > users.id [delete: cascade]
+Ref: bills.currency_id > currencies.id
+Ref: bills.asset_id > assets.id
+
+Ref: budget.user_id > users.id [delete: cascade]
+
+Ref: debts.user_id > users.id [delete: cascade]
+Ref: debts.currency_id > currencies.id
+Ref: debts.asset_id > assets.id
+
+Ref: expenses.user_id > users.id [delete: cascade]
+Ref: expenses.currency_id > currencies.id
+Ref: expenses.asset_id > assets.id
+
+Ref: financial_insight.user_id > users.id [delete: cascade]
+
+Ref: group_invoice_share_items.share_id > group_invoice_shares.id [delete: cascade]
+
+Ref: group_invoice_shares.group_invoice_id > group_invoices.id [delete: cascade]
+Ref: group_invoice_shares.user_id > users.id
+
+Ref: group_invoices.created_by_user_id > users.id [delete: cascade]
+Ref: group_invoices.currency_id > currencies.id
+Ref: group_invoices.asset_id > assets.id
+
+Ref: income_recurring_rules.income_id > incomes.id [delete: cascade]
+
+Ref: incomes.user_id > users.id [delete: cascade]
+Ref: incomes.currency_id > currencies.id
+Ref: incomes.asset_id > assets.id
+
+Ref: notifications.user_id > users.id [delete: cascade]
+
+Ref: password_reset_codes.user_id > users.id [delete: cascade]
+
+Ref: reminders.user_id > users.id [delete: cascade]
+Ref: reminders.debt_id - debts.id [delete: cascade]
+Ref: reminders.bill_id - bills.id [delete: cascade]
+Ref: reminders.expense_id - expenses.id [delete: cascade]
+Ref: reminders.group_invoice_id - group_invoices.id [delete: cascade]
+
+Ref: rewards.icon_asset_id > assets.id
+
+Ref: user_rewards.user_id > users.id [delete: cascade]
+Ref: user_rewards.reward_id > rewards.id [delete: cascade]
