@@ -12,6 +12,8 @@ import { User } from 'database/entities/user.entities';
 import { PasswordResetCode } from 'database/entities/password-reset-code.entities';
 import { MailService } from '../mail/mail.service';
 import { TResetJwtPayload } from 'src/types/jwt.types';
+import type { Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PasswordResetService {
@@ -24,6 +26,7 @@ export class PasswordResetService {
     private readonly resetRepo: Repository<PasswordResetCode>,
     private readonly mail: MailService,
     private readonly jwt: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   private generate4DigitCode() {
@@ -60,7 +63,7 @@ export class PasswordResetService {
     return { success: true };
   }
 
-  async verifyResetCode(email: string, code: string) {
+  async verifyResetCode(email: string, code: string, res: Response) {
     const user = await this.usersRepo.findOne({ where: { email } });
 
     if (!user) throw new BadRequestException('Invalid code');
@@ -94,18 +97,21 @@ export class PasswordResetService {
 
     const resetToken = this.generatePasswordResetToken(user.id);
 
-    return { success: true, resetToken };
+    res.cookie('reset_token', resetToken, {
+      httpOnly: true,
+      secure: this.configService.getOrThrow('NODE_ENV') === 'production',
+      sameSite:
+        this.configService.getOrThrow('NODE_ENV') === 'production'
+          ? 'none'
+          : 'lax',
+      path: '/',
+      maxAge: 10 * 60 * 1000,
+    });
+
+    return { success: true };
   }
 
-  async confirmReset(resetToken: string, newPassword: string) {
-    const payload = this.jwt.verify<TResetJwtPayload>(resetToken);
-
-    if (payload.type !== 'pwd_reset' || !payload.sub) {
-      throw new BadRequestException('Invalid reset token');
-    }
-
-    const userId = payload.sub;
-
+  async confirmReset(userId: string, newPassword: string, res: Response) {
     const passwordHash = await argon2.hash(newPassword);
 
     const updated = await this.usersRepo.update(
@@ -121,6 +127,15 @@ export class PasswordResetService {
       { userId, usedAt: IsNull(), expiresAt: MoreThan(new Date()) },
       { usedAt: new Date() },
     );
+    res.clearCookie('reset_token', {
+      httpOnly: true,
+      secure: this.configService.getOrThrow('NODE_ENV') === 'production',
+      sameSite:
+        this.configService.getOrThrow('NODE_ENV') === 'production'
+          ? 'none'
+          : 'lax',
+      path: '/',
+    });
 
     return { success: true };
   }

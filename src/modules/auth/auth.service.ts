@@ -12,6 +12,7 @@ import { GoogleIdTokenPayload, GoogleTokenResponse } from './types/googletypes';
 import { UserResponseDto } from '../user/dto';
 import { User } from 'database/entities/user.entities';
 import { Response } from 'express';
+import { toUserResponse } from '../user/mappers/user.mapper';
 
 @Injectable()
 export class AuthService {
@@ -37,14 +38,6 @@ export class AuthService {
     return { user, token };
   }
 
-  private hashPassword(password: string) {
-    return argon.hash(password);
-  }
-
-  private jwks = createRemoteJWKSet(
-    new URL('https://www.googleapis.com/oauth2/v3/certs'),
-  );
-
   async signIn(data: TSignInRequest) {
     const user = await this.userService.findByEmail(data.email);
 
@@ -66,9 +59,18 @@ export class AuthService {
     const userToToken = this.mapUserToToken(user);
 
     const token = this.generateToken(userToToken);
-
-    return { user, token };
+    const userToResponse = toUserResponse(user);
+    return { user: userToResponse, token };
   }
+
+  private hashPassword(password: string) {
+    return argon.hash(password);
+  }
+
+  private jwks = createRemoteJWKSet(
+    new URL('https://www.googleapis.com/oauth2/v3/certs'),
+  );
+
   private verifyPassword(hash: string, password: string) {
     return argon.verify(hash, password);
   }
@@ -154,7 +156,7 @@ export class AuthService {
       );
     }
   }
-  me(user: UserResponseDto) {
+  revalidate(user: UserResponseDto) {
     const userForToken = this.mapUserToToken(user);
     const token = this.generateToken(userForToken);
     return { user, token };
