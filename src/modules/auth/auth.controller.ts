@@ -50,16 +50,16 @@ import { PasswordResetService } from './password-reset.service';
 import { IsPublic } from '../../decorators/isPublic.decorator';
 
 @ApiTags('Auth')
-@IsPublic()
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
     private readonly passwordResetService: PasswordResetService,
-  ) {}
+  ) { }
 
   @Post('sign-up')
+  @IsPublic()
   @ApiBody({ type: SignUpRequestSwaggerDto })
   @ApiSuccess(AuthResponseSwaggerDto)
   async signUp(
@@ -77,13 +77,14 @@ export class AuthController {
           ? 'none'
           : 'lax',
       path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return result;
   }
 
   @Post('sign-in')
+  @IsPublic()
   @ApiBody({ type: SignInRequestSwaggerDto })
   @ApiSuccess(AuthResponseSwaggerDto)
   async signIn(
@@ -107,6 +108,7 @@ export class AuthController {
   }
 
   @Get('google')
+  @IsPublic()
   @ApiOperation({ summary: 'Initiate Google OAuth2 flow' })
   @ApiResponse({
     status: 302,
@@ -117,6 +119,7 @@ export class AuthController {
   }
 
   @Get('google/callback')
+  @IsPublic()
   @ApiOperation({ summary: 'Handle Google OAuth2 callback' })
   @ApiQuery({
     name: 'code',
@@ -141,15 +144,17 @@ export class AuthController {
     return this.authService.processGoogleCallback(res, code, googleError);
   }
 
-  @Get('me')
-  @UseGuards(JwtCookieGuard)
+  @Get('revalidate')
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiSuccess(AuthResponseSwaggerDto)
-  me(@Req() req: Request) {
-    return this.authService.me(req.user!);
+  revalidate(
+    @Req() req: Request,
+  ) {
+    return this.authService.revalidate(req.user!);
   }
 
   @Post('password-reset/request')
+  @IsPublic()
   @ApiOperation({ summary: 'Request password reset code' })
   @ApiBody({ type: PasswordResetRequestSwaggerDto })
   @ApiSuccess(PasswordResetGenericResponseSwaggerDto)
@@ -161,27 +166,34 @@ export class AuthController {
   }
 
   @Post('password-reset/verify')
+  @IsPublic()
   @ApiOperation({ summary: 'Verify reset code and get reset token' })
   @ApiBody({ type: PasswordResetVerifySwaggerDto })
   @ApiSuccess(PasswordResetVerifyResponseSwaggerDto)
   verifyReset(
     @Body(new ZodValidationPipe(PasswordResetVerifySchema))
     dto: PasswordResetVerifyDto,
+    @Res({ passthrough: true }) res: Response,
   ) {
-    return this.passwordResetService.verifyResetCode(dto.email, dto.code);
+    return this.passwordResetService.verifyResetCode(dto.email, dto.code, res);
   }
 
   @Patch('password-reset/confirm')
+  @IsPublic()
   @ApiOperation({ summary: 'Set new password using reset token' })
   @ApiBody({ type: PasswordResetConfirmSwaggerDto })
   @ApiSuccess(PasswordResetGenericResponseSwaggerDto)
+  @UseGuards(JwtCookieGuard)
   confirmReset(
     @Body(new ZodValidationPipe(PasswordResetConfirmSchema))
     dto: PasswordResetConfirmDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
   ) {
     return this.passwordResetService.confirmReset(
-      dto.resetToken,
+      req.user!.id,
       dto.newPassword,
+      res
     );
   }
 }
