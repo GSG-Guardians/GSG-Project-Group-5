@@ -35,10 +35,13 @@ import {
   ApiResponse,
   ApiQuery,
   ApiTags,
+  ApiBearerAuth,
+  ApiCookieAuth,
 } from '@nestjs/swagger';
 import { ApiSuccess } from 'src/helpers/swaggerDTOWrapper.helpers';
 import type { Response } from 'express';
 import { JwtCookieGuard } from './guards/cookies.guard';
+import { AuthGuard } from './guards/auth.guard';
 import { type Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import type {
@@ -56,7 +59,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
     private readonly passwordResetService: PasswordResetService,
-  ) { }
+  ) {}
 
   @Post('sign-up')
   @IsPublic()
@@ -64,21 +67,8 @@ export class AuthController {
   @ApiSuccess(AuthResponseSwaggerDto)
   async signUp(
     @Body(new ZodValidationPipe(SignUpSchema)) data: TSignUpRequest,
-    @Res({ passthrough: true }) res: Response,
   ) {
     const result = await this.authService.signUp(data);
-
-    // Set cookie with the token
-    res.cookie('access_token', result.token, {
-      httpOnly: true,
-      secure: this.configService.getOrThrow('NODE_ENV') === 'production',
-      sameSite:
-        this.configService.getOrThrow('NODE_ENV') === 'production'
-          ? 'none'
-          : 'lax',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
 
     return result;
   }
@@ -89,21 +79,8 @@ export class AuthController {
   @ApiSuccess(AuthResponseSwaggerDto)
   async signIn(
     @Body(new ZodValidationPipe(SignInSchema)) data: TSignInRequest,
-    @Res({ passthrough: true }) res: Response,
   ) {
     const result = await this.authService.signIn(data);
-
-    res.cookie('access_token', result.token, {
-      httpOnly: true,
-      secure: this.configService.getOrThrow('NODE_ENV') === 'production',
-      sameSite:
-        this.configService.getOrThrow('NODE_ENV') === 'production'
-          ? 'none'
-          : 'lax',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
     return result;
   }
 
@@ -145,12 +122,13 @@ export class AuthController {
   }
 
   @Get('revalidate')
-  @ApiOperation({ summary: 'Get current user profile' })
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Validate current token and get new one' })
   @ApiSuccess(AuthResponseSwaggerDto)
-  revalidate(
-    @Req() req: Request,
-  ) {
-    return this.authService.revalidate(req.user!);
+  revalidate(@Req() req: Request) {
+    const result = this.authService.revalidate(req.user!);
+    return result;
   }
 
   @Post('password-reset/request')
@@ -183,6 +161,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Set new password using reset token' })
   @ApiBody({ type: PasswordResetConfirmSwaggerDto })
   @ApiSuccess(PasswordResetGenericResponseSwaggerDto)
+  @ApiCookieAuth()
   @UseGuards(JwtCookieGuard)
   confirmReset(
     @Body(new ZodValidationPipe(PasswordResetConfirmSchema))
@@ -193,7 +172,7 @@ export class AuthController {
     return this.passwordResetService.confirmReset(
       req.user!.id,
       dto.newPassword,
-      res
+      res,
     );
   }
 }

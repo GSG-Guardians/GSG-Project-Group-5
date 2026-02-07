@@ -38,7 +38,6 @@ export class AuthService {
     return { user, token };
   }
 
-
   async signIn(data: TSignInRequest) {
     const user = await this.userService.findByEmail(data.email);
 
@@ -63,7 +62,6 @@ export class AuthService {
     const userToResponse = toUserResponse(user);
     return { user: userToResponse, token };
   }
-
 
   private hashPassword(password: string) {
     return argon.hash(password);
