@@ -8,6 +8,5 @@ export interface PasswordResetVerifyDto {
 }
 
 export interface PasswordResetConfirmDto {
-  resetToken: string;
   newPassword: string;
 }

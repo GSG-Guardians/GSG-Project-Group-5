@@ -56,9 +56,6 @@ export class PasswordResetVerifySwaggerDto {
 }
 
 export class PasswordResetConfirmSwaggerDto {
-  @ApiProperty({ example: 'eyJ...' })
-  resetToken: string;
-
   @ApiProperty({ example: 'NewStrongP@ssw0rd', minLength: 6 })
   newPassword: string;
 }
@@ -71,7 +68,4 @@ export class PasswordResetGenericResponseSwaggerDto {
 export class PasswordResetVerifyResponseSwaggerDto {
   @ApiProperty({ example: true })
   success: boolean;
-
-  @ApiProperty({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })
-  resetToken: string;
 }

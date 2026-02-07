@@ -18,9 +18,8 @@ export class JwtCookieGuard implements CanActivate {
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<Request>();
-
-    const token = (req.cookies as Record<string, string>)?.access_token;
-    if (!token) throw new UnauthorizedException('Missing access token');
+    const token = (req.cookies as Record<string, string>)?.reset_token;
+    if (!token) throw new UnauthorizedException('Missing reset token');
 
     try {
       const payload = this.jwtService.verify<IJWTPayload>(token);
