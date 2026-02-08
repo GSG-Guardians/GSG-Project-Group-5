@@ -41,7 +41,6 @@ import {
 import { ApiSuccess } from 'src/helpers/swaggerDTOWrapper.helpers';
 import type { Response } from 'express';
 import { JwtCookieGuard } from './guards/cookies.guard';
-import { AuthGuard } from './guards/auth.guard';
 import { type Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import type {
@@ -122,13 +121,20 @@ export class AuthController {
   }
 
   @Get('revalidate')
-  @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Validate current token and get new one' })
   @ApiSuccess(AuthResponseSwaggerDto)
   revalidate(@Req() req: Request) {
-    const result = this.authService.revalidate(req.user!);
+    const result = this.authService.me(req.user!);
     return result;
+  }
+
+  @Get('me')
+  @UseGuards(JwtCookieGuard)
+  @ApiOperation({ summary: 'Get current user' })
+  @ApiSuccess(AuthResponseSwaggerDto)
+  me(@Req() req: Request) {
+    return this.authService.me(req.user!);
   }
 
   @Post('password-reset/request')

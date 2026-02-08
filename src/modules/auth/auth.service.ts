@@ -119,7 +119,9 @@ export class AuthService {
     }
 
     if (!code) {
-      return res.redirect(`${frontendUrl}/login?error=missing_code`);
+      return res.redirect(
+        `${frontendUrl}/login?error=missing                                                                         _code`,
+      );
     }
 
     try {
@@ -156,7 +158,8 @@ export class AuthService {
       );
     }
   }
-  revalidate(user: UserResponseDto) {
+
+  me(user: UserResponseDto) {
     const userForToken = this.mapUserToToken(user);
     const token = this.generateToken(userForToken);
     return { user, token };
