@@ -119,9 +119,7 @@ export class AuthService {
     }
 
     if (!code) {
-      return res.redirect(
-        `${frontendUrl}/login?error=missing_code`,
-      );
+      return res.redirect(`${frontendUrl}/login?error=missing_code`);
     }
 
     try {
