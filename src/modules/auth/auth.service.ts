@@ -119,9 +119,7 @@ export class AuthService {
     }
 
     if (!code) {
-      return res.redirect(
-        `${frontendUrl}/login?error=missing                                                                         _code`,
-      );
+      return res.redirect(`${frontendUrl}/login?error=missing_code`);
     }
 
     try {
@@ -129,11 +127,8 @@ export class AuthService {
 
       res.cookie('access_token', token, {
         httpOnly: true,
-        secure: this.configService.getOrThrow('NODE_ENV') === 'production',
-        sameSite:
-          this.configService.getOrThrow('NODE_ENV') === 'production'
-            ? 'none'
-            : 'lax',
+        secure: true,
+        sameSite: 'none',
         path: '/',
       });
 

@@ -99,11 +99,8 @@ export class PasswordResetService {
 
     res.cookie('access_token', resetToken, {
       httpOnly: true,
-      secure: this.configService.getOrThrow('NODE_ENV') === 'production',
-      sameSite:
-        this.configService.getOrThrow('NODE_ENV') === 'production'
-          ? 'none'
-          : 'lax',
+      secure: true,
+      sameSite: 'none',
       path: '/',
       maxAge: 10 * 60 * 1000,
     });
@@ -119,7 +116,7 @@ export class PasswordResetService {
       { passwordHash },
     );
 
-    if (!updated.affected) {
+    if (updated.affected == 0) {
       throw new BadRequestException('User not found');
     }
 
@@ -129,11 +126,8 @@ export class PasswordResetService {
     );
     res.clearCookie('access_token', {
       httpOnly: true,
-      secure: this.configService.getOrThrow('NODE_ENV') === 'production',
-      sameSite:
-        this.configService.getOrThrow('NODE_ENV') === 'production'
-          ? 'none'
-          : 'lax',
+      secure: true,
+      sameSite: 'none',
       path: '/',
     });
 
