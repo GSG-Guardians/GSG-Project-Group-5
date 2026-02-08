@@ -5,19 +5,17 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
-
 import { Debt } from '../../../database/entities/debts.entities';
 import { Currency } from '../../../database/entities/currency.entities';
 import { DatabaseService } from '../database/database.service';
+import { UserService } from '../user/user.service';
 import { DebtDirection, DebtStatus } from '../../../database/enums';
-
 import { CreateDebtDto, UpdateDebtDto, FilterDebtDto } from './dto/request.dto';
 import { DebtResponseDto } from './dto/response.dto';
 import {
   IPaginationQuery,
   IPaginationResult,
 } from '../../types/pagination.types';
-
 import { toDebtResponse } from './mappers/debt.mapper';
 
 @Injectable()
@@ -27,26 +25,18 @@ export class DebtService {
     @InjectRepository(Currency)
     private readonly currencyRepo: Repository<Currency>,
     private readonly databaseService: DatabaseService,
+    private readonly userService: UserService,
   ) {}
 
   async create(userId: string, dto: CreateDebtDto): Promise<DebtResponseDto> {
-    const currency = await this.currencyRepo.findOne({
-      where: { id: dto.currencyId },
-    });
-    if (!currency) throw new BadRequestException('Invalid currency ID');
-
-    if (dto.reminderEnabled && !dto.remindAt) {
-      throw new BadRequestException(
-        'Reminder date is required when reminder is enabled',
-      );
-    }
+    const user = await this.userService.findOne(userId);
 
     const debt = this.debtRepo.create({
       userId,
       personalName: dto.personalName,
       direction: dto.direction,
       amount: dto.amount,
-      currencyId: dto.currencyId,
+      currencyId: user.defaultCurrencyId,
       dueDate: dto.dueDate,
       description: dto.description ?? null,
       reminderEnabled: dto.reminderEnabled ?? false,

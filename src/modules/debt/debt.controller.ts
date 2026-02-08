@@ -9,16 +9,19 @@ import {
   Query,
   Req,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiOperation, ApiTags, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import type { Request } from 'express';
-
 import { DebtService } from './debt.service';
 import type {
   CreateDebtDto,
   UpdateDebtDto,
   FilterDebtDto,
 } from './dto/request.dto';
-import { DebtResponseSwaggerDto } from './dto/swagger.dto';
+import {
+  DebtResponseSwaggerDto,
+  CreateDebtRequestSwaggerDto,
+  UpdateDebtRequestSwaggerDto,
+} from './dto/swagger.dto';
 import {
   debtValidationSchema,
   updateDebtValidationSchema,
@@ -38,6 +41,7 @@ export class DebtController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new debt' })
+  @ApiBody({ type: CreateDebtRequestSwaggerDto })
   @ApiSuccess(DebtResponseSwaggerDto)
   async create(
     @Body(new ZodValidationPipe(debtValidationSchema)) dto: CreateDebtDto,
@@ -77,6 +81,7 @@ export class DebtController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a debt' })
+  @ApiBody({ type: UpdateDebtRequestSwaggerDto })
   @ApiSuccess(DebtResponseSwaggerDto)
   async update(
     @Param('id') id: string,
