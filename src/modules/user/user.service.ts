@@ -19,6 +19,7 @@ import {
 } from '../../types/pagination.types';
 
 import { toUserResponse } from './mappers/user.mapper';
+import { UserRole, UserStatus } from 'database/enums';
 
 @Injectable()
 export class UserService {
@@ -65,8 +66,8 @@ export class UserService {
       provider,
       providerId: dto.providerId ?? null,
       defaultCurrencyId: currencyId,
-      role: dto.role ?? undefined,
-      status: dto.status ?? undefined,
+      role: UserRole.USER,
+      status: UserStatus.ACTIVE,
     });
 
     const saved = await this.userRepo.save(user);

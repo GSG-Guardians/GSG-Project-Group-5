@@ -97,7 +97,7 @@ export class PasswordResetService {
 
     const resetToken = this.generatePasswordResetToken(user.id);
 
-    res.cookie('reset_token', resetToken, {
+    res.cookie('access_token', resetToken, {
       httpOnly: true,
       secure: this.configService.getOrThrow('NODE_ENV') === 'production',
       sameSite:
@@ -127,7 +127,7 @@ export class PasswordResetService {
       { userId, usedAt: IsNull(), expiresAt: MoreThan(new Date()) },
       { usedAt: new Date() },
     );
-    res.clearCookie('reset_token', {
+    res.clearCookie('access_token', {
       httpOnly: true,
       secure: this.configService.getOrThrow('NODE_ENV') === 'production',
       sameSite:

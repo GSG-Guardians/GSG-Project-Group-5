@@ -8,12 +8,9 @@ import {
   Post,
   Query,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import type { Request } from 'express';
-
-import { JwtCookieGuard } from '../auth/guards/cookies.guard';
 
 import { DebtService } from './debt.service';
 import type {
@@ -36,7 +33,6 @@ import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
 @ApiTags('Debts')
 @ApiBearerAuth()
 @Controller('debts')
-@UseGuards(JwtCookieGuard)
 export class DebtController {
   constructor(private readonly debtService: DebtService) {}
 
@@ -64,6 +60,7 @@ export class DebtController {
   }
 
   @Get('summary')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get debt summary' })
   async getSummary(@Req() req: Request) {
     const userId = req.user!.id;
