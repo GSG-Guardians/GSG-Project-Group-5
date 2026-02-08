@@ -73,10 +73,10 @@ export class UserResponseSwaggerDto implements UserResponseDto {
   @ApiProperty({ example: '+970592497292', nullable: true })
   phone: string | null;
 
-  @ApiProperty({ example: 'USER' })
+  @ApiProperty({ enum: UserRole, example: UserRole.USER })
   role: UserRole;
 
-  @ApiProperty({ example: 'ACTIVE' })
+  @ApiProperty({ enum: UserStatus, example: UserStatus.ACTIVE })
   status: UserStatus;
 
   @ApiProperty({ format: 'uuid' })
