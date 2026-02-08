@@ -17,7 +17,11 @@ import type {
   UpdateDebtDto,
   FilterDebtDto,
 } from './dto/request.dto';
-import { DebtResponseSwaggerDto, CreateDebtRequestSwaggerDto, UpdateDebtRequestSwaggerDto } from './dto/swagger.dto';
+import {
+  DebtResponseSwaggerDto,
+  CreateDebtRequestSwaggerDto,
+  UpdateDebtRequestSwaggerDto,
+} from './dto/swagger.dto';
 import {
   debtValidationSchema,
   updateDebtValidationSchema,
@@ -33,7 +37,7 @@ import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
 @ApiBearerAuth()
 @Controller('debts')
 export class DebtController {
-  constructor(private readonly debtService: DebtService) { }
+  constructor(private readonly debtService: DebtService) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new debt' })

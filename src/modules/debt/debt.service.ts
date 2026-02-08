@@ -26,7 +26,7 @@ export class DebtService {
     private readonly currencyRepo: Repository<Currency>,
     private readonly databaseService: DatabaseService,
     private readonly userService: UserService,
-  ) { }
+  ) {}
 
   async create(userId: string, dto: CreateDebtDto): Promise<DebtResponseDto> {
     const user = await this.userService.findOne(userId);
