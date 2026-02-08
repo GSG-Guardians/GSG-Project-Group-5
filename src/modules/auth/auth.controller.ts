@@ -130,6 +130,7 @@ export class AuthController {
   }
 
   @Get('me')
+  @IsPublic()
   @UseGuards(JwtCookieGuard)
   @ApiOperation({ summary: 'Get current user' })
   @ApiSuccess(AuthResponseSwaggerDto)
@@ -172,8 +173,8 @@ export class AuthController {
   confirmReset(
     @Body(new ZodValidationPipe(PasswordResetConfirmSchema))
     dto: PasswordResetConfirmDto,
-    @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
+    @Req() req: Request,
   ) {
     return this.passwordResetService.confirmReset(
       req.user!.id,
