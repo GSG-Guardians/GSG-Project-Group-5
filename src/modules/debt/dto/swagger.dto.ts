@@ -3,8 +3,6 @@ import { CreateDebtDto, UpdateDebtDto, FilterDebtDto } from './request.dto';
 import { DebtResponseDto } from './response.dto';
 import { DebtDirection, DebtStatus } from 'database/enums';
 
-// ---------- Requests ----------
-
 export class CreateDebtRequestSwaggerDto implements CreateDebtDto {
   @ApiProperty({ example: 'Ahmad Hassan', minLength: 1, maxLength: 160 })
   personalName: string;
