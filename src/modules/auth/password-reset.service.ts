@@ -115,7 +115,6 @@ export class PasswordResetService {
       { id: userId },
       { passwordHash },
     );
-
     if (updated.affected == 0) {
       throw new BadRequestException('User not found');
     }
