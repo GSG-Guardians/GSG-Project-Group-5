@@ -23,10 +23,9 @@ export class JwtCookieGuard implements CanActivate {
 
     try {
       const payload = this.jwtService.verify<IJWTPayload>(token);
-      const user = await this.userService.findByEmail(payload.email);
+      const user = await this.userService.findOne(payload.sub);
       if (!user) throw new UnauthorizedException('User not found');
-      const userToClient = toUserResponse(user);
-      req.user = userToClient;
+      req.user = user;
       return true;
     } catch {
       throw new UnauthorizedException('Invalid access token');
