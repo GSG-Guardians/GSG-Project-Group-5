@@ -7,7 +7,6 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import type { IJWTPayload } from 'src/types/jwt.types';
 import { UserService } from 'src/modules/user/user.service';
-import { toUserResponse } from 'src/modules/user/mappers/user.mapper';
 import type { Request } from 'express';
 
 @Injectable()
