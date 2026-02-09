@@ -76,6 +76,7 @@ export enum IncomeSource {
 
 export enum IncomeFrequency {
   ONE_TIME = 'ONE_TIME',
+  DAILY = 'DAILY',
   WEEKLY = 'WEEKLY',
   MONTHLY = 'MONTHLY',
   YEARLY = 'YEARLY',
