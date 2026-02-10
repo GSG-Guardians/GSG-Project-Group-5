@@ -55,7 +55,7 @@ type UploadedFilePayload = {
 @ApiBearerAuth()
 @Controller('bills')
 export class BillsController {
-  constructor(private readonly billsService: BillsService) { }
+  constructor(private readonly billsService: BillsService) {}
 
   @Get()
   @ApiOperation({

@@ -58,7 +58,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
     private readonly passwordResetService: PasswordResetService,
-  ) { }
+  ) {}
 
   @Post('sign-up')
   @IsPublic()

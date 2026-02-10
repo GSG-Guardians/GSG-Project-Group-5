@@ -19,7 +19,7 @@ export class BillsService {
     private readonly billRepository: Repository<Bill>,
     @InjectRepository(GroupInvoice)
     private readonly groupInvoiceRepository: Repository<GroupInvoice>,
-  ) { }
+  ) {}
 
   async listBills(params: { type?: BillType; page: number; limit: number }) {
     const { type, page, limit } = params;
