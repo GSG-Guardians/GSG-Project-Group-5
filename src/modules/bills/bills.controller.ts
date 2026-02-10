@@ -10,6 +10,7 @@ import {
   Query,
   UploadedFile,
   UseInterceptors,
+  Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -41,6 +42,7 @@ import {
 } from './schemas/bills.schema';
 import { ApiBody } from '@nestjs/swagger';
 import { ApiSuccess } from 'src/helpers/swaggerDTOWrapper.helpers';
+import { type Request } from 'express';
 
 type UploadedFilePayload = {
   originalname: string;
@@ -113,8 +115,9 @@ export class BillsController {
   @ApiSuccess(BillResponseSwaggerDto)
   async createBill(
     @Body(new ZodValidationPipe(CreateBillSchema)) dto: TCreateBillRequest,
+    @Req() req: Request,
   ) {
-    return this.billsService.createBill(dto);
+    return this.billsService.createBill(req.user!.id, dto);
   }
 
   @Put(':id')

@@ -128,7 +128,7 @@ export class AuthService {
       res.cookie('access_token', token, {
         httpOnly: true,
         secure: true,
-        sameSite: 'none',
+        sameSite: 'lax',
         path: '/',
       });
 
