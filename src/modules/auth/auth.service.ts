@@ -20,7 +20,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   async signUp(data: TSignUpRequest) {
     const hashedPassword = await this.hashPassword(data.password);
