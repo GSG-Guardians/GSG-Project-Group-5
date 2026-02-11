@@ -100,7 +100,7 @@ export class PasswordResetService {
     res.cookie('access_token', resetToken, {
       httpOnly: true,
       secure: true,
-      sameSite: 'lax',
+      sameSite: 'none',
       path: '/',
       maxAge: 10 * 60 * 1000,
     });
@@ -126,7 +126,7 @@ export class PasswordResetService {
     res.clearCookie('access_token', {
       httpOnly: true,
       secure: true,
-      sameSite: 'lax',
+      sameSite: 'none',
       path: '/',
     });
 
