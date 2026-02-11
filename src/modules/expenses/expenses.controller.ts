@@ -27,11 +27,13 @@ import {
 } from './dto/swagger.dto';
 import {
   type TCreateExpenseRequest,
-  type TExpensePeriodQuery,
+  type TExpenseTotalsQuery,
+  type TExpenseDonutQuery,
 } from './dto/request.dto';
 import {
   CreateExpenseSchema,
-  ExpensePeriodQuerySchema,
+  ExpenseTotalsQuerySchema,
+  ExpenseDonutQuerySchema,
 } from './schema/expenses.schema';
 import {
   ApiSuccess,
@@ -48,19 +50,11 @@ export class ExpensesController {
   @Get('overview')
   @ApiOperation({ summary: 'Expenses overview' })
   @ApiSuccess(ExpenseOverviewResponseSwaggerDto)
-  @ApiQuery({ name: 'from', required: false, type: String })
-  @ApiQuery({ name: 'to', required: false, type: String })
-  @ApiQuery({
-    name: 'period',
-    required: false,
-    enum: ['day', 'week', 'month', 'year'],
-  })
-  @ApiQuery({ name: 'month', required: false, type: Number })
   @ApiQuery({ name: 'currencyId', required: false, type: String })
   getOverview(
     @Req() req: Request,
-    @Query(new ZodValidationPipe(ExpensePeriodQuerySchema))
-    query: TExpensePeriodQuery,
+    @Query(new ZodValidationPipe(ExpenseTotalsQuerySchema))
+    query: TExpenseTotalsQuery,
   ) {
     return this.expensesService.getOverview(req.user!, query);
   }
@@ -68,19 +62,11 @@ export class ExpensesController {
   @Get('categories/breakdown')
   @ApiOperation({ summary: 'Expenses categories breakdown' })
   @ApiSuccessArray(ExpenseCategoryBreakdownSwaggerDto)
-  @ApiQuery({ name: 'from', required: false, type: String })
-  @ApiQuery({ name: 'to', required: false, type: String })
-  @ApiQuery({
-    name: 'period',
-    required: false,
-    enum: ['day', 'week', 'month', 'year'],
-  })
-  @ApiQuery({ name: 'month', required: false, type: Number })
   @ApiQuery({ name: 'currencyId', required: false, type: String })
   getCategoryBreakdown(
     @Req() req: Request,
-    @Query(new ZodValidationPipe(ExpensePeriodQuerySchema))
-    query: TExpensePeriodQuery,
+    @Query(new ZodValidationPipe(ExpenseTotalsQuerySchema))
+    query: TExpenseTotalsQuery,
   ) {
     return this.expensesService.getCategoryBreakdown(req.user!, query);
   }
@@ -99,8 +85,8 @@ export class ExpensesController {
   @ApiQuery({ name: 'currencyId', required: false, type: String })
   getDonutChart(
     @Req() req: Request,
-    @Query(new ZodValidationPipe(ExpensePeriodQuerySchema))
-    query: TExpensePeriodQuery,
+    @Query(new ZodValidationPipe(ExpenseDonutQuerySchema))
+    query: TExpenseDonutQuery,
   ) {
     return this.expensesService.getDonutChart(req.user!, query);
   }

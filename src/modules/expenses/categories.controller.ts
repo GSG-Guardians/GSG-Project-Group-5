@@ -25,14 +25,6 @@ export class CategoriesController {
   @ApiOperation({ summary: 'Expense categories' })
   @ApiSuccessArray(ExpenseCategoryOptionSwaggerDto)
   @ApiQuery({ name: 'type', required: false, enum: ['expense'] })
-  @ApiQuery({ name: 'from', required: false, type: String })
-  @ApiQuery({ name: 'to', required: false, type: String })
-  @ApiQuery({
-    name: 'period',
-    required: false,
-    enum: ['day', 'week', 'month', 'year'],
-  })
-  @ApiQuery({ name: 'month', required: false, type: Number })
   @ApiQuery({ name: 'currencyId', required: false, type: String })
   getExpenseCategories(
     @Req() req: Request,
