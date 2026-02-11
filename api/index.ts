@@ -4,6 +4,7 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from '../src/app.module';
 import express from 'express';
+import cookieParser from 'cookie-parser';
 
 let cachedServer: any;
 
@@ -20,7 +21,12 @@ async function bootstrap() {
   nestApp.setGlobalPrefix('api/v1', {
     exclude: [{ path: '/', method: RequestMethod.GET }],
   });
-  nestApp.enableCors();
+  nestApp.use(cookieParser());
+  nestApp.enableCors({
+    origin: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Trackly API')
