@@ -17,8 +17,9 @@ import {
   PasswordResetRequestSwaggerDto,
   PasswordResetVerifySwaggerDto,
   PasswordResetConfirmSwaggerDto,
-  PasswordResetGenericResponseSwaggerDto,
   PasswordResetVerifyResponseSwaggerDto,
+  PasswordResetRequestResponseSwaggerDto,
+  PasswordResetConfirmResponseSwaggerDto,
   type TSignUpRequest,
   type TSignInRequest,
 } from './dto';
@@ -36,7 +37,6 @@ import {
   ApiQuery,
   ApiTags,
   ApiBearerAuth,
-  ApiCookieAuth,
 } from '@nestjs/swagger';
 import { ApiSuccess } from 'src/helpers/swaggerDTOWrapper.helpers';
 import type { Response } from 'express';
@@ -142,7 +142,7 @@ export class AuthController {
   @IsPublic()
   @ApiOperation({ summary: 'Request password reset code' })
   @ApiBody({ type: PasswordResetRequestSwaggerDto })
-  @ApiSuccess(PasswordResetGenericResponseSwaggerDto)
+  @ApiSuccess(PasswordResetRequestResponseSwaggerDto)
   requestReset(
     @Body(new ZodValidationPipe(PasswordResetRequestSchema))
     dto: PasswordResetRequestDto,
@@ -158,28 +158,23 @@ export class AuthController {
   verifyReset(
     @Body(new ZodValidationPipe(PasswordResetVerifySchema))
     dto: PasswordResetVerifyDto,
-    @Res({ passthrough: true }) res: Response,
   ) {
-    return this.passwordResetService.verifyResetCode(dto.email, dto.code, res);
+    return this.passwordResetService.verifyResetCode(dto.email, dto.code);
   }
 
   @Patch('password-reset/confirm')
-  @IsPublic()
   @ApiOperation({ summary: 'Set new password using reset token' })
   @ApiBody({ type: PasswordResetConfirmSwaggerDto })
-  @ApiSuccess(PasswordResetGenericResponseSwaggerDto)
-  @ApiCookieAuth()
-  @UseGuards(JwtCookieGuard)
+  @ApiSuccess(PasswordResetConfirmResponseSwaggerDto)
+  @ApiBearerAuth()
   confirmReset(
     @Body(new ZodValidationPipe(PasswordResetConfirmSchema))
     dto: PasswordResetConfirmDto,
-    @Res({ passthrough: true }) res: Response,
     @Req() req: Request,
   ) {
     return this.passwordResetService.confirmReset(
       req.user!.id,
       dto.newPassword,
-      res,
     );
   }
 }
