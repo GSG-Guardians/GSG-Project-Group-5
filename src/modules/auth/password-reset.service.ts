@@ -27,7 +27,7 @@ export class PasswordResetService {
     private readonly mail: MailService,
     private readonly jwt: JwtService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   private generate4DigitCode() {
     return Math.floor(1000 + Math.random() * 9000).toString();
@@ -100,7 +100,7 @@ export class PasswordResetService {
     res.cookie('access_token', resetToken, {
       httpOnly: true,
       secure: true,
-      sameSite: 'lax',
+      sameSite: 'none',
       path: '/',
       maxAge: 10 * 60 * 1000,
     });
@@ -126,7 +126,7 @@ export class PasswordResetService {
     res.clearCookie('access_token', {
       httpOnly: true,
       secure: true,
-      sameSite: 'lax',
+      sameSite: 'none',
       path: '/',
     });
 
