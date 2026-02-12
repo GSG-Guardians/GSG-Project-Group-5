@@ -28,3 +28,8 @@ export type UpdateIncomeDto = Partial<
     | 'isRecurringActive'
   >
 >;
+export type IncomePeriod = 'week' | 'month' | 'year';
+
+export type IncomePeriodQueryDto = {
+  period?: IncomePeriod;
+};
