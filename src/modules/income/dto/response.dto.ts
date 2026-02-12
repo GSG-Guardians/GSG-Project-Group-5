@@ -18,3 +18,14 @@ export type IncomeSummaryDto = {
   topSource: IncomeSource | null;
   topSourceAmount: number;
 };
+
+export type IncomeBreakdownItemDto = {
+  source: IncomeSource;
+  amount: number;
+  percentage: number;
+};
+
+export type IncomeBreakdownDto = {
+  totalIncome: number;
+  items: IncomeBreakdownItemDto[];
+};
