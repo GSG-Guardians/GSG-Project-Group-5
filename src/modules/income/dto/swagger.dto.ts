@@ -92,16 +92,20 @@ export class IncomeResponseSwaggerDto {
 }
 
 export class IncomeSummarySwaggerDto {
-  @ApiProperty({ example: 3500 })
+  @ApiProperty({ example: 9300 })
   totalIncome: number;
 
   @ApiProperty({ example: 12 })
   percentChangeVsPreviousPeriod: number;
 
-  @ApiProperty({ example: IncomeSource.SALARY, enum: IncomeSource })
-  topSource: IncomeSource;
+  @ApiProperty({
+    enum: IncomeSource,
+    nullable: true,
+    example: IncomeSource.SALARY,
+  })
+  topSource: IncomeSource | null;
 
-  @ApiProperty({ example: 2800 })
+  @ApiProperty({ example: 7250 })
   topSourceAmount: number;
 }
 
@@ -120,4 +124,31 @@ export class IncomeListQuerySwaggerDto {
 
   @ApiPropertyOptional({ enum: IncomeSource })
   source?: IncomeSource;
+}
+
+export class IncomeBreakdownItemSwaggerDto {
+  @ApiProperty({ enum: IncomeSource, example: IncomeSource.SALARY })
+  source: IncomeSource;
+
+  @ApiProperty({ example: 3500 })
+  amount: number;
+
+  @ApiProperty({ example: 70 })
+  percentage: number;
+}
+
+export class IncomeBreakdownSwaggerDto {
+  @ApiProperty({ example: 5000 })
+  totalIncome: number;
+
+  @ApiProperty({ type: [IncomeBreakdownItemSwaggerDto] })
+  items: IncomeBreakdownItemSwaggerDto[];
+}
+export class IncomePeriodQuerySwaggerDto {
+  @ApiPropertyOptional({
+    enum: ['week', 'month', 'year'],
+    default: 'month',
+    description: 'Time period for income aggregation',
+  })
+  period?: 'week' | 'month' | 'year';
 }
