@@ -4,7 +4,11 @@ import cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { RequestMethod } from '@nestjs/common';
-import { HttpExceptionFilter, UncaughtExceptionFilter, ZodExceptionFilter } from './error/exception.filter';
+import {
+  HttpExceptionFilter,
+  UncaughtExceptionFilter,
+  ZodExceptionFilter,
+} from './error/exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

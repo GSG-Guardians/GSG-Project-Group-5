@@ -13,44 +13,44 @@ import {
   QueryFailedError,
   CustomRepositoryNotFoundError,
 } from 'typeorm';
-import { buildApiErrorResponse, buildZodValidationErrorResponse, parseUniqueDetail } from './exception.utils';
+import {
+  buildApiErrorResponse,
+  buildZodValidationErrorResponse,
+  parseUniqueDetail,
+} from './exception.utils';
 import { DB_ERROR_MAP } from './exception.utils';
 import { PostgresErrorCode } from './exception.constants';
 import { IPostgresDriverError } from './exception.types';
 import { ZodError } from 'zod';
 
-@Catch(HttpException) 
+@Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
-    catch(exception: HttpException, host: ArgumentsHost) {
-        const ctx = host.switchToHttp();
-        const response = ctx.getResponse<Response>();
-        const request = ctx.getRequest<Request>();
-        const status = exception.getStatus();
-        const errorResponse = buildApiErrorResponse(
-            {
-                statusCode: status,
-                path: request.url,
-                message: exception.message || 'Something went wrong!',
-            }
-        )
-        response.status(status).json(errorResponse);
-    }
+  catch(exception: HttpException, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
+    const status = exception.getStatus();
+    const errorResponse = buildApiErrorResponse({
+      statusCode: status,
+      path: request.url,
+      message: exception.message || 'Something went wrong!',
+    });
+    response.status(status).json(errorResponse);
+  }
 }
-
 
 @Catch(ZodError)
 export class ZodExceptionFilter implements ExceptionFilter {
   catch(exception: ZodError, host: ArgumentsHost) {
-    
     const ctx = host.switchToHttp();
     const res = ctx.getResponse<Response>();
     const req = ctx.getRequest<Request>();
 
     const status = HttpStatus.BAD_REQUEST;
     const errorResponse = buildZodValidationErrorResponse(
-        req.url,
-        status,
-        exception.issues,
+      req.url,
+      status,
+      exception.issues,
     );
 
     res.status(status).json(errorResponse);
@@ -122,26 +122,26 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
 
 @Catch()
 export class UncaughtExceptionFilter implements ExceptionFilter {
-    
-    catch(exception: unknown, host: ArgumentsHost) {
-        const ctx = host.switchToHttp();
-        
-        const res = ctx.getResponse<Response>();
+  catch(exception: unknown, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
 
-        const req = ctx.getRequest<Request>();
+    const res = ctx.getResponse<Response>();
 
-        const status = HttpStatus.INTERNAL_SERVER_ERROR;
+    const req = ctx.getRequest<Request>();
 
-        const message = exception  instanceof Error 
-            ? exception.message
-            : "Internal Server Error, try again later!"
-            
-        const error = buildApiErrorResponse({
-                statusCode: status,
-                path: req.url,
-                message,
-        });
+    const status = HttpStatus.INTERNAL_SERVER_ERROR;
 
-        res.status(status).json(error);
-    }
+    const message =
+      exception instanceof Error
+        ? exception.message
+        : 'Internal Server Error, try again later!';
+
+    const error = buildApiErrorResponse({
+      statusCode: status,
+      path: req.url,
+      message,
+    });
+
+    res.status(status).json(error);
+  }
 }
