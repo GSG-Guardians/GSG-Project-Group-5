@@ -5,7 +5,7 @@ export const CreateBillSchema = z.object({
   amount: z.number().positive('Amount must be positive'),
   date: z.string().min(1, 'Date is required'),
   type: z.enum(['individual', 'group']),
-  currencyId: z.string().uuid().optional(),
+  currencyId: z.string().uuid(),
   description: z.string().nullable().optional(),
   assetId: z.string().uuid().nullable().optional(),
 });

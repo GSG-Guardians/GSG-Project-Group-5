@@ -19,9 +19,9 @@ export class BillsService {
     private readonly billRepository: Repository<Bill>,
     @InjectRepository(GroupInvoice)
     private readonly groupInvoiceRepository: Repository<GroupInvoice>,
-  ) {}
+  ) { }
 
-  async listBills(params: { type?: BillType; page: number; limit: number }) {
+  async listBills(userId: string, params: { type?: BillType; page: number; limit: number }) {
     const { type, page, limit } = params;
     const safePage = Number.isFinite(page) && page > 0 ? page : 1;
     const safeLimit = Number.isFinite(limit) && limit > 0 ? limit : 10;
@@ -29,6 +29,7 @@ export class BillsService {
 
     if (type === 'individual') {
       const [items, total] = await this.billRepository.findAndCount({
+        where: { userId },
         order: { dueDate: 'DESC' },
         skip,
         take: safeLimit,
@@ -46,6 +47,7 @@ export class BillsService {
 
     if (type === 'group') {
       const [items, total] = await this.groupInvoiceRepository.findAndCount({
+        where: { createdByUserId: userId },
         order: { dueDate: 'DESC' },
         skip,
         take: safeLimit,
@@ -64,10 +66,12 @@ export class BillsService {
     const takeForMerge = safePage * safeLimit;
     const [individual, group] = await Promise.all([
       this.billRepository.find({
+        where: { userId },
         order: { dueDate: 'DESC' },
         take: takeForMerge,
       }),
       this.groupInvoiceRepository.find({
+        where: { createdByUserId: userId },
         order: { dueDate: 'DESC' },
         take: takeForMerge,
       }),
@@ -93,9 +97,9 @@ export class BillsService {
     };
   }
 
-  async getBillDetails(id: string) {
+  async getBillDetails(userId: string, id: string) {
     const bill = await this.billRepository.findOne({
-      where: { id },
+      where: { id, userId },
       relations: ['currency', 'asset', 'reminder'],
     });
 
@@ -108,7 +112,7 @@ export class BillsService {
     }
 
     const groupInvoice = await this.groupInvoiceRepository.findOne({
-      where: { id },
+      where: { id, createdByUserId: userId },
       relations: [
         'currency',
         'asset',
@@ -190,8 +194,8 @@ export class BillsService {
     };
   }
 
-  async updateBill(id: string, dto: TUpdateBillRequest) {
-    const bill = await this.billRepository.findOne({ where: { id } });
+  async updateBill(userId: string, id: string, dto: TUpdateBillRequest) {
+    const bill = await this.billRepository.findOne({ where: { id, userId } });
     if (bill) {
       if (dto.name !== undefined) bill.name = dto.name;
       if (dto.amount !== undefined) bill.amount = dto.amount.toString();
@@ -209,7 +213,7 @@ export class BillsService {
     }
 
     const groupInvoice = await this.groupInvoiceRepository.findOne({
-      where: { id },
+      where: { id, createdByUserId: userId },
     });
     if (!groupInvoice) {
       throw new NotFoundException('Bill not found');
@@ -234,15 +238,15 @@ export class BillsService {
     };
   }
 
-  async deleteBill(id: string) {
-    const bill = await this.billRepository.findOne({ where: { id } });
+  async deleteBill(userId: string, id: string) {
+    const bill = await this.billRepository.findOne({ where: { id, userId } });
     if (bill) {
       await this.billRepository.remove(bill);
       return { deleted: true };
     }
 
     const groupInvoice = await this.groupInvoiceRepository.findOne({
-      where: { id },
+      where: { id, createdByUserId: userId },
     });
     if (!groupInvoice) {
       throw new NotFoundException('Bill not found');
@@ -252,10 +256,10 @@ export class BillsService {
     return { deleted: true };
   }
 
-  async updateBillStatus(id: string, status: 'paid' | 'unpaid') {
+  async updateBillStatus(userId: string, id: string, status: 'paid' | 'unpaid') {
     const normalized = status.toLowerCase();
     const isPaid = normalized === 'paid';
-    const bill = await this.billRepository.findOne({ where: { id } });
+    const bill = await this.billRepository.findOne({ where: { id, userId } });
     if (bill) {
       bill.status = isPaid ? BillStatus.PAID : BillStatus.UNPAID;
       bill.paidAt = isPaid ? new Date() : null;
@@ -268,7 +272,7 @@ export class BillsService {
     }
 
     const groupInvoice = await this.groupInvoiceRepository.findOne({
-      where: { id },
+      where: { id, createdByUserId: userId },
     });
     if (!groupInvoice) {
       throw new NotFoundException('Bill not found');

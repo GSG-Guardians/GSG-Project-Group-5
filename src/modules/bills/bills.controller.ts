@@ -55,7 +55,7 @@ type UploadedFilePayload = {
 @ApiBearerAuth()
 @Controller('bills')
 export class BillsController {
-  constructor(private readonly billsService: BillsService) {}
+  constructor(private readonly billsService: BillsService) { }
 
   @Get()
   @ApiOperation({
@@ -83,11 +83,12 @@ export class BillsController {
   })
   @ApiSuccess(BillListResponseSwaggerDto)
   async listBills(
+    @Req() req: Request,
     @Query('type') type?: 'individual' | 'group',
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ) {
-    return this.billsService.listBills({
+    return this.billsService.listBills(req.user!.id, {
       type,
       page: page ? Number(page) : 1,
       limit: limit ? Number(limit) : 10,
@@ -102,8 +103,8 @@ export class BillsController {
   })
   @ApiParam({ name: 'id', description: 'Bill ID' })
   @ApiSuccess(BillResponseSwaggerDto)
-  async getBill(@Param('id') id: string) {
-    return this.billsService.getBillDetails(id);
+  async getBill(@Param('id') id: string, @Req() req: Request) {
+    return this.billsService.getBillDetails(req.user!.id, id);
   }
 
   @Post()
@@ -131,16 +132,17 @@ export class BillsController {
   async updateBill(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(UpdateBillSchema)) dto: TUpdateBillRequest,
+    @Req() req: Request,
   ) {
-    return this.billsService.updateBill(id, dto);
+    return this.billsService.updateBill(req.user!.id, id, dto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete bill', description: 'Delete a bill record' })
   @ApiParam({ name: 'id', description: 'Bill ID' })
   @ApiResponse({ status: 200, description: 'Bill deleted successfully' })
-  async deleteBill(@Param('id') id: string) {
-    return this.billsService.deleteBill(id);
+  async deleteBill(@Param('id') id: string, @Req() req: Request) {
+    return this.billsService.deleteBill(req.user!.id, id);
   }
 
   @Patch(':id/status')
@@ -155,8 +157,9 @@ export class BillsController {
     @Param('id') id: string,
     @Body(new ZodValidationPipe(UpdateBillStatusSchema))
     dto: TUpdateBillStatusRequest,
+    @Req() req: Request,
   ) {
-    return this.billsService.updateBillStatus(id, dto.status);
+    return this.billsService.updateBillStatus(req.user!.id, id, dto.status);
   }
 
   @Post('smart-parse')
