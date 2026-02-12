@@ -5,7 +5,6 @@ export class ZodValidationPipe<T> implements PipeTransform<unknown, T> {
   constructor(private schema: ZodType<T>) {}
 
   transform(value: unknown, metadata: ArgumentMetadata) {
-    console.log(metadata);
     const parsedValue = this.schema.parse(value);
     return parsedValue;
   }
