@@ -63,7 +63,7 @@ export class PasswordResetService {
     return { success: true };
   }
 
-  async verifyResetCode(email: string, code: string, res: Response) {
+  async verifyResetCode(email: string, code: string) {
     const user = await this.usersRepo.findOne({ where: { email } });
 
     if (!user) throw new BadRequestException('Invalid code');
@@ -96,30 +96,17 @@ export class PasswordResetService {
     await this.resetRepo.save(row);
 
     const resetToken = this.generatePasswordResetToken(user.id);
-
-    res.cookie('reset_token', resetToken, {
-      httpOnly: true,
-      secure: this.configService.getOrThrow('NODE_ENV') === 'production',
-      sameSite:
-        this.configService.getOrThrow('NODE_ENV') === 'production'
-          ? 'none'
-          : 'lax',
-      path: '/',
-      maxAge: 10 * 60 * 1000,
-    });
-
-    return { success: true };
+    return { success: true, token: resetToken };
   }
 
-  async confirmReset(userId: string, newPassword: string, res: Response) {
+  async confirmReset(userId: string, newPassword: string) {
     const passwordHash = await argon2.hash(newPassword);
 
     const updated = await this.usersRepo.update(
       { id: userId },
       { passwordHash },
     );
-
-    if (!updated.affected) {
+    if (updated.affected == 0) {
       throw new BadRequestException('User not found');
     }
 
@@ -127,16 +114,6 @@ export class PasswordResetService {
       { userId, usedAt: IsNull(), expiresAt: MoreThan(new Date()) },
       { usedAt: new Date() },
     );
-    res.clearCookie('reset_token', {
-      httpOnly: true,
-      secure: this.configService.getOrThrow('NODE_ENV') === 'production',
-      sameSite:
-        this.configService.getOrThrow('NODE_ENV') === 'production'
-          ? 'none'
-          : 'lax',
-      path: '/',
-    });
-
     return { success: true };
   }
 

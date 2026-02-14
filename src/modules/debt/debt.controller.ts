@@ -8,20 +8,20 @@ import {
   Post,
   Query,
   Req,
-  UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiOperation, ApiTags, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import type { Request } from 'express';
-
-import { JwtCookieGuard } from '../auth/guards/cookies.guard';
-
 import { DebtService } from './debt.service';
 import type {
   CreateDebtDto,
   UpdateDebtDto,
   FilterDebtDto,
 } from './dto/request.dto';
-import { DebtResponseSwaggerDto } from './dto/swagger.dto';
+import {
+  DebtResponseSwaggerDto,
+  CreateDebtRequestSwaggerDto,
+  UpdateDebtRequestSwaggerDto,
+} from './dto/swagger.dto';
 import {
   debtValidationSchema,
   updateDebtValidationSchema,
@@ -36,12 +36,12 @@ import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
 @ApiTags('Debts')
 @ApiBearerAuth()
 @Controller('debts')
-@UseGuards(JwtCookieGuard)
 export class DebtController {
   constructor(private readonly debtService: DebtService) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new debt' })
+  @ApiBody({ type: CreateDebtRequestSwaggerDto })
   @ApiSuccess(DebtResponseSwaggerDto)
   async create(
     @Body(new ZodValidationPipe(debtValidationSchema)) dto: CreateDebtDto,
@@ -64,6 +64,7 @@ export class DebtController {
   }
 
   @Get('summary')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get debt summary' })
   async getSummary(@Req() req: Request) {
     const userId = req.user!.id;
@@ -80,6 +81,7 @@ export class DebtController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a debt' })
+  @ApiBody({ type: UpdateDebtRequestSwaggerDto })
   @ApiSuccess(DebtResponseSwaggerDto)
   async update(
     @Param('id') id: string,

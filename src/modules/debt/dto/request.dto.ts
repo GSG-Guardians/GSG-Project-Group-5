@@ -4,7 +4,6 @@ export type CreateDebtDto = {
   personalName: string;
   direction: DebtDirection;
   amount: string;
-  currencyId: string;
   dueDate: string;
   description?: string | null;
   reminderEnabled?: boolean;

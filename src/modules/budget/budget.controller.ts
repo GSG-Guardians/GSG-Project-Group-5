@@ -8,7 +8,6 @@ import {
   Body,
   Query,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -18,8 +17,6 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import type { Request } from 'express';
-
-import { JwtCookieGuard } from '../auth/guards/cookies.guard';
 
 import { BudgetService } from './budget.service';
 import type {
@@ -47,7 +44,6 @@ import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
 @ApiTags('Budgets')
 @ApiBearerAuth()
 @Controller('budgets')
-@UseGuards(JwtCookieGuard)
 export class BudgetController {
   constructor(private readonly budgetService: BudgetService) {}
 

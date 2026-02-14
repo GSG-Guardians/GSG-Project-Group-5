@@ -127,11 +127,8 @@ export class AuthService {
 
       res.cookie('access_token', token, {
         httpOnly: true,
-        secure: this.configService.getOrThrow('NODE_ENV') === 'production',
-        sameSite:
-          this.configService.getOrThrow('NODE_ENV') === 'production'
-            ? 'none'
-            : 'lax',
+        secure: true,
+        sameSite: 'none',
         path: '/',
       });
 
@@ -156,7 +153,8 @@ export class AuthService {
       );
     }
   }
-  revalidate(user: UserResponseDto) {
+
+  me(user: UserResponseDto) {
     const userForToken = this.mapUserToToken(user);
     const token = this.generateToken(userForToken);
     return { user, token };

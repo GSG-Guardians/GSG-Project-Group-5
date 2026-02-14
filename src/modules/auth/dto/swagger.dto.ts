@@ -1,5 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { TSignInRequest, TSignUpRequest } from './request.dto';
+import {
+  TPasswordResetGenericResponse,
+  TPasswordResetVerifyResponse,
+} from './response.dto';
 import { UserResponseSwaggerDto } from '../../user/dto';
 
 export class SignInRequestSwaggerDto implements TSignInRequest {
@@ -60,12 +64,20 @@ export class PasswordResetConfirmSwaggerDto {
   newPassword: string;
 }
 
-export class PasswordResetGenericResponseSwaggerDto {
+export class PasswordResetRequestResponseSwaggerDto implements TPasswordResetGenericResponse {
   @ApiProperty({ example: true })
   success: boolean;
 }
 
-export class PasswordResetVerifyResponseSwaggerDto {
+export class PasswordResetConfirmResponseSwaggerDto implements TPasswordResetGenericResponse {
   @ApiProperty({ example: true })
   success: boolean;
+}
+
+export class PasswordResetVerifyResponseSwaggerDto implements TPasswordResetVerifyResponse {
+  @ApiProperty({ example: true })
+  success: boolean;
+
+  @ApiProperty({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })
+  token: string;
 }

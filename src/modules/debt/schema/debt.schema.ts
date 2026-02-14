@@ -11,7 +11,6 @@ const debtBaseObjectSchema = z.object({
       /^\d+(\.\d{1,2})?$/,
       'Amount must be a valid decimal with up to 2 decimal places',
     ),
-  currencyId: z.string().uuid('Invalid currency ID'),
   dueDate: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Due date must be in YYYY-MM-DD format'),

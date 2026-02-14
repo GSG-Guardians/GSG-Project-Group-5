@@ -139,21 +139,18 @@ export class BillsService {
     };
   }
 
-  async createBill(dto: TCreateBillRequest) {
+  async createBill(userId: string, dto: TCreateBillRequest) {
     if (!dto.type) {
       throw new BadRequestException('type is required');
     }
 
     if (dto.type === 'individual') {
-      if (!dto.userId) {
-        throw new BadRequestException('userId is required');
-      }
       if (!dto.currencyId) {
         throw new BadRequestException('currencyId is required');
       }
 
       const bill = this.billRepository.create({
-        userId: dto.userId,
+        userId,
         name: dto.name,
         amount: dto.amount.toString(),
         dueDate: dto.date,
@@ -171,15 +168,12 @@ export class BillsService {
       };
     }
 
-    if (!dto.userId) {
-      throw new BadRequestException('userId is required');
-    }
     if (!dto.currencyId) {
       throw new BadRequestException('currencyId is required');
     }
 
     const groupInvoice = this.groupInvoiceRepository.create({
-      createdByUserId: dto.userId,
+      createdByUserId: userId,
       title: dto.name,
       amountTotal: dto.amount.toString(),
       dueDate: dto.date,

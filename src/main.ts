@@ -4,17 +4,17 @@ import cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { RequestMethod } from '@nestjs/common';
+import {
+  HttpExceptionFilter,
+  UncaughtExceptionFilter,
+  ZodExceptionFilter,
+} from './error/exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      'http://localhost:5173',
-      'http://localhost:4200',
-      process.env.FRONTEND_URL || '',
-    ].filter(Boolean),
+    origin: true,
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Accept, Authorization',
@@ -34,6 +34,12 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document, {
     useGlobalPrefix: true,
   });
+
+  app.useGlobalFilters(
+    new UncaughtExceptionFilter(),
+    new HttpExceptionFilter(),
+    new ZodExceptionFilter(),
+  );
   await app.listen(process.env.PORT ?? 3000);
 }
 void bootstrap();

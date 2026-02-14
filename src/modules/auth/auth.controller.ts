@@ -17,8 +17,9 @@ import {
   PasswordResetRequestSwaggerDto,
   PasswordResetVerifySwaggerDto,
   PasswordResetConfirmSwaggerDto,
-  PasswordResetGenericResponseSwaggerDto,
   PasswordResetVerifyResponseSwaggerDto,
+  PasswordResetRequestResponseSwaggerDto,
+  PasswordResetConfirmResponseSwaggerDto,
   type TSignUpRequest,
   type TSignInRequest,
 } from './dto';
@@ -36,12 +37,10 @@ import {
   ApiQuery,
   ApiTags,
   ApiBearerAuth,
-  ApiCookieAuth,
 } from '@nestjs/swagger';
 import { ApiSuccess } from 'src/helpers/swaggerDTOWrapper.helpers';
 import type { Response } from 'express';
 import { JwtCookieGuard } from './guards/cookies.guard';
-import { AuthGuard } from './guards/auth.guard';
 import { type Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import type {
@@ -122,20 +121,28 @@ export class AuthController {
   }
 
   @Get('revalidate')
-  @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Validate current token and get new one' })
   @ApiSuccess(AuthResponseSwaggerDto)
   revalidate(@Req() req: Request) {
-    const result = this.authService.revalidate(req.user!);
+    const result = this.authService.me(req.user!);
     return result;
+  }
+
+  @Get('me')
+  @IsPublic()
+  @UseGuards(JwtCookieGuard)
+  @ApiOperation({ summary: 'Get current user' })
+  @ApiSuccess(AuthResponseSwaggerDto)
+  me(@Req() req: Request) {
+    return this.authService.me(req.user!);
   }
 
   @Post('password-reset/request')
   @IsPublic()
   @ApiOperation({ summary: 'Request password reset code' })
   @ApiBody({ type: PasswordResetRequestSwaggerDto })
-  @ApiSuccess(PasswordResetGenericResponseSwaggerDto)
+  @ApiSuccess(PasswordResetRequestResponseSwaggerDto)
   requestReset(
     @Body(new ZodValidationPipe(PasswordResetRequestSchema))
     dto: PasswordResetRequestDto,
@@ -151,28 +158,23 @@ export class AuthController {
   verifyReset(
     @Body(new ZodValidationPipe(PasswordResetVerifySchema))
     dto: PasswordResetVerifyDto,
-    @Res({ passthrough: true }) res: Response,
   ) {
-    return this.passwordResetService.verifyResetCode(dto.email, dto.code, res);
+    return this.passwordResetService.verifyResetCode(dto.email, dto.code);
   }
 
   @Patch('password-reset/confirm')
-  @IsPublic()
   @ApiOperation({ summary: 'Set new password using reset token' })
   @ApiBody({ type: PasswordResetConfirmSwaggerDto })
-  @ApiSuccess(PasswordResetGenericResponseSwaggerDto)
-  @ApiCookieAuth()
-  @UseGuards(JwtCookieGuard)
+  @ApiSuccess(PasswordResetConfirmResponseSwaggerDto)
+  @ApiBearerAuth()
   confirmReset(
     @Body(new ZodValidationPipe(PasswordResetConfirmSchema))
     dto: PasswordResetConfirmDto,
     @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
   ) {
     return this.passwordResetService.confirmReset(
       req.user!.id,
       dto.newPassword,
-      res,
     );
   }
 }
