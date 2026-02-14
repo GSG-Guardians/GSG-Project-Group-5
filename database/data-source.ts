@@ -18,6 +18,7 @@ import { Income } from './entities/income.entities';
 import { IncomeRecurringRule } from './entities/income-recurring-rule.entities';
 import { Notification } from './entities/notifications.entities';
 import { PasswordResetCode } from './entities/password-reset-code.entities';
+import { PushToken } from './entities/push-token.entities';
 import { Reminder } from './entities/reminders.entities';
 import { Reward } from './entities/reward.entities';
 import { User } from './entities/user.entities';
@@ -44,6 +45,7 @@ export const dataSourceOptions: DataSourceOptions = {
     IncomeRecurringRule,
     Notification,
     PasswordResetCode,
+    PushToken,
     Reminder,
     Reward,
     User,

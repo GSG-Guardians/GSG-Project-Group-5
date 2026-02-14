@@ -105,6 +105,7 @@ export class ExpensesService {
 
     const expense = this.expenseRepository.create({
       userId: owner.id,
+      user: owner,
       name: dto.name,
       amount: dto.amount.toString(),
       currencyId: dto.currencyId,
