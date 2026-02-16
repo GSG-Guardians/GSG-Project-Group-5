@@ -20,7 +20,7 @@ import {
 
 import { toUserResponse } from './mappers/user.mapper';
 import { AssetOwnerType, UserRole, UserStatus } from 'database/enums';
-import { SideEffectQueue } from 'src/utils/side-effects';
+import { SideEffectQueue } from '../../utils/side-effects';
 import { AssetsService } from '../assets/assets.service';
 import { Asset } from 'database/entities/assets.entities';
 

@@ -31,10 +31,10 @@ import {
   ApiOkResponse,
 } from '@nestjs/swagger';
 import { UseGuards } from '@nestjs/common';
-import { ZodValidationPipe } from 'src/pipes/zodValidation.pipe';
+import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
 import type { Request } from 'express';
-import { ApiSuccessPaginated } from 'src/helpers/swaggerDTOWrapper.helpers';
-import type { IPaginationQuery } from 'src/types/pagination.types';
+import { ApiSuccessPaginated } from '../../helpers/swaggerDTOWrapper.helpers';
+import type { IPaginationQuery } from '../../types/pagination.types';
 import type { FilterIncomeDto } from './dto/filter-income.dto';
 
 @ApiTags('Income')

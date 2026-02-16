@@ -1,5 +1,5 @@
 import ImageKit from '@imagekit/nodejs';
-import { UserResponseDto } from 'src/modules/user/dto';
+import { UserResponseDto } from '../modules/user/dto';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
