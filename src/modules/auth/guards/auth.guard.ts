@@ -25,7 +25,7 @@ export class AuthGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
-    
+
     if (isPublic) {
       return true;
     }
@@ -41,7 +41,7 @@ export class AuthGuard implements CanActivate {
       const user = await this.userService.findOne(tokenPayload.sub);
       request.user = user;
       return true;
-    } catch(e: unknown){
+    } catch (e: unknown) {
       console.log(e);
       throw new UnauthorizedException('Invalid token');
     }

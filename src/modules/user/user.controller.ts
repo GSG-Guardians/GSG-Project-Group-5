@@ -8,7 +8,6 @@ import {
   Body,
   Query,
   UploadedFile,
-  Req,
   UseInterceptors,
 } from '@nestjs/common';
 import {
@@ -88,7 +87,7 @@ export class UserController {
   @UseInterceptors(
     FileInterceptor('avatar'),
     FolderInterceptor('USER'),
-    AssetCleanupInterceptor
+    AssetCleanupInterceptor,
   )
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UpdateUserRequestSwaggerDto })

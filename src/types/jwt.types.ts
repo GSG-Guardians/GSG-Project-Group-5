@@ -14,4 +14,3 @@ export type TUserForToken = Pick<
   User,
   'id' | 'role' | 'email' | 'fullName' | 'provider' | 'status'
 >;
-

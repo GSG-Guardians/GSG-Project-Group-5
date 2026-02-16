@@ -1,12 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, EntityManager, FindOptionsWhere, Repository } from 'typeorm';
+import {
+  DeepPartial,
+  EntityManager,
+  FindOptionsWhere,
+  Repository,
+} from 'typeorm';
 import { Asset } from '../../../database/entities/assets.entities';
 import { AssetOwnerType } from '../../../database/enums';
 import { imageKitToken } from './providers/imageKit.provider';
 import ImageKit, { toFile } from '@imagekit/nodejs';
 import { StorageEngine } from 'multer';
-import { SideEffectQueue } from '../../utils/side-effetcts';
+import { SideEffectQueue } from '../../utils/side-effects';
 
 @Injectable()
 export class AssetsService {
@@ -55,7 +60,7 @@ export class AssetsService {
     return {
       userId,
       url: file.url,
-      fileId: file.fileId, 
+      fileId: file.fileId,
       fileName: file.originalname,
       mimeType: file.mimetype,
       sizeBytes: String(file.size),
@@ -84,15 +89,15 @@ export class AssetsService {
     if (existingAssets.length > 0) {
       await tx.remove(existingAssets);
 
-        existingAssets.forEach((asset) => {
-          if (asset.fileId) {
-            sideEffects.add('delete imagekit file', async () => {
-              await this.imagekit.files.delete(asset.fileId);
-            });
-          }
-        });
-      }
-      sideEffects.runAll();
+      existingAssets.forEach((asset) => {
+        if (asset.fileId) {
+          sideEffects.add('delete imagekit file', async () => {
+            await this.imagekit.files.delete(asset.fileId);
+          });
+        }
+      });
+    }
+    await sideEffects.runAll();
     return existingAssets;
   }
 }

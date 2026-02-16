@@ -16,7 +16,7 @@ export function FolderInterceptor(folder: FolderArg): Type<NestInterceptor> {
   class FolderInterceptorMixin implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler) {
       const req = context.switchToHttp().getRequest<Request>();
-        
+
       req.folderName = folder;
 
       return next.handle();

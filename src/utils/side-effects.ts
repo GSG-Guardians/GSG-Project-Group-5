@@ -15,7 +15,6 @@ export class SideEffectQueue {
       const { label } = this.effects[i];
       if (r.status === 'rejected') {
         console.error(`[SideEffect FAIL] ${label}:`, r.reason);
-
       } else {
         console.log(`[SideEffect OK] ${label}`);
       }
