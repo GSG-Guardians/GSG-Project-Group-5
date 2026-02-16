@@ -4,6 +4,9 @@ import { seedUsers } from './user.seed';
 import { seedBudgets } from './budget.seed';
 import { seedDebts } from './debt.seed';
 import { seedFinancialInsights } from './financial-insight.seed';
+import { seedIncomes } from './income.seed';
+import { seedExpenses } from './expense.seed';
+import { seedBills } from './bill.seed';
 
 const main = async () => {
   const dataSource = new DataSource(dataSourceOptions);
@@ -16,6 +19,9 @@ const main = async () => {
     await seedBudgets(dataSource);
     await seedDebts(dataSource);
     await seedFinancialInsights(dataSource);
+    await seedIncomes(dataSource);
+    await seedExpenses(dataSource);
+    await seedBills(dataSource);
 
     console.log('Main seed completed successfully!');
   } catch (err) {

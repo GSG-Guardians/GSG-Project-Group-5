@@ -5,6 +5,7 @@ import {
   Index,
   ManyToOne,
   PrimaryGeneratedColumn,
+  JoinColumn,
 } from 'typeorm';
 import { AssetOwnerType } from '../enums';
 import { User } from './user.entities';
@@ -20,10 +21,14 @@ export class Asset {
   userId: string;
 
   @ManyToOne(() => User, (u) => u.assets, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' }) // ✅ important
   user: User;
 
   @Column('text')
   url: string;
+
+  @Column('varchar', { name: 'file_id', length: 255, nullable: true })
+  fileId: string;
 
   @Column('varchar', { name: 'file_name', length: 255, nullable: true })
   fileName: string | null;
@@ -40,7 +45,7 @@ export class Asset {
     name: 'owner_type',
     nullable: true,
   })
-  ownerType: AssetOwnerType | null;
+  ownerType: AssetOwnerType;
 
   @Column('uuid', { name: 'owner_id', nullable: true })
   ownerId: string | null;

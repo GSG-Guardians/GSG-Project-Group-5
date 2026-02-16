@@ -3,8 +3,6 @@ import { CreateDebtDto, UpdateDebtDto, FilterDebtDto } from './request.dto';
 import { DebtResponseDto } from './response.dto';
 import { DebtDirection, DebtStatus } from 'database/enums';
 
-// ---------- Requests ----------
-
 export class CreateDebtRequestSwaggerDto implements CreateDebtDto {
   @ApiProperty({ example: 'Ahmad Hassan', minLength: 1, maxLength: 160 })
   personalName: string;
@@ -14,12 +12,6 @@ export class CreateDebtRequestSwaggerDto implements CreateDebtDto {
 
   @ApiProperty({ example: '1500.00', description: 'Amount as decimal string' })
   amount: string;
-
-  @ApiProperty({
-    format: 'uuid',
-    example: '550e8400-e29b-41d4-a716-446655440000',
-  })
-  currencyId: string;
 
   @ApiProperty({ example: '2026-03-15', type: 'string', format: 'date' })
   dueDate: string;

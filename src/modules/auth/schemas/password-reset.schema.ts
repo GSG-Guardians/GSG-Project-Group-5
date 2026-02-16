@@ -10,6 +10,5 @@ export const PasswordResetVerifySchema = z.object({
 });
 
 export const PasswordResetConfirmSchema = z.object({
-  resetToken: z.string().min(1),
   newPassword: z.string().min(6),
 });

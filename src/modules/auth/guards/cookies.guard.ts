@@ -7,7 +7,6 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import type { IJWTPayload } from 'src/types/jwt.types';
 import { UserService } from 'src/modules/user/user.service';
-import { toUserResponse } from 'src/modules/user/mappers/user.mapper';
 import type { Request } from 'express';
 
 @Injectable()
@@ -18,16 +17,14 @@ export class JwtCookieGuard implements CanActivate {
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<Request>();
-
     const token = (req.cookies as Record<string, string>)?.access_token;
     if (!token) throw new UnauthorizedException('Missing access token');
 
     try {
       const payload = this.jwtService.verify<IJWTPayload>(token);
-      const user = await this.userService.findByEmail(payload.email);
+      const user = await this.userService.findOne(payload.sub);
       if (!user) throw new UnauthorizedException('User not found');
-      const userToClient = toUserResponse(user);
-      req.user = userToClient;
+      req.user = user;
       return true;
     } catch {
       throw new UnauthorizedException('Invalid access token');

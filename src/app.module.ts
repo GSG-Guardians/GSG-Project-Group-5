@@ -18,6 +18,7 @@ import { ExpensesModule } from './modules/expenses/expenses.module';
 import { MailModule } from './modules/mail/mail.module';
 import { IncomeModule } from './modules/income/income.module';
 import { AuthGuard } from './modules/auth/guards/auth.guard';
+import { AssetsModule } from './modules/assets/assets.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { AuthGuard } from './modules/auth/guards/auth.guard';
     BillsModule,
     MailModule,
     IncomeModule,
+    AssetsModule,
   ],
   controllers: [AppController],
   providers: [
