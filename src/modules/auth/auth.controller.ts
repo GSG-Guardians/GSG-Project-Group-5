@@ -23,7 +23,7 @@ import {
   type TSignUpRequest,
   type TSignInRequest,
 } from './dto';
-import { ZodValidationPipe } from 'src/pipes/zodValidation.pipe';
+import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
 import { SignUpSchema, SignInSchema } from './schemas/auth.schema';
 import {
   PasswordResetConfirmSchema,
@@ -38,7 +38,7 @@ import {
   ApiTags,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { ApiSuccess } from 'src/helpers/swaggerDTOWrapper.helpers';
+import { ApiSuccess } from '../../helpers/swaggerDTOWrapper.helpers';
 import type { Response } from 'express';
 import { JwtCookieGuard } from './guards/cookies.guard';
 import { type Request } from 'express';

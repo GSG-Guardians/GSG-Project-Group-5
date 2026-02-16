@@ -6,7 +6,7 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
-import { ApiErrorResponse } from 'src/types/api.types';
+import { ApiErrorResponse } from '../types/api.types';
 import { Response, Request } from 'express';
 import {
   EntityMetadataNotFoundError,

@@ -7,20 +7,16 @@ export function toUserResponse(u: User): UserResponseDto {
     fullName: u.fullName,
     email: u.email,
     phone: u.phone ?? null,
-
     role: u.role,
     status: u.status,
-
     defaultCurrencyId: u.defaultCurrencyId ?? null,
     currentBalance: u.currentBalance,
     points: u.points,
-
     avatarAssetId: u.avatarAssetId ?? null,
-
     provider: u.provider,
     providerId: u.providerId ?? null,
-
     createdAt: u.createdAt,
     updatedAt: u.updatedAt,
+    avatar: u.assets,
   };
 }

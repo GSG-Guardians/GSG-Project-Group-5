@@ -20,6 +20,7 @@ import { MailModule } from './modules/mail/mail.module';
 import { IncomeModule } from './modules/income/income.module';
 import { AuthGuard } from './modules/auth/guards/auth.guard';
 import { ReminderModule } from './modules/reminder/reminder.module';
+import { AssetsModule } from './modules/assets/assets.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ReminderModule } from './modules/reminder/reminder.module';
     MailModule,
     ReminderModule,
     IncomeModule,
+    AssetsModule,
   ],
   controllers: [AppController],
   providers: [
