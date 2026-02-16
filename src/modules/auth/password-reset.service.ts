@@ -11,9 +11,8 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from 'database/entities/user.entities';
 import { PasswordResetCode } from 'database/entities/password-reset-code.entities';
 import { MailService } from '../mail/mail.service';
-import { TResetJwtPayload } from 'src/types/jwt.types';
-import type { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class PasswordResetService {
@@ -27,6 +26,7 @@ export class PasswordResetService {
     private readonly mail: MailService,
     private readonly jwt: JwtService,
     private readonly configService: ConfigService,
+    private readonly authService: AuthService,
   ) {}
 
   private generate4DigitCode() {
@@ -94,8 +94,8 @@ export class PasswordResetService {
 
     row.usedAt = new Date();
     await this.resetRepo.save(row);
-
-    const resetToken = this.generatePasswordResetToken(user.id);
+    const userForToken = this.authService.mapUserToToken(user);
+    const resetToken = this.authService.generateToken(userForToken);
     return { success: true, token: resetToken };
   }
 
@@ -115,12 +115,5 @@ export class PasswordResetService {
       { usedAt: new Date() },
     );
     return { success: true };
-  }
-
-  private generatePasswordResetToken(userId: string) {
-    return this.jwt.sign<TResetJwtPayload>(
-      { sub: userId, type: 'pwd_reset' },
-      { expiresIn: `${this.CODE_TTL_MIN}m` },
-    );
   }
 }

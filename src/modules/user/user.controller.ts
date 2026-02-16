@@ -7,6 +7,9 @@ import {
   Param,
   Body,
   Query,
+  UploadedFile,
+  Req,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -14,6 +17,7 @@ import {
   ApiOperation,
   ApiQuery,
   ApiBearerAuth,
+  ApiConsumes,
 } from '@nestjs/swagger';
 
 import { UserService } from './user.service';
@@ -34,6 +38,10 @@ import {
 } from '../../helpers/swaggerDTOWrapper.helpers';
 import type { IPaginationQuery } from '../../types/pagination.types';
 import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
+import type { Request } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FolderInterceptor } from 'src/interceptors/assetFolder.interceptor';
+import { AssetCleanupInterceptor } from 'src/interceptors/assetCleanup.interceptor';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -77,14 +85,21 @@ export class UserController {
   }
 
   @Patch(':id')
+  @UseInterceptors(
+    FileInterceptor('avatar'),
+    FolderInterceptor('USER'),
+    AssetCleanupInterceptor
+  )
+  @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UpdateUserRequestSwaggerDto })
   @ApiSuccess(UserResponseSwaggerDto)
   update(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateUserValidationSchema))
     body: UpdateUserDto,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
-    return this.userService.update(id, body);
+    return this.userService.update(id, body, file);
   }
 
   @Delete(':id')
