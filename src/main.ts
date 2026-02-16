@@ -4,6 +4,11 @@ import cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { RequestMethod } from '@nestjs/common';
+import {
+  HttpExceptionFilter,
+  UncaughtExceptionFilter,
+  ZodExceptionFilter,
+} from './error/exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -29,6 +34,12 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document, {
     useGlobalPrefix: true,
   });
+
+  app.useGlobalFilters(
+    new UncaughtExceptionFilter(),
+    new HttpExceptionFilter(),
+    new ZodExceptionFilter(),
+  );
   await app.listen(process.env.PORT ?? 3000);
 }
 void bootstrap();

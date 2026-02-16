@@ -1,3 +1,4 @@
+import { Asset } from 'database/entities/assets.entities';
 import { User } from 'database/entities/user.entities';
 export type UserResponseDto = {
   id: User['id'];
@@ -14,4 +15,5 @@ export type UserResponseDto = {
   providerId: User['providerId'];
   createdAt: User['createdAt'];
   updatedAt: User['updatedAt'];
+  avatar: Asset[] | null;
 };

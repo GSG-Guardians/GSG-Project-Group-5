@@ -15,9 +15,3 @@ export type TUserForToken = Pick<
   'id' | 'role' | 'email' | 'fullName' | 'provider' | 'status'
 >;
 
-export type TResetJwtPayload = {
-  sub: string;
-  type: 'pwd_reset';
-  iat?: number;
-  exp?: number;
-};
