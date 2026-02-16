@@ -8,7 +8,6 @@ import {
   Body,
   Query,
   UploadedFile,
-  Req,
   UseInterceptors,
 } from '@nestjs/common';
 import {
@@ -40,8 +39,8 @@ import type { IPaginationQuery } from '../../types/pagination.types';
 import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
 import type { Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { FolderInterceptor } from 'src/interceptors/assetFolder.interceptor';
-import { AssetCleanupInterceptor } from 'src/interceptors/assetCleanup.interceptor';
+import { FolderInterceptor } from '../../interceptors/assetFolder.interceptor';
+import { AssetCleanupInterceptor } from '../../interceptors/assetCleanup.interceptor';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -88,7 +87,7 @@ export class UserController {
   @UseInterceptors(
     FileInterceptor('avatar'),
     FolderInterceptor('USER'),
-    AssetCleanupInterceptor
+    AssetCleanupInterceptor,
   )
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UpdateUserRequestSwaggerDto })

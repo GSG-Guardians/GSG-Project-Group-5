@@ -6,8 +6,8 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import type { Request } from 'express';
-import { ZodValidationPipe } from 'src/pipes/zodValidation.pipe';
-import { ApiSuccessArray } from 'src/helpers/swaggerDTOWrapper.helpers';
+import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
+import { ApiSuccessArray } from '../../helpers/swaggerDTOWrapper.helpers';
 import { JwtCookieGuard } from '../auth/guards/cookies.guard';
 import { ExpensesService } from './expenses.service';
 import type { TExpenseCategoryQuery } from './dto/request.dto';

@@ -3,7 +3,6 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, DataSource } from 'typeorm';
@@ -21,7 +20,7 @@ import {
 
 import { toUserResponse } from './mappers/user.mapper';
 import { AssetOwnerType, UserRole, UserStatus } from 'database/enums';
-import { SideEffectQueue } from 'src/utils/side-effetcts';
+import { SideEffectQueue } from '../../utils/side-effects';
 import { AssetsService } from '../assets/assets.service';
 import { Asset } from 'database/entities/assets.entities';
 
@@ -108,16 +107,20 @@ export class UserService {
     };
   }
 
-  async update(id: string, dto: UpdateUserDto, file?: Express.Multer.File): Promise<UserResponseDto> {
+  async update(
+    id: string,
+    dto: UpdateUserDto,
+    file?: Express.Multer.File,
+  ): Promise<UserResponseDto> {
     const sideEffect = new SideEffectQueue();
     const updatedUser = await this.dataSource.transaction(async (tx) => {
-      if(file) {
+      if (file) {
         await this.assetsService.deleteAsset(
-          tx, 
-          id, 
-          sideEffect, 
-          AssetOwnerType.USER, 
-          id
+          tx,
+          id,
+          sideEffect,
+          AssetOwnerType.USER,
+          id,
         );
 
         const assetData = this.assetsService.createFileAssetData(
@@ -130,18 +133,19 @@ export class UserService {
         await tx.save(asset);
       }
 
-      const res = await tx.update(User, { id }, {...dto});
-      if(res.affected === 0) throw new BadRequestException('User not updated');
-      
+      const res = await tx.update(User, { id }, { ...dto });
+      if (res.affected === 0) throw new BadRequestException('User not updated');
+
       const updatedUser = await tx.findOne(User, {
         where: { id },
         relations: { assets: true },
       });
-      
-      if (!updatedUser ) throw new BadRequestException('User not found after update');
-      
-    return toUserResponse(updatedUser) ;
-    })
+
+      if (!updatedUser)
+        throw new BadRequestException('User not found after update');
+
+      return toUserResponse(updatedUser);
+    });
 
     await sideEffect.runAll();
     return updatedUser;
@@ -151,7 +155,6 @@ export class UserService {
     const sideEffect = new SideEffectQueue();
 
     await this.dataSource.transaction(async (tx) => {
-
       const user = await tx.findOne(User, { where: { id } });
       if (!user) throw new NotFoundException('User not found');
 

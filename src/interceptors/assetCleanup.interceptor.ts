@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import {
   CallHandler,
   ExecutionContext,
@@ -7,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Observable, catchError, throwError, from, mergeMap } from 'rxjs';
 import type { Request } from 'express';
-import { imageKitToken } from 'src/modules/assets/providers/imageKit.provider';
+import { imageKitToken } from '../modules/assets/providers/imageKit.provider';
 import ImageKit from '@imagekit/nodejs';
 
 @Injectable()

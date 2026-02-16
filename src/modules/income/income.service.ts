@@ -24,10 +24,10 @@ import { IncomeRecurringRule } from '../../../database/entities/income-recurring
 import { IncomeFrequency, IncomeSource } from '../../../database/enums';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DatabaseService } from '../database/database.service';
-import { IPaginationQuery } from 'src/types/pagination.types';
+import { IPaginationQuery } from '../../types/pagination.types';
 import { FilterIncomeDto } from './dto/filter-income.dto';
 import { ILike } from 'typeorm';
-import { IMetaPagination } from 'src/types/pagination.types';
+import { IMetaPagination } from '../../types/pagination.types';
 
 @Injectable()
 export class IncomeService {

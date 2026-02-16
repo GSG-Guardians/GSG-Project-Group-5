@@ -1,10 +1,8 @@
-
 import ImageKit from '@imagekit/nodejs';
-import { UserResponseDto } from 'src/modules/user/dto';
-
-
+import { UserResponseDto } from '../modules/user/dto';
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace NodeJS {
     interface ProcessEnv {
       JWT_SECRET: string;
@@ -22,6 +20,7 @@ declare global {
   namespace Express {
     // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace Multer {
+      // eslint-disable-next-line @typescript-eslint/no-empty-object-type
       interface File extends ImageKit.Files.FileUploadResponse {}
     }
     interface Request {

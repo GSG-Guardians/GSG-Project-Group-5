@@ -26,7 +26,7 @@ import { ImageKitProvider } from './providers/imageKit.provider';
       },
       inject: [AssetsService],
     }),
-],
+  ],
   providers: [AssetsService, ImageKitProvider],
   exports: [AssetsService, MulterModule],
 })

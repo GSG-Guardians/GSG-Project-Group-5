@@ -43,7 +43,6 @@ export class CreateUserRequestSwaggerDto implements CreateUserDto {
 }
 
 export class UpdateUserRequestSwaggerDto implements UpdateUserDto {
-
   @ApiPropertyOptional({ example: 'Moamen Al-Yazouri' })
   fullName?: string;
 

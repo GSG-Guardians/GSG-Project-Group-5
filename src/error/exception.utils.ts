@@ -1,4 +1,4 @@
-import { ApiErrorResponse } from 'src/types/api.types';
+import { ApiErrorResponse } from '../types/api.types';
 import { PostgresErrorCode } from './exception.constants';
 import { HttpStatus } from '@nestjs/common';
 import { $ZodIssue } from 'zod/v4/core';

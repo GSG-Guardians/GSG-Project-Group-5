@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { TSignInRequest, TSignUpRequest } from './dto';
 import * as argon from 'argon2';
-import { IJWTPayload, TUserForToken } from 'src/types/jwt.types';
+import { IJWTPayload, TUserForToken } from '../../types/jwt.types';
 
 import { JwtService } from '@nestjs/jwt';
 import { createRemoteJWKSet, jwtVerify } from 'jose';

@@ -15,7 +15,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import type { Request } from 'express';
-import { ZodValidationPipe } from 'src/pipes/zodValidation.pipe';
+import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
 import { JwtCookieGuard } from '../auth/guards/cookies.guard';
 import { ExpensesService } from './expenses.service';
 import {
@@ -36,7 +36,7 @@ import {
 import {
   ApiSuccess,
   ApiSuccessArray,
-} from 'src/helpers/swaggerDTOWrapper.helpers';
+} from '../../helpers/swaggerDTOWrapper.helpers';
 
 @ApiTags('Expenses')
 @ApiBearerAuth()
