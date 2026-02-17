@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAdminDto } from './dto/create-admin.dto';
-import { UpdateAdminDto } from './dto/update-admin.dto';
+
 import { UserService } from '../user/user.service';
 import { UserStatus } from '../../../database/enums';
 import { Between, FindOptionsWhere, Not } from 'typeorm';
@@ -154,7 +153,7 @@ export class AdminService {
   }
 
   private toHourlyPairs(rows: THourlyPeak): THourCount[] {
-    const counts = Array(24).fill(0);
+    const counts: number[] = Array(24).fill(0);
     for (const r of rows) {
       if (r.hour >= 0 && r.hour <= 23) counts[r.hour] = r.count;
     }
