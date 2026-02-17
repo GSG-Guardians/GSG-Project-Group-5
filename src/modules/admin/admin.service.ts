@@ -153,7 +153,7 @@ export class AdminService {
   }
 
   private toHourlyPairs(rows: THourlyPeak): THourCount[] {
-    const counts: number[] = Array(24).fill(0);
+    const counts: number[] = Array<number>(24).fill(0);
     for (const r of rows) {
       if (r.hour >= 0 && r.hour <= 23) counts[r.hour] = r.count;
     }
