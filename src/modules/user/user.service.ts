@@ -80,13 +80,19 @@ export class UserService {
   }
 
   async findOne(id: string): Promise<UserResponseDto> {
-    const user = await this.userRepo.findOne({ where: { id } });
+    const user = await this.userRepo.findOne({
+      where: { id },
+      relations: { assets: true },
+    });
     if (!user) throw new NotFoundException('User not found');
     return toUserResponse(user);
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.userRepo.findOne({ where: { email } });
+    return this.userRepo.findOne({
+      where: { email },
+      relations: { assets: true },
+    });
   }
 
   async findAll(
@@ -97,6 +103,7 @@ export class UserService {
 
     const [rows, total] = await this.userRepo.findAndCount({
       order: { createdAt: 'DESC' },
+      relations: { assets: true },
       skip,
       take,
     });
@@ -181,6 +188,7 @@ export class UserService {
 
     const users = await this.userRepo.find({
       where: [{ fullName: Like(`%${name}%`) }, { email: Like(`%${name}%`) }],
+      relations: { assets: true },
       select: ['id', 'fullName', 'email'],
       take: 20,
     });
