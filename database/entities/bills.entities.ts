@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { BillStatus, ReminderFrequency } from '../enums';
+import { BillStatus } from '../enums';
 import { User } from './user.entities';
 import { Asset } from './assets.entities';
 import { Reminder } from './reminders.entities';

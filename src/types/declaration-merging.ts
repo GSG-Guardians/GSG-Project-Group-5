@@ -10,6 +10,9 @@ declare global {
       GOOGLE_CLIENT_SECRET: string;
       GOOGLE_CALLBACK_URL: string;
       FRONTEND_URL: string;
+      FIREBASE_PROJECT_ID: string;
+      FIREBASE_CLIENT_EMAIL: string;
+      FIREBASE_PRIVATE_KEY: string;
       IMAGEKIT_PRIVATE_KEY: string;
     }
     interface BigInt {
