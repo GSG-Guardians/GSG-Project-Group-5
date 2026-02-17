@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -115,10 +116,16 @@ export class UserService {
   }
 
   async update(
+    userId: string,
     id: string,
+    userRole: UserRole,
     dto: UpdateUserDto,
     file?: Express.Multer.File,
   ): Promise<UserResponseDto> {
+    if (userId !== id && userRole !== UserRole.ADMIN) {
+      throw new ForbiddenException('Invalid Credintials');
+    }
+
     const sideEffect = new SideEffectQueue();
     const updatedUser = await this.dataSource.transaction(async (tx) => {
       if (file) {

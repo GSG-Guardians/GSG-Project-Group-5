@@ -22,6 +22,7 @@ import { DB_ERROR_MAP } from './exception.utils';
 import { PostgresErrorCode } from './exception.constants';
 import { IPostgresDriverError } from './exception.types';
 import { ZodError } from 'zod';
+import { APIError } from '@imagekit/nodejs';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -143,5 +144,30 @@ export class UncaughtExceptionFilter implements ExceptionFilter {
     });
 
     res.status(status).json(error);
+  }
+}
+
+@Catch(APIError)
+export class ImageKitExceptionFilter implements ExceptionFilter {
+  catch(exception: APIError, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const res = ctx.getResponse<Response>();
+    const req = ctx.getRequest<Request>();
+
+    const status =
+      typeof exception.status === 'number' && exception.status >= 400
+        ? exception.status
+        : HttpStatus.BAD_GATEWAY;
+
+    const error: ApiErrorResponse = {
+      timestamp: new Date().toISOString(),
+      success: false,
+      statusCode: status,
+      path: req.url,
+      message:
+        'We couldn’t handle your image upload right now. Please try again later',
+    };
+
+    return res.status(status).json(error);
   }
 }

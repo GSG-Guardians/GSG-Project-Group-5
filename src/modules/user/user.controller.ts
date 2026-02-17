@@ -9,6 +9,7 @@ import {
   Query,
   UploadedFile,
   UseInterceptors,
+  Req,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -41,6 +42,8 @@ import type { Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FolderInterceptor } from '../../interceptors/assetFolder.interceptor';
 import { AssetCleanupInterceptor } from '../../interceptors/assetCleanup.interceptor';
+import { Roles } from '../../decorators/roles.decorators';
+import { UserRole } from 'database/enums';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -96,11 +99,19 @@ export class UserController {
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateUserValidationSchema))
     body: UpdateUserDto,
+    @Req() request: Request,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    return this.userService.update(id, body, file);
+    return this.userService.update(
+      request.user!.id,
+      id,
+      request.user!.role,
+      body,
+      file,
+    );
   }
 
+  @Roles([UserRole.ADMIN])
   @Delete(':id')
   @ApiSuccess(UserResponseSwaggerDto)
   remove(@Param('id') id: string) {
