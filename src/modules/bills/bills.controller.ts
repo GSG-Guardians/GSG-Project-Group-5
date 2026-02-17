@@ -43,7 +43,8 @@ import {
 import { ApiBody } from '@nestjs/swagger';
 import { ApiSuccess } from '../../helpers/swaggerDTOWrapper.helpers';
 import { type Request } from 'express';
-
+import { UserRole } from 'database/enums';
+import { Roles } from '../../decorators/roles.decorators';
 type UploadedFilePayload = {
   originalname: string;
   mimetype: string;
@@ -57,6 +58,7 @@ type UploadedFilePayload = {
 export class BillsController {
   constructor(private readonly billsService: BillsService) {}
 
+  @Roles([UserRole.ADMIN])
   @Get()
   @ApiOperation({
     summary: 'List bills',
@@ -102,8 +104,8 @@ export class BillsController {
   })
   @ApiParam({ name: 'id', description: 'Bill ID' })
   @ApiSuccess(BillResponseSwaggerDto)
-  async getBill(@Param('id') id: string) {
-    return this.billsService.getBillDetails(id);
+  async getBill(@Param('id') id: string, @Req() req: Request) {
+    return this.billsService.getBillDetails(id, req.user!.id, req.user!.role);
   }
 
   @Post()
@@ -131,16 +133,17 @@ export class BillsController {
   async updateBill(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(UpdateBillSchema)) dto: TUpdateBillRequest,
+    @Req() req: Request,
   ) {
-    return this.billsService.updateBill(id, dto);
+    return this.billsService.updateBill(id, req.user!.id, dto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete bill', description: 'Delete a bill record' })
   @ApiParam({ name: 'id', description: 'Bill ID' })
   @ApiResponse({ status: 200, description: 'Bill deleted successfully' })
-  async deleteBill(@Param('id') id: string) {
-    return this.billsService.deleteBill(id);
+  async deleteBill(@Param('id') id: string, @Req() req: Request) {
+    return this.billsService.deleteBill(id, req.user!.id);
   }
 
   @Patch(':id/status')
@@ -154,9 +157,11 @@ export class BillsController {
   async updateStatus(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(UpdateBillStatusSchema))
+    @Req()
+    req: Request,
     dto: TUpdateBillStatusRequest,
   ) {
-    return this.billsService.updateBillStatus(id, dto.status);
+    return this.billsService.updateBillStatus(id, req.user!.id, dto.status);
   }
 
   @Post('smart-parse')

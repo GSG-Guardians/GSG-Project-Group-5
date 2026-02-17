@@ -4,10 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { Bill } from '../../../database/entities/bills.entities';
 import { GroupInvoice } from '../../../database/entities/group-invoice.entities';
-import { BillStatus, GroupInvoiceStatus } from '../../../database/enums';
+import {
+  BillStatus,
+  GroupInvoiceStatus,
+  UserRole,
+} from '../../../database/enums';
 import { type TCreateBillRequest, type TUpdateBillRequest } from './dto';
 
 export type BillType = 'individual' | 'group';
@@ -93,9 +97,15 @@ export class BillsService {
     };
   }
 
-  async getBillDetails(id: string) {
+  async getBillDetails(id: string, userId: string, userRole: UserRole) {
+    const where: FindOptionsWhere<Bill> = { id };
+
+    if (userRole !== UserRole.ADMIN) {
+      where.userId = userId;
+    }
+
     const bill = await this.billRepository.findOne({
-      where: { id },
+      where,
       relations: ['currency', 'asset', 'reminder'],
     });
 
@@ -190,8 +200,8 @@ export class BillsService {
     };
   }
 
-  async updateBill(id: string, dto: TUpdateBillRequest) {
-    const bill = await this.billRepository.findOne({ where: { id } });
+  async updateBill(id: string, userId: string, dto: TUpdateBillRequest) {
+    const bill = await this.billRepository.findOne({ where: { id, userId } });
     if (bill) {
       if (dto.name !== undefined) bill.name = dto.name;
       if (dto.amount !== undefined) bill.amount = dto.amount.toString();
@@ -234,8 +244,8 @@ export class BillsService {
     };
   }
 
-  async deleteBill(id: string) {
-    const bill = await this.billRepository.findOne({ where: { id } });
+  async deleteBill(id: string, userId: string) {
+    const bill = await this.billRepository.findOne({ where: { id, userId } });
     if (bill) {
       await this.billRepository.remove(bill);
       return { deleted: true };
@@ -252,10 +262,14 @@ export class BillsService {
     return { deleted: true };
   }
 
-  async updateBillStatus(id: string, status: 'paid' | 'unpaid') {
+  async updateBillStatus(
+    id: string,
+    userId: string,
+    status: 'paid' | 'unpaid',
+  ) {
     const normalized = status.toLowerCase();
     const isPaid = normalized === 'paid';
-    const bill = await this.billRepository.findOne({ where: { id } });
+    const bill = await this.billRepository.findOne({ where: { id, userId } });
     if (bill) {
       bill.status = isPaid ? BillStatus.PAID : BillStatus.UNPAID;
       bill.paidAt = isPaid ? new Date() : null;
