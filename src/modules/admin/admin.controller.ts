@@ -3,9 +3,7 @@ import { AdminService } from './admin.service';
 import { Roles } from '../../decorators/roles.decorators';
 import { UserRole } from '../../../database/enums/index';
 
-@Roles([
-  UserRole.ADMIN,
-])
+@Roles([UserRole.ADMIN])
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
@@ -30,9 +28,8 @@ export class AdminController {
     return this.adminService.getFinancialSnapShot();
   }
 
-  @Get("/user-managements/stats")
+  @Get('/user-managements/stats')
   getUserManagementStats() {
     return this.adminService.getUserManagementStatistics();
   }
-
 }

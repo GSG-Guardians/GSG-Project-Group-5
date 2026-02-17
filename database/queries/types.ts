@@ -1,1 +1,1 @@
-export type THourlyPeak = { hour: number; count: number }[]
+export type THourlyPeak = { hour: number; count: number }[];

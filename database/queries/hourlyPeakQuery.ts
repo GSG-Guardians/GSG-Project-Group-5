@@ -1,6 +1,6 @@
-import dataSource from "database/data-source";
-import { Expense } from "database/entities/expense.entities";
-import { THourlyPeak } from "./types";
+import dataSource from 'database/data-source';
+import { Expense } from 'database/entities/expense.entities';
+import { THourlyPeak } from './types';
 
 export const getHourlyPeakQuery = async (): Promise<THourlyPeak> => {
   const rows = await dataSource

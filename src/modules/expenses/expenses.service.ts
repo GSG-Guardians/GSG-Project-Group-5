@@ -123,8 +123,8 @@ export class ExpensesService {
 
     return this.toExpenseResponse(saved);
   }
-  
-  async getExpensesCount () {
+
+  async getExpensesCount() {
     return await this.expenseRepository.count();
   }
   private async getTotalsByCategory(

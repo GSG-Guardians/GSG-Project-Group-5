@@ -6,7 +6,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, DataSource, Between, FindOptionsWhere } from 'typeorm';
+import {
+  Repository,
+  Like,
+  DataSource,
+  Between,
+  FindOptionsWhere,
+} from 'typeorm';
 
 import { User } from '../../../database/entities/user.entities';
 import { Currency } from '../../../database/entities/currency.entities';
@@ -203,10 +209,9 @@ export class UserService {
     return users;
   }
 
-  
   async getUsersCountWithWhere(where: FindOptionsWhere<User>) {
     return this.userRepo.count({
-      where
+      where,
     });
   }
 }

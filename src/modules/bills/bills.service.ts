@@ -300,12 +300,8 @@ export class BillsService {
     };
   }
 
-
-  async getBillsCount () {
-    const [
-      totalBills,
-      totalGroupInvoices,
-    ] = await Promise.all([
+  async getBillsCount() {
+    const [totalBills, totalGroupInvoices] = await Promise.all([
       this.billRepository.count({}),
       this.groupInvoiceRepository.count({}),
     ]);
