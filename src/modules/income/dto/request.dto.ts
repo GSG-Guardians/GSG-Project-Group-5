@@ -1,35 +1,35 @@
-import { IncomeSource, IncomeFrequency } from '../../../../database/enums';
+import { IncomeFrequency, IncomeSource } from '../../../../database/enums';
+
+export type CreateIncomeRecurringDto = {
+  frequency: IncomeFrequency;
+  endAt?: string | null;
+};
 
 export type CreateIncomeDto = {
-  amount: number;
+  amount: string;
   currencyId: string;
   source: IncomeSource;
-
-  incomeDate: string; // YYYY-MM-DD
-
-  frequency?: IncomeFrequency;
   description?: string | null;
+  incomeDate: string;
   assetId?: string | null;
-
-  endAt?: string | null; // YYYY-MM-DD
-  isRecurringActive?: boolean;
+  recurring?: CreateIncomeRecurringDto;
 };
+
 export type UpdateIncomeDto = Partial<
   Pick<
     CreateIncomeDto,
     | 'amount'
     | 'currencyId'
     | 'source'
-    | 'incomeDate'
-    | 'frequency'
     | 'description'
+    | 'incomeDate'
     | 'assetId'
-    | 'endAt'
-    | 'isRecurringActive'
   >
 >;
-export type IncomePeriod = 'week' | 'month' | 'year';
 
-export type IncomePeriodQueryDto = {
-  period?: IncomePeriod;
+export type FilterIncomeDto = {
+  source?: IncomeSource;
+  currencyId?: string;
+  startDate?: string;
+  endDate?: string;
 };

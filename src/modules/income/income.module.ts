@@ -1,26 +1,22 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Income } from '../../../database/entities/income.entities';
-import { User } from '../../../database/entities/user.entities';
 import { Currency } from '../../../database/entities/currency.entities';
-import { Asset } from '../../../database/entities/assets.entities';
 import { IncomeRecurringRule } from '../../../database/entities/income-recurring-rule.entities';
-import { JwtCookieGuard } from '../auth/guards/cookies.guard';
+import { DatabaseModule } from '../database/database.module';
 import { UserModule } from '../user/user.module';
+import { IncomeController } from './income.controller';
+import { IncomeService } from './income.service';
+import { IncomeRecurringCronService } from './income-recurring-cron.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      Income,
-      User,
-      Currency,
-      Asset,
-      IncomeRecurringRule,
-    ]),
+    TypeOrmModule.forFeature([Income, Currency, IncomeRecurringRule]),
+    DatabaseModule,
     UserModule,
   ],
-
-  controllers: [],
-  providers: [JwtCookieGuard],
+  controllers: [IncomeController],
+  providers: [IncomeService, IncomeRecurringCronService],
+  exports: [IncomeService],
 })
 export class IncomeModule {}
