@@ -22,6 +22,7 @@ import { AuthGuard } from './modules/auth/guards/auth.guard';
 import { ReminderModule } from './modules/reminder/reminder.module';
 import { AssetsModule } from './modules/assets/assets.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { HomeModule } from './modules/home/home.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { AdminModule } from './modules/admin/admin.module';
     IncomeModule,
     AssetsModule,
     AdminModule,
+    HomeModule,
   ],
   controllers: [AppController],
   providers: [
