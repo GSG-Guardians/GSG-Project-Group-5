@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { UserService } from '../user/user.service';
 import { UserStatus } from '../../../database/enums';
-import { Between, FindOptionsWhere, Not } from 'typeorm';
+import { Between, FindOptionsWhere, LessThan, Not } from 'typeorm';
 import { User } from 'database/entities/user.entities';
 import { DebtService } from '../debt/debt.service';
 import { BillsService } from '../bills/bills.service';
@@ -33,21 +33,19 @@ export class AdminService {
 
   async getDashboardStatistics(): Promise<TDashboardStatistics> {
     const totalDebts = await this.getTotalDebts();
-    const totalDebtsLastMonth = await this.getTotalDebtsLastMonth();
     const activeUsersCount = await this.getActiveUsersCount();
     const totalUsersCount = await this.getTotalUsersCount();
-    const totalUsersLastMonth = await this.getTotalUsersLastMonth();
-    const totalActiveUsersLastMonth = await this.getTotalActiveUsersLastMonth();
+
     const activeUsersChangePercent = this.calcChangePercent(
-      totalActiveUsersLastMonth,
+      await this.getCumulativeActiveUsersUntilLastMonth(),
       activeUsersCount,
     );
     const totalUsersChangePercent = this.calcChangePercent(
-      totalUsersLastMonth,
+      await this.getCumulativeUsersUntilLastMonth(),
       totalUsersCount,
     );
     const debtsChangePercent = this.calcChangePercent(
-      totalDebtsLastMonth,
+      await this.getCumulativeDebtsUntilLastMonth(),
       totalDebts,
     );
 
@@ -101,23 +99,23 @@ export class AdminService {
     const activeUsersCount = await this.getActiveUsersCount();
     const uActiveUsersCount = await this.getUActiveUsersCount();
     const totalUsersCount = await this.getTotalUsersCount();
-    const totalUsersLastMonth = await this.getTotalUsersLastMonth();
-    const totalActiveUsersLastMonth = await this.getTotalActiveUsersLastMonth();
+
+    // Using cumulative counts for Total/Active Users change percent
     const activeUsersChangePercent = this.calcChangePercent(
-      totalActiveUsersLastMonth,
+      await this.getCumulativeActiveUsersUntilLastMonth(),
       activeUsersCount,
     );
     const totalUsersChangePercent = this.calcChangePercent(
-      totalUsersLastMonth,
+      await this.getCumulativeUsersUntilLastMonth(),
       totalUsersCount,
     );
     const uActiveUsersChangePercent = this.calcChangePercent(
-      totalUsersLastMonth,
+      await this.getCumulativeUsersUntilLastMonth(true),
       uActiveUsersCount,
     );
     const newUsersCount = await this.getNewUsersCount();
     const newUsersChangePercent = this.calcChangePercent(
-      totalUsersLastMonth,
+      await this.getNewUsersLastMonth(),
       newUsersCount,
     );
     return {
@@ -196,11 +194,6 @@ export class AdminService {
     return await this.debtService.getTotalDebtsWithWhere({});
   }
 
-  private async getTotalDebtsLastMonth() {
-    const where = this.getWhereInMonth();
-    return await this.debtService.getTotalDebtsWithWhere(where);
-  }
-
   private async getActiveUsersCount() {
     return await this.userService.getUsersCountWithWhere({
       status: UserStatus.ACTIVE,
@@ -209,18 +202,6 @@ export class AdminService {
 
   private async getTotalUsersCount() {
     return await this.userService.getUsersCountWithWhere({});
-  }
-
-  private async getTotalUsersLastMonth() {
-    const where = this.getWhereInMonth();
-    return await this.userService.getUsersCountWithWhere(where);
-  }
-
-  private async getTotalActiveUsersLastMonth() {
-    const where = this.getWhereInMonth() as FindOptionsWhere<User>;
-    where.status = UserStatus.ACTIVE;
-
-    return await this.userService.getUsersCountWithWhere(where);
   }
 
   private calcChangePercent(prevTotal: number, nowTotal: number): number {
@@ -237,6 +218,69 @@ export class AdminService {
     const percent = ((now - prev) / prev) * 100;
 
     return Math.round(percent * 10) / 10;
+  }
+
+  private async getNewUsersLastMonth() {
+    const where = this.getWhereInMonth();
+    return await this.userService.getUsersCountWithWhere(where);
+  }
+
+  private async getCumulativeUsersUntilLastMonth(inactive = false) {
+    const now = new Date();
+    const startOfThisMonth = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      1,
+      0,
+      0,
+      0,
+      0,
+    );
+
+    const where: FindOptionsWhere<User> = {
+      createdAt: LessThan(startOfThisMonth),
+    };
+
+    if (inactive) {
+      // logic for inactive users if explicitly requested, but UActive likely stands for "Inactive" based on usage?
+      // Wait, getUActiveUsersCount uses Not(UserStatus.ACTIVE).
+      where.status = Not(UserStatus.ACTIVE);
+    }
+
+    return await this.userService.getUsersCountWithWhere(where);
+  }
+
+  private async getCumulativeActiveUsersUntilLastMonth() {
+    const now = new Date();
+    const startOfThisMonth = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      1,
+      0,
+      0,
+      0,
+      0,
+    );
+    return await this.userService.getUsersCountWithWhere({
+      status: UserStatus.ACTIVE,
+      createdAt: LessThan(startOfThisMonth),
+    });
+  }
+
+  private async getCumulativeDebtsUntilLastMonth() {
+    const now = new Date();
+    const startOfThisMonth = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      1,
+      0,
+      0,
+      0,
+      0,
+    );
+    return await this.debtService.getTotalDebtsWithWhere({
+      createdAt: LessThan(startOfThisMonth),
+    });
   }
 
   private getWhereInMonth() {

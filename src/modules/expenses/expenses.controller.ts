@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Query,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req } from '@nestjs/common';
 import {
   ApiBody,
   ApiOperation,
@@ -16,7 +8,6 @@ import {
 } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
-import { JwtCookieGuard } from '../auth/guards/cookies.guard';
 import { ExpensesService } from './expenses.service';
 import {
   CreateExpenseRequestSwaggerDto,
@@ -41,7 +32,6 @@ import {
 @ApiTags('Expenses')
 @ApiBearerAuth()
 @Controller('expenses')
-@UseGuards(JwtCookieGuard)
 export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 
