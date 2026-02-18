@@ -300,6 +300,13 @@ export class BillsService {
     };
   }
 
+  async getBillsCount() {
+    const [totalBills, totalGroupInvoices] = await Promise.all([
+      this.billRepository.count({}),
+      this.groupInvoiceRepository.count({}),
+    ]);
+    return totalBills + totalGroupInvoices;
+  }
   private mapBillStatus(status: BillStatus) {
     return status === BillStatus.PAID ? 'paid' : 'unpaid';
   }
