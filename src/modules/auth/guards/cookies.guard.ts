@@ -5,8 +5,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import type { IJWTPayload } from 'src/types/jwt.types';
-import { UserService } from 'src/modules/user/user.service';
+import type { IJWTPayload } from '../../../types/jwt.types';
+import { UserService } from '../../user/user.service';
 import type { Request } from 'express';
 
 @Injectable()

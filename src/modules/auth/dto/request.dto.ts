@@ -1,5 +1,5 @@
 import { User } from 'database/entities/user.entities';
-import { UserResponseDto } from 'src/modules/user/dto';
+import { UserResponseDto } from '../../user/dto';
 
 export type TSignInRequest = Pick<User, 'email'> & {
   password: string;

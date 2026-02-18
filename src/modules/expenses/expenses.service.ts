@@ -106,6 +106,7 @@ export class ExpensesService {
 
     const expense = this.expenseRepository.create({
       userId: owner.id,
+      user: owner,
       name: dto.name,
       amount: dto.amount.toString(),
       currencyId: dto.currencyId,
@@ -124,6 +125,9 @@ export class ExpensesService {
     return this.toExpenseResponse(saved);
   }
 
+  async getExpensesCount() {
+    return await this.expenseRepository.count();
+  }
   private async getTotalsByCategory(
     userId: string,
     currencyId: string,

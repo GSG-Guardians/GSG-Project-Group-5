@@ -1,11 +1,12 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm';
+import { Repository, Like, DataSource, FindOptionsWhere } from 'typeorm';
 
 import { User } from '../../../database/entities/user.entities';
 import { Currency } from '../../../database/entities/currency.entities';
@@ -19,7 +20,10 @@ import {
 } from '../../types/pagination.types';
 
 import { toUserResponse } from './mappers/user.mapper';
-import { UserRole, UserStatus } from 'database/enums';
+import { AssetOwnerType, UserRole, UserStatus } from 'database/enums';
+import { SideEffectQueue } from '../../utils/side-effects';
+import { AssetsService } from '../assets/assets.service';
+import { Asset } from 'database/entities/assets.entities';
 
 @Injectable()
 export class UserService {
@@ -28,6 +32,8 @@ export class UserService {
     @InjectRepository(Currency)
     private readonly currencyRepo: Repository<Currency>,
     private readonly databaseService: DatabaseService,
+    private readonly dataSource: DataSource,
+    private readonly assetsService: AssetsService,
   ) {}
 
   async create(dto: CreateUserDto): Promise<UserResponseDto> {
@@ -75,13 +81,19 @@ export class UserService {
   }
 
   async findOne(id: string): Promise<UserResponseDto> {
-    const user = await this.userRepo.findOne({ where: { id } });
+    const user = await this.userRepo.findOne({
+      where: { id },
+      relations: { assets: true },
+    });
     if (!user) throw new NotFoundException('User not found');
     return toUserResponse(user);
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.userRepo.findOne({ where: { email } });
+    return this.userRepo.findOne({
+      where: { email },
+      relations: { assets: true },
+    });
   }
 
   async findAll(
@@ -92,6 +104,7 @@ export class UserService {
 
     const [rows, total] = await this.userRepo.findAndCount({
       order: { createdAt: 'DESC' },
+      relations: { assets: true },
       skip,
       take,
     });
@@ -102,48 +115,76 @@ export class UserService {
     };
   }
 
-  async update(id: string, dto: UpdateUserDto): Promise<UserResponseDto> {
-    const user = await this.userRepo.findOne({ where: { id } });
-    if (!user) throw new NotFoundException('User not found');
+  async update(
+    userId: string,
+    id: string,
+    userRole: UserRole,
+    dto: UpdateUserDto,
+    file?: Express.Multer.File,
+  ): Promise<UserResponseDto> {
+    if (userId !== id && userRole !== UserRole.ADMIN) {
+      throw new ForbiddenException('Invalid Credintials');
+    }
 
-    // email change + unique
-    if (dto.email !== undefined) {
-      const nextEmail = dto.email.toLowerCase();
-      if (nextEmail !== user.email) {
-        const emailExists = await this.userRepo.findOne({
-          where: { email: nextEmail },
-        });
-        if (emailExists) throw new ConflictException('Email already exists');
-        user.email = nextEmail;
+    const sideEffect = new SideEffectQueue();
+    const updatedUser = await this.dataSource.transaction(async (tx) => {
+      if (file) {
+        await this.assetsService.deleteAsset(
+          tx,
+          id,
+          sideEffect,
+          AssetOwnerType.USER,
+          id,
+        );
+
+        const assetData = this.assetsService.createFileAssetData(
+          file,
+          id,
+          AssetOwnerType.USER,
+          id,
+        );
+        const asset = tx.create(Asset, assetData);
+        await tx.save(asset);
       }
-    }
 
-    if (dto.phone !== undefined) {
-      user.phone = dto.phone ?? null;
-    }
-    if (dto.defaultCurrencyId !== undefined) {
-      if (dto.defaultCurrencyId) {
-        const currency = await this.currencyRepo.findOne({
-          where: { id: dto.defaultCurrencyId },
-        });
-        if (!currency)
-          throw new BadRequestException('Invalid defaultCurrencyId');
-      }
-      user.defaultCurrencyId = dto.defaultCurrencyId ?? null;
-    }
+      const res = await tx.update(User, { id }, { ...dto });
+      if (res.affected === 0) throw new BadRequestException('User not updated');
 
-    if (dto.fullName !== undefined) user.fullName = dto.fullName;
-    if (dto.avatarAssetId !== undefined)
-      user.avatarAssetId = dto.avatarAssetId ?? null;
-    const saved = await this.userRepo.save(user);
-    return toUserResponse(saved);
+      const updatedUser = await tx.findOne(User, {
+        where: { id },
+        relations: { assets: true },
+      });
+
+      if (!updatedUser)
+        throw new BadRequestException('User not found after update');
+
+      return toUserResponse(updatedUser);
+    });
+
+    await sideEffect.runAll();
+    return updatedUser;
   }
 
   async remove(id: string): Promise<{ data: null; message: string }> {
-    const exists = await this.userRepo.exists({ where: { id } });
-    if (!exists) throw new NotFoundException('User not found');
+    const sideEffect = new SideEffectQueue();
 
-    await this.userRepo.delete({ id });
+    await this.dataSource.transaction(async (tx) => {
+      const user = await tx.findOne(User, { where: { id } });
+      if (!user) throw new NotFoundException('User not found');
+
+      await this.assetsService.deleteAsset(
+        tx,
+        id,
+        sideEffect,
+        AssetOwnerType.USER,
+        id,
+      );
+
+      await tx.delete(User, { id });
+    });
+
+    await sideEffect.runAll();
+
     return { data: null, message: 'User deleted' };
   }
 
@@ -154,10 +195,17 @@ export class UserService {
 
     const users = await this.userRepo.find({
       where: [{ fullName: Like(`%${name}%`) }, { email: Like(`%${name}%`) }],
+      relations: { assets: true },
       select: ['id', 'fullName', 'email'],
       take: 20,
     });
 
     return users;
+  }
+
+  async getUsersCountWithWhere(where: FindOptionsWhere<User>) {
+    return this.userRepo.count({
+      where,
+    });
   }
 }

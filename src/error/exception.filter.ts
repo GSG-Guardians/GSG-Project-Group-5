@@ -2,20 +2,61 @@ import {
   ArgumentsHost,
   Catch,
   ExceptionFilter,
+  HttpException,
   HttpStatus,
   Logger,
 } from '@nestjs/common';
-import { ApiErrorResponse } from 'src/types/api.types';
+import { ApiErrorResponse } from '../types/api.types';
 import { Response, Request } from 'express';
 import {
   EntityMetadataNotFoundError,
   QueryFailedError,
   CustomRepositoryNotFoundError,
 } from 'typeorm';
-import { buildApiErrorResponse, parseUniqueDetail } from './exception.utils';
+import {
+  buildApiErrorResponse,
+  buildZodValidationErrorResponse,
+  parseUniqueDetail,
+} from './exception.utils';
 import { DB_ERROR_MAP } from './exception.utils';
 import { PostgresErrorCode } from './exception.constants';
 import { IPostgresDriverError } from './exception.types';
+import { ZodError } from 'zod';
+import { APIError } from '@imagekit/nodejs';
+
+@Catch(HttpException)
+export class HttpExceptionFilter implements ExceptionFilter {
+  catch(exception: HttpException, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
+    const status = exception.getStatus();
+    const errorResponse = buildApiErrorResponse({
+      statusCode: status,
+      path: request.url,
+      message: exception.message || 'Something went wrong!',
+    });
+    response.status(status).json(errorResponse);
+  }
+}
+
+@Catch(ZodError)
+export class ZodExceptionFilter implements ExceptionFilter {
+  catch(exception: ZodError, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const res = ctx.getResponse<Response>();
+    const req = ctx.getRequest<Request>();
+
+    const status = HttpStatus.BAD_REQUEST;
+    const errorResponse = buildZodValidationErrorResponse(
+      req.url,
+      status,
+      exception.issues,
+    );
+
+    res.status(status).json(errorResponse);
+  }
+}
 
 @Catch(
   QueryFailedError,
@@ -77,5 +118,56 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
     }
 
     return response.status(defaultError.statusCode).json(defaultError);
+  }
+}
+
+@Catch()
+export class UncaughtExceptionFilter implements ExceptionFilter {
+  catch(exception: unknown, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+
+    const res = ctx.getResponse<Response>();
+
+    const req = ctx.getRequest<Request>();
+
+    const status = HttpStatus.INTERNAL_SERVER_ERROR;
+
+    const message =
+      exception instanceof Error
+        ? exception.message
+        : 'Internal Server Error, try again later!';
+
+    const error = buildApiErrorResponse({
+      statusCode: status,
+      path: req.url,
+      message,
+    });
+
+    res.status(status).json(error);
+  }
+}
+
+@Catch(APIError)
+export class ImageKitExceptionFilter implements ExceptionFilter {
+  catch(exception: APIError, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const res = ctx.getResponse<Response>();
+    const req = ctx.getRequest<Request>();
+
+    const status =
+      typeof exception.status === 'number' && exception.status >= 400
+        ? exception.status
+        : HttpStatus.BAD_GATEWAY;
+
+    const error: ApiErrorResponse = {
+      timestamp: new Date().toISOString(),
+      success: false,
+      statusCode: status,
+      path: req.url,
+      message:
+        'We couldn’t handle your image upload right now. Please try again later',
+    };
+
+    return res.status(status).json(error);
   }
 }

@@ -1,6 +1,7 @@
-import { ApiErrorResponse } from 'src/types/api.types';
+import { ApiErrorResponse } from '../types/api.types';
 import { PostgresErrorCode } from './exception.constants';
 import { HttpStatus } from '@nestjs/common';
+import { $ZodIssue } from 'zod/v4/core';
 
 export function buildApiErrorResponse(args: {
   statusCode: number;
@@ -67,3 +68,21 @@ export const DB_ERROR_MAP: Record<
     message: 'Transaction conflict, please retry',
   },
 };
+
+export function buildZodValidationErrorResponse(
+  url: string,
+  status: number,
+  issues: $ZodIssue[],
+): ApiErrorResponse {
+  return {
+    timestamp: new Date().toISOString(),
+    success: false,
+    statusCode: status,
+    path: url,
+    message: 'Validation failed',
+    fields: issues.map((iss) => ({
+      field: iss.path.join('.'),
+      message: iss.message,
+    })),
+  };
+}

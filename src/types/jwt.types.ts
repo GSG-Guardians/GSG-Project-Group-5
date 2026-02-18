@@ -14,10 +14,3 @@ export type TUserForToken = Pick<
   User,
   'id' | 'role' | 'email' | 'fullName' | 'provider' | 'status'
 >;
-
-export type TResetJwtPayload = {
-  sub: string;
-  type: 'pwd_reset';
-  iat?: number;
-  exp?: number;
-};

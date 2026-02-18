@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { TSignInRequest, TSignUpRequest } from './dto';
 import * as argon from 'argon2';
-import { IJWTPayload, TUserForToken } from 'src/types/jwt.types';
+import { IJWTPayload, TUserForToken } from '../../types/jwt.types';
 
 import { JwtService } from '@nestjs/jwt';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
@@ -160,7 +160,7 @@ export class AuthService {
     return { user, token };
   }
 
-  private mapUserToToken(user: User | UserResponseDto): TUserForToken {
+  mapUserToToken(user: User | UserResponseDto): TUserForToken {
     return {
       id: user.id,
       email: user.email,
@@ -197,7 +197,7 @@ export class AuthService {
     return payload as GoogleIdTokenPayload;
   }
 
-  private generateToken(userForToken: TUserForToken) {
+  generateToken(userForToken: TUserForToken) {
     const token = this.jwtService.sign<IJWTPayload>({
       sub: userForToken.id,
       role: userForToken.role,

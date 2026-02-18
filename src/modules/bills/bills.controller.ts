@@ -34,16 +34,17 @@ import {
   type TUpdateBillRequest,
   type TUpdateBillStatusRequest,
 } from './dto';
-import { ZodValidationPipe } from 'src/pipes/zodValidation.pipe';
+import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
 import {
   CreateBillSchema,
   UpdateBillSchema,
   UpdateBillStatusSchema,
 } from './schemas/bills.schema';
 import { ApiBody } from '@nestjs/swagger';
-import { ApiSuccess } from 'src/helpers/swaggerDTOWrapper.helpers';
+import { ApiSuccess } from '../../helpers/swaggerDTOWrapper.helpers';
 import { type Request } from 'express';
-
+import { UserRole } from 'database/enums';
+import { Roles } from '../../decorators/roles.decorators';
 type UploadedFilePayload = {
   originalname: string;
   mimetype: string;
@@ -57,6 +58,7 @@ type UploadedFilePayload = {
 export class BillsController {
   constructor(private readonly billsService: BillsService) { }
 
+  @Roles([UserRole.ADMIN])
   @Get()
   @ApiOperation({
     summary: 'List bills',
@@ -156,6 +158,8 @@ export class BillsController {
   async updateStatus(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(UpdateBillStatusSchema))
+    @Req()
+    req: Request,
     dto: TUpdateBillStatusRequest,
     @Req() req: Request,
   ) {

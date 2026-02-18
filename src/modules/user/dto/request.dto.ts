@@ -14,8 +14,7 @@ export type CreateUserDto = {
 };
 
 export type UpdateUserDto = Partial<
-  Pick<
-    CreateUserDto,
-    'fullName' | 'email' | 'phone' | 'defaultCurrencyId' | 'avatarAssetId'
-  >
+  Pick<CreateUserDto, 'fullName' | 'phone'> & {
+    avatar?: Express.Multer.File;
+  }
 >;
