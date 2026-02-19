@@ -7,12 +7,9 @@ import {
   Post,
   Query,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import type { Request } from 'express';
-
-import { JwtCookieGuard } from '../auth/guards/cookies.guard';
 
 import { FinancialReportService } from './financial-report.service';
 import type { GetFinancialReportDto } from './dto/request.dto';
@@ -27,7 +24,6 @@ import { ApiSuccess } from '../../helpers/swaggerDTOWrapper.helpers';
 @ApiTags('Financial Reports')
 @ApiBearerAuth()
 @Controller('financial-reports')
-@UseGuards(JwtCookieGuard)
 export class FinancialReportController {
   constructor(
     private readonly financialReportService: FinancialReportService,
@@ -35,6 +31,7 @@ export class FinancialReportController {
 
   @Get()
   @ApiOperation({ summary: 'Get financial report for a period' })
+  @ApiBearerAuth()
   @ApiSuccess(FinancialReportResponseSwaggerDto)
   async getReport(
     @Query(new ZodValidationPipe(getFinancialReportValidationSchema))
@@ -46,6 +43,7 @@ export class FinancialReportController {
   }
 
   @Post('insights')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a financial insight' })
   @ApiSuccess(FinancialInsightResponseSwaggerDto)
   async createInsight(
@@ -64,6 +62,7 @@ export class FinancialReportController {
   }
 
   @Patch('insights/:id/read')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Mark an insight as read' })
   @ApiSuccess(FinancialInsightResponseSwaggerDto)
   async markInsightAsRead(@Param('id') id: string, @Req() req: Request) {

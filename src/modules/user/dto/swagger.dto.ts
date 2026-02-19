@@ -1,5 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { CreateUserDto, UpdateUserDto } from './request.dto';
+import {
+  CreateUserDto,
+  TChangePasswordDto,
+  UpdateUserDto,
+} from './request.dto';
 import { UserResponseDto } from './response.dto';
 import { UserRole, UserStatus } from 'database/enums';
 import { Asset } from 'database/entities/assets.entities';
@@ -100,4 +104,20 @@ export class UserResponseSwaggerDto implements UserResponseDto {
 
   @ApiProperty()
   avatar: Asset[];
+}
+
+export class ChangePasswordRequestSwaggerDto implements TChangePasswordDto {
+  @ApiProperty({ example: 'StrongP@ssw0rd' })
+  currentPassword: string;
+
+  @ApiProperty({ example: 'StrongP@ssw0rd' })
+  newPassword: string;
+
+  @ApiProperty({ example: 'StrongP@ssw0rd' })
+  confirmNewPassword: string;
+}
+
+export class ChangePasswordResponseSwaggerDto {
+  @ApiProperty({ example: 'Password changed successfully' })
+  message: string;
 }
