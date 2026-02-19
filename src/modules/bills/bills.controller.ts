@@ -158,8 +158,6 @@ export class BillsController {
   async updateStatus(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(UpdateBillStatusSchema))
-    @Req()
-    req: Request,
     dto: TUpdateBillStatusRequest,
     @Req() req: Request,
   ) {
