@@ -88,6 +88,9 @@ export class FinancialReportSummarySwaggerDto {
   @ApiProperty({ example: '1749.25' })
   netSavings: string;
 
+  @ApiProperty({ example: '1200.00' })
+  totalDebts: string;
+
   @ApiProperty({ example: 65.01 })
   budgetUtilization: number;
 }
@@ -100,12 +103,7 @@ export class FinancialReportResponseSwaggerDto implements FinancialReportRespons
   };
 
   @ApiProperty({ type: FinancialReportSummarySwaggerDto })
-  summary: {
-    totalIncome: string;
-    totalExpenses: string;
-    netSavings: string;
-    budgetUtilization: number;
-  };
+  summary: FinancialReportSummarySwaggerDto;
 
   @ApiProperty({ type: [CategoryBreakdownSwaggerDto] })
   categoryBreakdown: CategoryBreakdown[];
