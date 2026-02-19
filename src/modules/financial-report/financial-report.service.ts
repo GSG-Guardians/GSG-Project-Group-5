@@ -5,9 +5,12 @@ import { Repository, Between, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
 import { Budget } from '../../../database/entities/budget.entities';
 import { Debt } from '../../../database/entities/debts.entities';
 import { FinancialInsight } from '../../../database/entities/financial-insight.entities';
-import { BudgetCategory } from '../../../database/enums';
+import {
+  BudgetCategory,
+  DebtDirection,
+  DebtStatus,
+} from '../../../database/enums';
 
-import { GetFinancialReportDto } from './dto/request.dto';
 import { FinancialReportResponseDto } from './dto/response.dto';
 
 @Injectable()
@@ -23,9 +26,10 @@ export class FinancialReportService {
 
   async getFinancialReport(
     userId: string,
-    dto: GetFinancialReportDto,
   ): Promise<FinancialReportResponseDto> {
-    const { startDate, endDate } = dto;
+    const endDate = new Date();
+    const startDate = new Date(endDate);
+    startDate.setMonth(endDate.getMonth() - 1);
 
     // Get budgets in the period
     const budgets = await this.budgetRepo.find({
@@ -78,6 +82,22 @@ export class FinancialReportService {
     // Calculate weekly expenses (mock for now - would need transaction data)
     const weeklyExpenses = this.calculateWeeklyExpenses(startDate, endDate);
 
+    // Calculate total debts (unpaid liabilities) in the period
+    const startStr = startDate.toISOString().split('T')[0];
+    const endStr = endDate.toISOString().split('T')[0];
+    const debtsInRange = await this.debtRepo.find({
+      where: {
+        userId,
+        status: DebtStatus.UNPAID,
+        direction: DebtDirection.I_OWE,
+        dueDate: Between(startStr, endStr),
+      },
+    });
+    const totalDebtsAmount = debtsInRange.reduce(
+      (sum, d) => sum + Number(d.amount),
+      0,
+    );
+
     // Get insights
     const insights = await this.insightRepo.find({
       where: {
@@ -121,6 +141,7 @@ export class FinancialReportService {
         totalIncome: totalIncome.toFixed(2),
         totalExpenses: totalExpenses.toFixed(2),
         netSavings: netSavings.toFixed(2),
+        totalDebts: totalDebtsAmount.toFixed(2),
         budgetUtilization,
       },
       categoryBreakdown,

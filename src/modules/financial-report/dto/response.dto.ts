@@ -28,6 +28,7 @@ export type FinancialReportResponseDto = {
     totalIncome: string;
     totalExpenses: string;
     netSavings: string;
+    totalDebts: string;
     budgetUtilization: number;
   };
   categoryBreakdown: CategoryBreakdown[];

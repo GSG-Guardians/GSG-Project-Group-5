@@ -1,24 +1,12 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  Req,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Req } from '@nestjs/common';
 import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import type { Request } from 'express';
 
 import { FinancialReportService } from './financial-report.service';
-import type { GetFinancialReportDto } from './dto/request.dto';
 import {
   FinancialReportResponseSwaggerDto,
   FinancialInsightResponseSwaggerDto,
 } from './dto/swagger.dto';
-import { ZodValidationPipe } from '../../pipes/zodValidation.pipe';
-import { getFinancialReportValidationSchema } from './schema/financial-report.schema';
 import { ApiSuccess } from '../../helpers/swaggerDTOWrapper.helpers';
 
 @ApiTags('Financial Reports')
@@ -30,16 +18,12 @@ export class FinancialReportController {
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get financial report for a period' })
+  @ApiOperation({ summary: 'Get financial report for the last month' })
   @ApiBearerAuth()
   @ApiSuccess(FinancialReportResponseSwaggerDto)
-  async getReport(
-    @Query(new ZodValidationPipe(getFinancialReportValidationSchema))
-    dto: GetFinancialReportDto,
-    @Req() req: Request,
-  ) {
+  async getReport(@Req() req: Request) {
     const userId = req.user!.id;
-    return this.financialReportService.getFinancialReport(userId, dto);
+    return this.financialReportService.getFinancialReport(userId);
   }
 
   @Post('insights')
