@@ -70,4 +70,3 @@ Endpoint requires Bearer JWT authentication.
 - `alert` => `85`
 - `recommendation` or `info` => `65`
 - any other type => `50`
-

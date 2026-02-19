@@ -18,4 +18,3 @@ export class HomeController {
     return this.homeService.getOverview(req.user!);
   }
 }
-

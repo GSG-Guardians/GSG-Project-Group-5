@@ -62,7 +62,8 @@ class HomeAttentionNeededItemSwaggerDto implements HomeAttentionNeededItem {
   title: string;
 
   @ApiProperty({
-    example: 'You have spent 80% of your Shopping budget. Only $69.70 remaining.',
+    example:
+      'You have spent 80% of your Shopping budget. Only $69.70 remaining.',
   })
   message: string;
 
@@ -108,4 +109,3 @@ export class HomeOverviewResponseSwaggerDto implements HomeOverviewResponseDto {
   @ApiProperty({ type: [HomeAttentionNeededItemSwaggerDto] })
   attentionNeeded: HomeAttentionNeededItem[];
 }
-

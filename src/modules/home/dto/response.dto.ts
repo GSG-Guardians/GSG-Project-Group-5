@@ -31,4 +31,3 @@ export type HomeOverviewResponseDto = {
   };
   attentionNeeded: HomeAttentionNeededItem[];
 };
-
