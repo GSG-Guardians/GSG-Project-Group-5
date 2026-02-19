@@ -1,5 +1,6 @@
 import { Debt } from '../../../../database/entities/debts.entities';
 import { DebtResponseDto } from '../dto/response.dto';
+import { TMonthlyDebtSummary } from '../debt.types';
 
 export function toDebtResponse(d: Debt): DebtResponseDto {
   return {
@@ -17,5 +18,13 @@ export function toDebtResponse(d: Debt): DebtResponseDto {
     assetId: d.assetId ?? null,
     createdAt: d.createdAt,
     updatedAt: d.updatedAt,
+  };
+}
+
+export function toMonthlyDebtSummary(d: Debt): TMonthlyDebtSummary {
+  return {
+    personalName: d.personalName,
+    amount: d.amount,
+    dueDate: d.dueDate,
   };
 }

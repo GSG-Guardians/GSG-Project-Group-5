@@ -12,3 +12,21 @@ export type IncomeResponseDto = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type IncomePeriod = 'week' | 'month' | 'year';
+
+export type IncomeSummaryDto = {
+  totalIncome: number;
+  percentChangeVsPreviousPeriod: number;
+  topSource: IncomeSource | null;
+  topSourceAmount: number;
+};
+
+export type IncomeBreakdownDto = {
+  totalIncome: number;
+  items: {
+    source: IncomeSource;
+    amount: number;
+    percentage: number;
+  }[];
+};

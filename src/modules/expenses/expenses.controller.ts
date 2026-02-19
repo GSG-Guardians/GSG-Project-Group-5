@@ -85,7 +85,7 @@ export class ExpensesController {
   @ApiOperation({ summary: 'Create new expense' })
   @ApiBody({ type: CreateExpenseRequestSwaggerDto })
   @ApiSuccess(ExpenseResponseSwaggerDto)
-  createExpense(
+  async createExpense(
     @Req() req: Request,
     @Body(new ZodValidationPipe(CreateExpenseSchema))
     body: TCreateExpenseRequest,

@@ -6,6 +6,8 @@ import { Asset } from './entities/assets.entities';
 import { BalanceHistory } from './entities/balance-history.entities';
 import { Bill } from './entities/bills.entities';
 import { Budget } from './entities/budget.entities';
+import { Chat } from './entities/chat.entities';
+import { Message } from './entities/message.entities';
 import { Currency } from './entities/currency.entities';
 import { Debt } from './entities/debts.entities';
 
@@ -34,6 +36,8 @@ export const dataSourceOptions: DataSourceOptions = {
     BalanceHistory,
     Bill,
     Budget,
+    Chat,
+    Message,
     Currency,
     Debt,
     Expense,

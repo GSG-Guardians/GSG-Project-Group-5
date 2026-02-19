@@ -22,6 +22,9 @@ import { AuthGuard } from './modules/auth/guards/auth.guard';
 import { ReminderModule } from './modules/reminder/reminder.module';
 import { AssetsModule } from './modules/assets/assets.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { HomeModule } from './modules/home/home.module';
+import { ChatModule } from './modules/chat/chat.module';
+import { AiModule } from './modules/ai/ai.module';
 
 @Module({
   imports: [
@@ -45,6 +48,9 @@ import { AdminModule } from './modules/admin/admin.module';
     IncomeModule,
     AssetsModule,
     AdminModule,
+    HomeModule,
+    ChatModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [
