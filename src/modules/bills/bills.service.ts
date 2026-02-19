@@ -4,10 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { Bill } from '../../../database/entities/bills.entities';
 import { GroupInvoice } from '../../../database/entities/group-invoice.entities';
-import { BillStatus, GroupInvoiceStatus } from '../../../database/enums';
+import {
+  BillStatus,
+  GroupInvoiceStatus,
+  UserRole,
+} from '../../../database/enums';
 import { type TCreateBillRequest, type TUpdateBillRequest } from './dto';
 
 export type BillType = 'individual' | 'group';
