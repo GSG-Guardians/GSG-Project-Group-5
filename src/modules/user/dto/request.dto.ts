@@ -18,3 +18,9 @@ export type UpdateUserDto = Partial<
     avatar?: Express.Multer.File;
   }
 >;
+
+export type TChangePasswordDto = {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+};

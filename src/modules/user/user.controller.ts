@@ -21,8 +21,14 @@ import {
 } from '@nestjs/swagger';
 
 import { UserService } from './user.service';
-import type { CreateUserDto, UpdateUserDto } from './dto/request.dto';
+import type {
+  CreateUserDto,
+  TChangePasswordDto,
+  UpdateUserDto,
+} from './dto/request.dto';
 import {
+  ChangePasswordRequestSwaggerDto,
+  ChangePasswordResponseSwaggerDto,
   CreateUserRequestSwaggerDto,
   UpdateUserRequestSwaggerDto,
   UserResponseSwaggerDto,
@@ -30,6 +36,7 @@ import {
 import {
   userValidationSchema,
   updateUserValidationSchema,
+  changePasswordValidationSchema,
 } from './schema/user.schema';
 
 import {
@@ -109,6 +116,22 @@ export class UserController {
       body,
       file,
     );
+  }
+
+  @Patch('change-password/:id')
+  @ApiBody({ type: ChangePasswordRequestSwaggerDto })
+  @ApiOperation({
+    summary: 'Change password from profile',
+    description: 'Change password for a logged user',
+  })
+  @ApiSuccess(ChangePasswordResponseSwaggerDto)
+  changePassword(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(changePasswordValidationSchema))
+    body: TChangePasswordDto,
+    @Req() request: Request,
+  ) {
+    return this.userService.changePassword(id, request.user!.id, body);
   }
 
   @Roles([UserRole.ADMIN])
