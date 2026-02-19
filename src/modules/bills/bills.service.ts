@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository, Between } from 'typeorm';
 import { Bill } from '../../../database/entities/bills.entities';
 import { GroupInvoice } from '../../../database/entities/group-invoice.entities';
 import {
@@ -13,6 +13,10 @@ import {
   UserRole,
 } from '../../../database/enums';
 import { type TCreateBillRequest, type TUpdateBillRequest } from './dto';
+import {
+  toMonthlyBillSummary,
+  toMonthlyGroupBillSummary,
+} from './mappers/bills.mapper';
 
 export type BillType = 'individual' | 'group';
 
@@ -298,6 +302,59 @@ export class BillsService {
       ...saved,
       status: this.mapGroupStatus(saved.status),
     };
+  }
+
+  async getBillsCount() {
+    const [totalBills, totalGroupInvoices] = await Promise.all([
+      this.billRepository.count({}),
+      this.groupInvoiceRepository.count({}),
+    ]);
+    return totalBills + totalGroupInvoices;
+  }
+
+  async getMonthlySummary(userId: string, date: Date) {
+    const targetDate = new Date(date);
+    targetDate.setMonth(targetDate.getMonth() - 1);
+
+    const year = targetDate.getFullYear();
+    const month = targetDate.getMonth();
+
+    const startDate = new Date(year, month, 1);
+    const endDate = new Date(year, month + 1, 0);
+
+    const formatDate = (d: Date) =>
+      d.getFullYear() +
+      '-' +
+      String(d.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(d.getDate()).padStart(2, '0');
+
+    const startStr = formatDate(startDate);
+    const endStr = formatDate(endDate);
+
+    const [individual, group] = await Promise.all([
+      this.billRepository.find({
+        where: {
+          dueDate: Between(startStr, endStr),
+          userId,
+        },
+        order: { dueDate: 'DESC' },
+      }),
+      this.groupInvoiceRepository.find({
+        where: {
+          dueDate: Between(startStr, endStr),
+          createdByUserId: userId,
+        },
+        order: { dueDate: 'DESC' },
+      }),
+    ]);
+
+    const items = [
+      ...individual.map(toMonthlyBillSummary),
+      ...group.map(toMonthlyGroupBillSummary),
+    ].sort((a, b) => (a.dueDate < b.dueDate ? 1 : -1));
+
+    return items;
   }
 
   private mapBillStatus(status: BillStatus) {

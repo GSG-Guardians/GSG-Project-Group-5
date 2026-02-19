@@ -20,7 +20,10 @@ import {
   IPaginationResult,
 } from '../../types/pagination.types';
 
-import { toBudgetResponse } from './mappers/budget.mapper';
+import {
+  toBudgetResponse,
+  toMonthlyBudgetSummary,
+} from './mappers/budget.mapper';
 
 @Injectable()
 export class BudgetService {
@@ -149,7 +152,6 @@ export class BudgetService {
     return { data: null, message: 'Budget deleted successfully' };
   }
 
-  // Additional methods for budget analytics
   async getBudgetSummary(userId: string): Promise<{
     totalAllocated: number;
     totalSpent: number;
@@ -178,5 +180,28 @@ export class BudgetService {
       totalRemaining,
       utilizationPercentage: Math.round(utilizationPercentage * 100) / 100,
     };
+  }
+
+  async getMonthlyBudgetSummary(userId: string, date: Date) {
+    const targetDate = new Date(date);
+    targetDate.setMonth(targetDate.getMonth() - 1);
+
+    const year = targetDate.getFullYear();
+    const month = targetDate.getMonth();
+
+    const startDate = new Date(year, month, 1);
+    const endDate = new Date(year, month + 1, 0);
+
+    const budgets = await this.budgetRepo.find({
+      where: {
+        user_id: userId,
+        is_active: true,
+        start_date: MoreThanOrEqual(startDate),
+        end_date: LessThanOrEqual(endDate),
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    return budgets.map(toMonthlyBudgetSummary);
   }
 }

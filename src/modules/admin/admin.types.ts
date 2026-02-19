@@ -1,0 +1,1 @@
+export type THourCount = { hour: string; count: number };

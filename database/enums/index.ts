@@ -126,3 +126,8 @@ export enum DebtType {
   INDIVIDUAL = 'INDIVIDUAL',
   GROUP = 'GROUP',
 }
+
+export enum ChatRole {
+  USER = 'USER',
+  AGENT = 'AGENT',
+}

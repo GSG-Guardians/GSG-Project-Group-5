@@ -14,7 +14,10 @@ import {
   IPaginationQuery,
   IPaginationResult,
 } from '../../types/pagination.types';
-import { toIncomeResponse } from './mappers/income.mapper';
+import {
+  toIncomeResponse,
+  toMonthlyIncomeSummary,
+} from './mappers/income.mapper';
 
 @Injectable()
 export class IncomeService {
@@ -150,5 +153,36 @@ export class IncomeService {
       totalIncome: totalIncome.toFixed(2),
       count: incomes.length,
     };
+  }
+
+  async getMonthlyIncomeSummary(userId: string, date: Date) {
+    const targetDate = new Date(date);
+    targetDate.setMonth(targetDate.getMonth() - 1);
+
+    const year = targetDate.getFullYear();
+    const month = targetDate.getMonth();
+
+    const startDate = new Date(year, month, 1);
+    const endDate = new Date(year, month + 1, 0);
+
+    const formatDate = (d: Date) =>
+      d.getFullYear() +
+      '-' +
+      String(d.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(d.getDate()).padStart(2, '0');
+
+    const startStr = formatDate(startDate);
+    const endStr = formatDate(endDate);
+
+    const incomes = await this.incomeRepo.find({
+      where: {
+        userId,
+        incomeDate: Between(startStr, endStr),
+      },
+      order: { incomeDate: 'DESC' },
+    });
+
+    return incomes.map(toMonthlyIncomeSummary);
   }
 }

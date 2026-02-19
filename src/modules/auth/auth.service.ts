@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  Inject,
+  forwardRef,
+} from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { TSignInRequest, TSignUpRequest } from './dto';
 import * as argon from 'argon2';
@@ -17,6 +22,7 @@ import { toUserResponse } from '../user/mappers/user.mapper';
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
@@ -63,7 +69,7 @@ export class AuthService {
     return { user: userToResponse, token };
   }
 
-  private hashPassword(password: string) {
+  async hashPassword(password: string) {
     return argon.hash(password);
   }
 
@@ -71,7 +77,7 @@ export class AuthService {
     new URL('https://www.googleapis.com/oauth2/v3/certs'),
   );
 
-  private verifyPassword(hash: string, password: string) {
+  async verifyPassword(hash: string, password: string) {
     return argon.verify(hash, password);
   }
 

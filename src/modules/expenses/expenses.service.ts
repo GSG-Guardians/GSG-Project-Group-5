@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Between } from 'typeorm';
 import { Expense } from '../../../database/entities/expense.entities';
 import { Income } from '../../../database/entities/income.entities';
 import { User } from '../../../database/entities/user.entities';
 import { CategoryName } from '../../../database/enums';
+import { toMonthlyExpenseSummary } from './mappers/expense.mapper';
 import type { UserResponseDto } from '../user/dto';
 import type {
   ExpenseCategoryBreakdown,
@@ -124,6 +125,9 @@ export class ExpensesService {
     return this.toExpenseResponse(saved);
   }
 
+  async getExpensesCount() {
+    return await this.expenseRepository.count();
+  }
   private async getTotalsByCategory(
     userId: string,
     currencyId: string,
@@ -311,6 +315,37 @@ export class ExpensesService {
       createdAt: expense.createdAt,
       updatedAt: expense.updatedAt,
     };
+  }
+
+  async getMonthlyExpenseSummary(userId: string, date: Date) {
+    const targetDate = new Date(date);
+    targetDate.setMonth(targetDate.getMonth() - 1);
+
+    const year = targetDate.getFullYear();
+    const month = targetDate.getMonth();
+
+    const startDate = new Date(year, month, 1);
+    const endDate = new Date(year, month + 1, 0);
+
+    const formatDate = (d: Date) =>
+      d.getFullYear() +
+      '-' +
+      String(d.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(d.getDate()).padStart(2, '0');
+
+    const startStr = formatDate(startDate);
+    const endStr = formatDate(endDate);
+
+    const expenses = await this.expenseRepository.find({
+      where: {
+        userId,
+        dueDate: Between(startStr, endStr),
+      },
+      order: { dueDate: 'DESC' },
+    });
+
+    return expenses.map(toMonthlyExpenseSummary);
   }
 }
 

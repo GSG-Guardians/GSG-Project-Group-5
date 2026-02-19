@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
+import { Repository, Between, FindOptionsWhere } from 'typeorm';
 import { Debt } from '../../../database/entities/debts.entities';
 import { Currency } from '../../../database/entities/currency.entities';
 import { DatabaseService } from '../database/database.service';
@@ -16,7 +16,7 @@ import {
   IPaginationQuery,
   IPaginationResult,
 } from '../../types/pagination.types';
-import { toDebtResponse } from './mappers/debt.mapper';
+import { toDebtResponse, toMonthlyDebtSummary } from './mappers/debt.mapper';
 
 @Injectable()
 export class DebtService {
@@ -181,5 +181,40 @@ export class DebtService {
       netBalance: (totalOwed - totalOwe).toFixed(2),
       unpaidCount,
     };
+  }
+
+  async getMonthlyDebtSummary(userId: string, date: Date) {
+    const targetDate = new Date(date);
+    targetDate.setMonth(targetDate.getMonth() - 1);
+
+    const year = targetDate.getFullYear();
+    const month = targetDate.getMonth();
+
+    const startDate = new Date(year, month, 1);
+    const endDate = new Date(year, month + 1, 0);
+
+    const formatDate = (d: Date) =>
+      d.getFullYear() +
+      '-' +
+      String(d.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(d.getDate()).padStart(2, '0');
+
+    const startStr = formatDate(startDate);
+    const endStr = formatDate(endDate);
+
+    const debts = await this.debtRepo.find({
+      where: {
+        userId,
+        dueDate: Between(startStr, endStr),
+      },
+      order: { dueDate: 'DESC' },
+    });
+
+    return debts.map(toMonthlyDebtSummary);
+  }
+
+  async getTotalDebtsWithWhere(where: FindOptionsWhere<Debt>) {
+    return await this.debtRepo.count({ where });
   }
 }
