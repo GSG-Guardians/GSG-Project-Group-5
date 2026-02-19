@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { CreateUserDto, UpdateUserDto } from './request.dto';
 import { UserResponseDto } from './response.dto';
 import { UserRole, UserStatus } from 'database/enums';
+import { Asset } from 'database/entities/assets.entities';
 
 // ---------- Requests ----------
 
@@ -42,20 +43,14 @@ export class CreateUserRequestSwaggerDto implements CreateUserDto {
 }
 
 export class UpdateUserRequestSwaggerDto implements UpdateUserDto {
-  @ApiPropertyOptional({ example: 'moamen@example.com' })
-  email?: string;
-
   @ApiPropertyOptional({ example: 'Moamen Al-Yazouri' })
   fullName?: string;
 
   @ApiPropertyOptional({ example: '+970592497292', nullable: true })
   phone?: string | null;
 
-  @ApiPropertyOptional({ format: 'uuid', nullable: true })
-  defaultCurrencyId: string;
-
-  @ApiPropertyOptional({ format: 'uuid', nullable: true })
-  avatarAssetId?: string;
+  @ApiPropertyOptional({ type: 'string', format: 'binary', nullable: true })
+  avatar?: Express.Multer.File;
 }
 
 // ---------- Response ----------
@@ -102,4 +97,7 @@ export class UserResponseSwaggerDto implements UserResponseDto {
 
   @ApiProperty()
   updatedAt: Date;
+
+  @ApiProperty()
+  avatar: Asset[];
 }

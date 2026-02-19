@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 import { dataSourceOptions } from '../database/data-source';
 import { BillsModule } from './modules/bills/bills.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
@@ -18,6 +19,9 @@ import { ExpensesModule } from './modules/expenses/expenses.module';
 import { MailModule } from './modules/mail/mail.module';
 import { IncomeModule } from './modules/income/income.module';
 import { AuthGuard } from './modules/auth/guards/auth.guard';
+import { ReminderModule } from './modules/reminder/reminder.module';
+import { AssetsModule } from './modules/assets/assets.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -26,6 +30,7 @@ import { AuthGuard } from './modules/auth/guards/auth.guard';
       envFilePath: '.env',
     }),
     TypeOrmModule.forRoot(dataSourceOptions),
+    ScheduleModule.forRoot(),
     DatabaseModule,
     UserModule,
     AuthModule,
@@ -36,7 +41,10 @@ import { AuthGuard } from './modules/auth/guards/auth.guard';
     ExpensesModule,
     BillsModule,
     MailModule,
+    ReminderModule,
     IncomeModule,
+    AssetsModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [

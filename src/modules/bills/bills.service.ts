@@ -19,9 +19,12 @@ export class BillsService {
     private readonly billRepository: Repository<Bill>,
     @InjectRepository(GroupInvoice)
     private readonly groupInvoiceRepository: Repository<GroupInvoice>,
-  ) { }
+  ) {}
 
-  async listBills(userId: string, params: { type?: BillType; page: number; limit: number }) {
+  async listBills(
+    userId: string,
+    params: { type?: BillType; page: number; limit: number },
+  ) {
     const { type, page, limit } = params;
     const safePage = Number.isFinite(page) && page > 0 ? page : 1;
     const safeLimit = Number.isFinite(limit) && limit > 0 ? limit : 10;
@@ -256,7 +259,11 @@ export class BillsService {
     return { deleted: true };
   }
 
-  async updateBillStatus(userId: string, id: string, status: 'paid' | 'unpaid') {
+  async updateBillStatus(
+    userId: string,
+    id: string,
+    status: 'paid' | 'unpaid',
+  ) {
     const normalized = status.toLowerCase();
     const isPaid = normalized === 'paid';
     const bill = await this.billRepository.findOne({ where: { id, userId } });
@@ -290,6 +297,13 @@ export class BillsService {
     };
   }
 
+  async getBillsCount() {
+    const [totalBills, totalGroupInvoices] = await Promise.all([
+      this.billRepository.count({}),
+      this.groupInvoiceRepository.count({}),
+    ]);
+    return totalBills + totalGroupInvoices;
+  }
   private mapBillStatus(status: BillStatus) {
     return status === BillStatus.PAID ? 'paid' : 'unpaid';
   }

@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
+import { Repository, Between, FindOptionsWhere } from 'typeorm';
 import { Debt } from '../../../database/entities/debts.entities';
 import { Currency } from '../../../database/entities/currency.entities';
 import { DatabaseService } from '../database/database.service';
@@ -181,5 +181,9 @@ export class DebtService {
       netBalance: (totalOwed - totalOwe).toFixed(2),
       unpaidCount,
     };
+  }
+
+  async getTotalDebtsWithWhere(where: FindOptionsWhere<Debt>) {
+    return await this.debtRepo.count({ where });
   }
 }
