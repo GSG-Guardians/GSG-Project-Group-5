@@ -17,3 +17,7 @@ export type UserResponseDto = {
   updatedAt: User['updatedAt'];
   avatar: Asset[] | null;
 };
+
+export type ChangePasswordResponseDto = {
+  message: string;
+};

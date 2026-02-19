@@ -1,7 +1,11 @@
 // user/schema/user.schema.ts
 
 import z, { ZodType } from 'zod';
-import { CreateUserDto, UpdateUserDto } from '../dto/request.dto';
+import {
+  CreateUserDto,
+  TChangePasswordDto,
+  UpdateUserDto,
+} from '../dto/request.dto';
 
 // base schema object
 export const userBaseObjectSchema = z.object({
@@ -45,3 +49,19 @@ export const updateUserValidationSchema = userBaseObjectSchema
     avatarAssetId: true,
   })
   .partial() satisfies ZodType<UpdateUserDto>;
+
+export const changePasswordValidationSchema = z
+  .object({
+    currentPassword: z.string().min(6).max(100),
+    newPassword: z.string().min(6).max(100),
+    confirmNewPassword: z.string().min(6).max(100),
+  })
+  .superRefine((val, ctx) => {
+    if (val.newPassword !== val.confirmNewPassword) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['confirmNewPassword'],
+        message: 'New passwords do not match',
+      });
+    }
+  }) satisfies ZodType<TChangePasswordDto>;

@@ -1,5 +1,6 @@
 import { Income } from '../../../../database/entities/income.entities';
 import { IncomeResponseDto } from '../dto/response.dto';
+import { TMonthlyIncomeSummary } from '../income.types';
 
 export function toIncomeResponse(income: Income): IncomeResponseDto {
   return {
@@ -13,5 +14,13 @@ export function toIncomeResponse(income: Income): IncomeResponseDto {
     assetId: income.assetId ?? null,
     createdAt: income.createdAt,
     updatedAt: income.updatedAt,
+  };
+}
+
+export function toMonthlyIncomeSummary(i: Income): TMonthlyIncomeSummary {
+  return {
+    source: i.source,
+    amount: i.amount,
+    incomeDate: i.incomeDate,
   };
 }

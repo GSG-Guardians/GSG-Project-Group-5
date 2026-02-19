@@ -4,6 +4,8 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, DataSource, FindOptionsWhere } from 'typeorm';
@@ -12,7 +14,11 @@ import { User } from '../../../database/entities/user.entities';
 import { Currency } from '../../../database/entities/currency.entities';
 import { DatabaseService } from '../database/database.service';
 
-import { CreateUserDto, UpdateUserDto } from './dto/request.dto';
+import {
+  CreateUserDto,
+  TChangePasswordDto,
+  UpdateUserDto,
+} from './dto/request.dto';
 import { UserResponseDto } from './dto/response.dto';
 import {
   IPaginationQuery,
@@ -24,6 +30,7 @@ import { AssetOwnerType, UserRole, UserStatus } from 'database/enums';
 import { SideEffectQueue } from '../../utils/side-effects';
 import { AssetsService } from '../assets/assets.service';
 import { Asset } from 'database/entities/assets.entities';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UserService {
@@ -34,6 +41,8 @@ export class UserService {
     private readonly databaseService: DatabaseService,
     private readonly dataSource: DataSource,
     private readonly assetsService: AssetsService,
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
   ) {}
 
   async create(dto: CreateUserDto): Promise<UserResponseDto> {
@@ -207,5 +216,43 @@ export class UserService {
     return this.userRepo.count({
       where,
     });
+  }
+
+  async changePassword(id: string, userId: string, dto: TChangePasswordDto) {
+    if (id !== userId) {
+      throw new ForbiddenException('Invalid Credintials');
+    }
+    const user = await this.userRepo.findOne({
+      where: { id },
+    });
+    if (!user) throw new NotFoundException('User not found');
+
+    if (user.provider !== 'LOCAL') {
+      throw new BadRequestException('User is not a local user');
+    }
+
+    if (!user.passwordHash) {
+      throw new BadRequestException('User has no password');
+    }
+
+    const isPasswordValid = await this.authService.verifyPassword(
+      user.passwordHash,
+      dto.currentPassword,
+    );
+    if (!isPasswordValid) {
+      throw new BadRequestException('Invalid current password');
+    }
+
+    if (dto.newPassword !== dto.confirmNewPassword) {
+      throw new BadRequestException('New passwords do not match');
+    }
+
+    const newPasswordHash = await this.authService.hashPassword(
+      dto.newPassword,
+    );
+
+    await this.userRepo.update(userId, { passwordHash: newPasswordHash });
+
+    return { message: 'Password changed successfully' };
   }
 }
