@@ -32,6 +32,9 @@ export class DashboardStatisticsSwaggerDto implements TDashboardStatistics {
 
   @ApiProperty({ type: CountWithChangeDto })
   debts: CountWithChangeDto;
+
+  @ApiProperty({ type: CountWithChangeDto })
+  incomes: CountWithChangeDto;
 }
 
 export class DashboardDonutSwaggerDto implements TDashboardDount {
