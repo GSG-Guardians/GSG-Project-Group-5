@@ -21,6 +21,7 @@ import {
   getMonthlyExpensesSum,
 } from '../../../database/queries/monthlyStatistics';
 import { MONTHES_NAMES } from '../../constants/months.constants';
+import { IncomeService } from '../income/income.service';
 
 @Injectable()
 export class AdminService {
@@ -29,12 +30,14 @@ export class AdminService {
     private readonly debtService: DebtService,
     private readonly billService: BillsService,
     private readonly expenseService: ExpensesService,
+    private readonly incomeService: IncomeService,
   ) {}
 
   async getDashboardStatistics(): Promise<TDashboardStatistics> {
     const totalDebts = await this.getTotalDebts();
     const activeUsersCount = await this.getActiveUsersCount();
     const totalUsersCount = await this.getTotalUsersCount();
+    const incomesTotal = await this.getTotalIncomes();
 
     const activeUsersChangePercent = this.calcChangePercent(
       await this.getCumulativeActiveUsersUntilLastMonth(),
@@ -49,6 +52,11 @@ export class AdminService {
       totalDebts,
     );
 
+    const incomesChangePercent = this.calcChangePercent(
+      await this.getTotalIncomesLastMonth(),
+      incomesTotal,
+    );
+
     return {
       activeUsers: {
         count: activeUsersCount,
@@ -61,6 +69,10 @@ export class AdminService {
       debts: {
         count: totalDebts,
         changePercent: debtsChangePercent,
+      },
+      incomes: {
+        count: incomesTotal,
+        changePercent: incomesChangePercent,
       },
     };
   }
@@ -118,6 +130,7 @@ export class AdminService {
       await this.getNewUsersLastMonth(),
       newUsersCount,
     );
+
     return {
       newUsers: {
         count: newUsersCount,
@@ -307,5 +320,14 @@ export class AdminService {
     return {
       createdAt: Between(startOfPrevMonth, startOfThisMonth),
     };
+  }
+
+  private async getTotalIncomes() {
+    return await this.incomeService.getTotalIncomesWithWhere({});
+  }
+
+  private async getTotalIncomesLastMonth() {
+    const where = this.getWhereInMonth();
+    return await this.incomeService.getTotalIncomesWithWhere(where);
   }
 }

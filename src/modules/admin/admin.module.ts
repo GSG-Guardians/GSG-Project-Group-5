@@ -5,9 +5,10 @@ import { UserModule } from '../user/user.module';
 import { DebtModule } from '../debt/debt.module';
 import { BillsModule } from '../bills/bills.module';
 import { ExpensesModule } from '../expenses/expenses.module';
+import { IncomeModule } from '../income/income.module';
 
 @Module({
-  imports: [UserModule, DebtModule, BillsModule, ExpensesModule],
+  imports: [UserModule, DebtModule, BillsModule, ExpensesModule, IncomeModule],
   controllers: [AdminController],
   providers: [AdminService],
 })
