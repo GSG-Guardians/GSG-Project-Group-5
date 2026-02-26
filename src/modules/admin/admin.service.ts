@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { UserService } from '../user/user.service';
 import { UserStatus } from '../../../database/enums';
-import { Between, FindOptionsWhere, LessThan, Not } from 'typeorm';
+import { Between, FindOptionsWhere, LessThan, Not, DataSource } from 'typeorm';
 import { User } from 'database/entities/user.entities';
 import { DebtService } from '../debt/debt.service';
 import { BillsService } from '../bills/bills.service';
@@ -31,6 +31,7 @@ export class AdminService {
     private readonly billService: BillsService,
     private readonly expenseService: ExpensesService,
     private readonly incomeService: IncomeService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async getDashboardStatistics(): Promise<TDashboardStatistics> {
@@ -87,14 +88,14 @@ export class AdminService {
   }
 
   async getPeakHourly() {
-    const peakRows = await getHourlyPeakQuery();
+    const peakRows = await getHourlyPeakQuery(this.dataSource);
     return this.toHourlyPairs(peakRows);
   }
 
   async getBillsVsExpensesMonthly(): Promise<TMonthlyPoint[]> {
     const [billsRows, expensesRows] = await Promise.all([
-      getMonthlyBillsSum(),
-      getMonthlyExpensesSum(),
+      getMonthlyBillsSum(this.dataSource),
+      getMonthlyExpensesSum(this.dataSource),
     ]);
 
     const billsMap = new Map(billsRows.map((r) => [r.month, r.total]));
