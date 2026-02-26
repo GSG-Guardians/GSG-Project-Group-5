@@ -1,13 +1,32 @@
-import { Body, Controller, Delete, Post, Req } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Query,
+  Req,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import type { Request } from 'express';
-import { ApiSuccess } from 'src/helpers/swaggerDTOWrapper.helpers';
+import {
+  ApiSuccess,
+  ApiSuccessPaginated,
+} from 'src/helpers/swaggerDTOWrapper.helpers';
 import { ZodValidationPipe } from 'src/pipes/zodValidation.pipe';
+import type { IPaginationQuery } from 'src/types/pagination.types';
 import type {
   RegisterPushTokenDto,
   RemovePushTokenDto,
 } from './dto/request.dto';
 import {
+  NotificationResponseSwaggerDto,
   PushTokenActionResponseSwaggerDto,
   RegisterPushTokenRequestSwaggerDto,
   RemovePushTokenRequestSwaggerDto,
@@ -23,6 +42,21 @@ import {
 @Controller('notifications')
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
+
+  @Get('me')
+  @ApiOperation({ summary: 'Get current user notifications with pagination' })
+  @ApiSuccessPaginated(NotificationResponseSwaggerDto)
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  async getMyNotifications(
+    @Req() req: Request,
+    @Query() query: IPaginationQuery,
+  ) {
+    return await this.notificationService.findMyNotifications(
+      req.user!.id,
+      query,
+    );
+  }
 
   @Post('push-tokens')
   @ApiOperation({ summary: 'Register a push token for the current user' })

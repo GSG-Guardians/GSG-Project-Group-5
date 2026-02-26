@@ -11,6 +11,12 @@ import {
   ReminderFrequency,
 } from 'database/enums';
 import { Repository } from 'typeorm';
+import {
+  IPaginationQuery,
+  IPaginationResult,
+} from '../../types/pagination.types';
+import { DatabaseService } from '../database/database.service';
+import { ReminderResponseDto } from './dto/response.dto';
 import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
@@ -25,6 +31,7 @@ export class ReminderService {
     @InjectRepository(Reminder)
     private readonly reminderRepository: Repository<Reminder>,
     private readonly notificationService: NotificationService,
+    private readonly databaseService: DatabaseService,
   ) {}
 
   @Cron(CronExpression.EVERY_HOUR)
@@ -147,5 +154,45 @@ export class ReminderService {
 
   private getDueAtDate(dateISO: string): Date {
     return new Date(`${dateISO}T00:00:00.000Z`);
+  }
+
+  async findMyReminders(
+    userId: string,
+    query: IPaginationQuery,
+  ): Promise<IPaginationResult<ReminderResponseDto>> {
+    const { page, limit, skip, take } =
+      this.databaseService.createPaginationOptions(query);
+
+    const [rows, total] = await this.reminderRepository.findAndCount({
+      where: { userId },
+      order: { dueDate: 'ASC', createdAt: 'DESC' },
+      skip,
+      take,
+    });
+
+    return {
+      data: rows.map((row) => this.toReminderResponse(row)),
+      meta: this.databaseService.createPaginationMetaData(limit, page, total),
+    };
+  }
+
+  private toReminderResponse(reminder: Reminder): ReminderResponseDto {
+    return {
+      id: reminder.id,
+      userId: reminder.userId,
+      dueDate: reminder.dueDate,
+      description: reminder.description,
+      isActive: reminder.isActive,
+      frequency: reminder.frequency,
+      nextRemindAt: reminder.nextRemindAt,
+      lastSentAt: reminder.lastSentAt,
+      completedAt: reminder.completedAt,
+      debtId: reminder.debtId,
+      billId: reminder.billId,
+      expenseId: reminder.expenseId,
+      groupInvoiceId: reminder.groupInvoiceId,
+      createdAt: reminder.createdAt,
+      updatedAt: reminder.updatedAt,
+    };
   }
 }
