@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Bill } from '../../../database/entities/bills.entities';
 import { Debt } from '../../../database/entities/debts.entities';
 import { Reminder } from '../../../database/entities/reminders.entities';
+import { ReminderController } from './reminder.controller';
 import { ReminderService } from './reminder.service';
 import { NotificationModule } from '../notification/notification.module';
 
@@ -11,6 +12,7 @@ import { NotificationModule } from '../notification/notification.module';
     TypeOrmModule.forFeature([Bill, Debt, Reminder]),
     NotificationModule,
   ],
+  controllers: [ReminderController],
   providers: [ReminderService],
   exports: [ReminderService],
 })

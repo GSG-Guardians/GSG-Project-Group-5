@@ -3,7 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Notification } from 'database/entities/notifications.entities';
 import { NotificationType } from 'database/enums';
 import { Repository } from 'typeorm';
+import { DatabaseService } from '../database/database.service';
+import {
+  IPaginationQuery,
+  IPaginationResult,
+} from '../../types/pagination.types';
 import { RegisterPushTokenDto } from './dto/request.dto';
+import { NotificationResponseDto } from './dto/response.dto';
 import { PushNotificationService } from './push-notification.service';
 
 type CreateNotificationInput = {
@@ -22,6 +28,7 @@ export class NotificationService {
     @InjectRepository(Notification)
     private readonly notificationRepository: Repository<Notification>,
     private readonly pushNotificationService: PushNotificationService,
+    private readonly databaseService: DatabaseService,
   ) {}
 
   async create(input: CreateNotificationInput): Promise<Notification> {
@@ -67,5 +74,44 @@ export class NotificationService {
 
   async removePushToken(userId: string, token: string) {
     await this.pushNotificationService.removeToken(userId, token);
+  }
+
+  async findMyNotifications(
+    userId: string,
+    query: IPaginationQuery,
+  ): Promise<IPaginationResult<NotificationResponseDto>> {
+    const { page, limit, skip, take } =
+      this.databaseService.createPaginationOptions(query);
+
+    const [rows, total] = await this.notificationRepository.findAndCount({
+      where: { userId },
+      order: { sentAt: 'DESC' },
+      skip,
+      take,
+    });
+
+    return {
+      data: rows.map((row) => this.toNotificationResponse(row)),
+      meta: this.databaseService.createPaginationMetaData(limit, page, total),
+    };
+  }
+
+  private toNotificationResponse(
+    notification: Notification,
+  ): NotificationResponseDto {
+    return {
+      id: notification.id,
+      userId: notification.userId,
+      type: notification.type,
+      title: notification.title,
+      body: notification.body,
+      entityType: notification.entityType,
+      entityId: notification.entityId,
+      data: notification.data,
+      sentAt: notification.sentAt,
+      isRead: notification.isRead,
+      readAt: notification.readAt,
+      createdAt: notification.createdAt,
+    };
   }
 }
