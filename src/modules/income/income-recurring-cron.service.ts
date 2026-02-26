@@ -3,8 +3,9 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IncomeRecurringRule } from 'database/entities/income-recurring-rule.entities';
 import { Income } from 'database/entities/income.entities';
-import { IncomeFrequency } from 'database/enums';
+import { IncomeFrequency, NotificationType } from 'database/enums';
 import { IsNull, LessThanOrEqual, Repository } from 'typeorm';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class IncomeRecurringCronService {
@@ -15,6 +16,7 @@ export class IncomeRecurringCronService {
     private readonly recurringRuleRepo: Repository<IncomeRecurringRule>,
     @InjectRepository(Income)
     private readonly incomeRepo: Repository<Income>,
+    private readonly notificationService: NotificationService,
   ) {}
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
@@ -34,6 +36,7 @@ export class IncomeRecurringCronService {
     }
 
     let createdCount = 0;
+    const createdByUser = new Map<string, number>();
 
     for (const rule of dueRules) {
       if (!rule.income) {
@@ -72,6 +75,10 @@ export class IncomeRecurringCronService {
         });
         await this.incomeRepo.save(newIncome);
         createdCount += 1;
+        createdByUser.set(
+          rule.income.userId,
+          (createdByUser.get(rule.income.userId) ?? 0) + 1,
+        );
       }
 
       if (rule.frequency === IncomeFrequency.ONE_TIME) {
@@ -89,6 +96,25 @@ export class IncomeRecurringCronService {
     }
 
     if (createdCount > 0) {
+      await Promise.all(
+        Array.from(createdByUser.entries()).map(([userId, userCreatedCount]) =>
+          this.notificationService.create({
+            userId,
+            type: NotificationType.INCOME_REMINDER,
+            title: 'Recurring Income Created',
+            body:
+              userCreatedCount === 1
+                ? `1 recurring income entry was created for ${today}`
+                : `${userCreatedCount} recurring income entries were created for ${today}`,
+            entityType: 'INCOME',
+            data: {
+              date: today,
+              createdCount: userCreatedCount,
+            },
+          }),
+        ),
+      );
+
       this.logger.log(
         `Created ${createdCount} recurring income(s) for ${today}`,
       );

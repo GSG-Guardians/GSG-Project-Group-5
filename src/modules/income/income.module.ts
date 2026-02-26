@@ -5,6 +5,7 @@ import { Currency } from '../../../database/entities/currency.entities';
 import { IncomeRecurringRule } from '../../../database/entities/income-recurring-rule.entities';
 import { DatabaseModule } from '../database/database.module';
 import { UserModule } from '../user/user.module';
+import { NotificationModule } from '../notification/notification.module';
 import { IncomeController } from './income.controller';
 import { IncomeService } from './income.service';
 import { IncomeRecurringCronService } from './income-recurring-cron.service';
@@ -14,6 +15,7 @@ import { IncomeRecurringCronService } from './income-recurring-cron.service';
     TypeOrmModule.forFeature([Income, Currency, IncomeRecurringRule]),
     DatabaseModule,
     UserModule,
+    NotificationModule,
   ],
   controllers: [IncomeController],
   providers: [IncomeService, IncomeRecurringCronService],
