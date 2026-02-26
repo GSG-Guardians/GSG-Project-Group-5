@@ -11,6 +11,10 @@ export type TDashboardStatistics = {
     count: number;
     changePercent: number;
   };
+  incomes: {
+    count: number;
+    changePercent: number;
+  };
 };
 
 export type TDashboardDount = {

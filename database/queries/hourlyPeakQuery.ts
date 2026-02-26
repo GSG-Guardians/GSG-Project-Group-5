@@ -1,8 +1,10 @@
-import dataSource from 'database/data-source';
+import { DataSource } from 'typeorm';
 import { Expense } from 'database/entities/expense.entities';
 import { THourlyPeak } from './types';
 
-export const getHourlyPeakQuery = async (): Promise<THourlyPeak> => {
+export const getHourlyPeakQuery = async (
+  dataSource: DataSource,
+): Promise<THourlyPeak> => {
   const rows = await dataSource
     .getRepository(Expense)
     .createQueryBuilder('e')

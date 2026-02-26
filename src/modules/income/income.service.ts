@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Repository } from 'typeorm';
+import { Between, FindOptionsWhere, Repository } from 'typeorm';
 import { Income } from '../../../database/entities/income.entities';
 import { Currency } from '../../../database/entities/currency.entities';
 import { DatabaseService } from '../database/database.service';
@@ -184,5 +184,11 @@ export class IncomeService {
     });
 
     return incomes.map(toMonthlyIncomeSummary);
+  }
+
+  async getTotalIncomesWithWhere(where: FindOptionsWhere<Income>) {
+    const rows = await this.incomeRepo.find({ where });
+    const total = rows.reduce((sum, i) => sum + Number(i.amount), 0);
+    return Number.isFinite(total) ? total : 0;
   }
 }

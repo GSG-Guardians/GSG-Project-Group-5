@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { UserService } from '../user/user.service';
 import { UserStatus } from '../../../database/enums';
-import { Between, FindOptionsWhere, LessThan, Not } from 'typeorm';
+import { Between, FindOptionsWhere, LessThan, Not, DataSource } from 'typeorm';
 import { User } from 'database/entities/user.entities';
 import { DebtService } from '../debt/debt.service';
 import { BillsService } from '../bills/bills.service';
@@ -21,6 +21,7 @@ import {
   getMonthlyExpensesSum,
 } from '../../../database/queries/monthlyStatistics';
 import { MONTHES_NAMES } from '../../constants/months.constants';
+import { IncomeService } from '../income/income.service';
 
 @Injectable()
 export class AdminService {
@@ -29,12 +30,15 @@ export class AdminService {
     private readonly debtService: DebtService,
     private readonly billService: BillsService,
     private readonly expenseService: ExpensesService,
+    private readonly incomeService: IncomeService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async getDashboardStatistics(): Promise<TDashboardStatistics> {
     const totalDebts = await this.getTotalDebts();
     const activeUsersCount = await this.getActiveUsersCount();
     const totalUsersCount = await this.getTotalUsersCount();
+    const incomesTotal = await this.getTotalIncomes();
 
     const activeUsersChangePercent = this.calcChangePercent(
       await this.getCumulativeActiveUsersUntilLastMonth(),
@@ -47,6 +51,11 @@ export class AdminService {
     const debtsChangePercent = this.calcChangePercent(
       await this.getCumulativeDebtsUntilLastMonth(),
       totalDebts,
+    );
+
+    const incomesChangePercent = this.calcChangePercent(
+      await this.getTotalIncomesLastMonth(),
+      incomesTotal,
     );
 
     return {
@@ -62,6 +71,10 @@ export class AdminService {
         count: totalDebts,
         changePercent: debtsChangePercent,
       },
+      incomes: {
+        count: incomesTotal,
+        changePercent: incomesChangePercent,
+      },
     };
   }
 
@@ -75,14 +88,14 @@ export class AdminService {
   }
 
   async getPeakHourly() {
-    const peakRows = await getHourlyPeakQuery();
+    const peakRows = await getHourlyPeakQuery(this.dataSource);
     return this.toHourlyPairs(peakRows);
   }
 
   async getBillsVsExpensesMonthly(): Promise<TMonthlyPoint[]> {
     const [billsRows, expensesRows] = await Promise.all([
-      getMonthlyBillsSum(),
-      getMonthlyExpensesSum(),
+      getMonthlyBillsSum(this.dataSource),
+      getMonthlyExpensesSum(this.dataSource),
     ]);
 
     const billsMap = new Map(billsRows.map((r) => [r.month, r.total]));
@@ -118,6 +131,7 @@ export class AdminService {
       await this.getNewUsersLastMonth(),
       newUsersCount,
     );
+
     return {
       newUsers: {
         count: newUsersCount,
@@ -307,5 +321,14 @@ export class AdminService {
     return {
       createdAt: Between(startOfPrevMonth, startOfThisMonth),
     };
+  }
+
+  private async getTotalIncomes() {
+    return await this.incomeService.getTotalIncomesWithWhere({});
+  }
+
+  private async getTotalIncomesLastMonth() {
+    const where = this.getWhereInMonth();
+    return await this.incomeService.getTotalIncomesWithWhere(where);
   }
 }

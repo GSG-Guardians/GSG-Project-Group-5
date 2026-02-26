@@ -1,9 +1,8 @@
-import dataSource from '../data-source';
+import { DataSource } from 'typeorm';
 import { Bill } from '../entities/bills.entities';
 import { Expense } from '../entities/expense.entities';
-import { MONTHES_NAMES } from 'src/constants/months.constants';
 
-export const getMonthlyBillsSum = async () => {
+export const getMonthlyBillsSum = async (dataSource: DataSource) => {
   const year = new Date().getFullYear();
   const start = `${year}-01-01`;
   const end = `${year + 1}-01-01`;
@@ -24,7 +23,7 @@ export const getMonthlyBillsSum = async () => {
   }));
 };
 
-export const getMonthlyExpensesSum = async () => {
+export const getMonthlyExpensesSum = async (dataSource: DataSource) => {
   const year = new Date().getFullYear();
   const start = new Date(Date.UTC(year, 0, 1));
   const end = new Date(Date.UTC(year + 1, 0, 1));
