@@ -17,7 +17,8 @@ import type {
 import type {
   TCreateExpenseRequest,
   TExpenseCategoryQuery,
-  TExpensePeriodQuery,
+  TExpenseTotalsQuery,
+  TExpenseDonutQuery,
 } from './dto/request.dto';
 
 @Injectable()
@@ -33,10 +34,10 @@ export class ExpensesService {
 
   async getOverview(
     user: UserResponseDto,
-    query: TExpensePeriodQuery,
+    query: TExpenseTotalsQuery,
   ): Promise<ExpenseOverviewResponse> {
     const currencyId = query.currencyId ?? user.defaultCurrencyId;
-    const range = this.resolveDateRange(query);
+    const range: DateRange = {};
 
     const totalExpenses = await this.getTotalAmount(
       this.expenseRepository,
@@ -64,10 +65,10 @@ export class ExpensesService {
 
   async getCategoryBreakdown(
     user: UserResponseDto,
-    query: TExpensePeriodQuery,
+    query: TExpenseTotalsQuery,
   ): Promise<ExpenseCategoryBreakdown[]> {
     const currencyId = query.currencyId ?? user.defaultCurrencyId;
-    const range = this.resolveDateRange(query);
+    const range: DateRange = {};
     const totals = await this.getTotalsByCategory(user.id, currencyId, range);
 
     return totals.breakdown;
@@ -75,7 +76,7 @@ export class ExpensesService {
 
   async getDonutChart(
     user: UserResponseDto,
-    query: TExpensePeriodQuery,
+    query: TExpenseDonutQuery,
   ): Promise<ExpenseDonutSegment[]> {
     const currencyId = query.currencyId ?? user.defaultCurrencyId;
     const range = this.resolveDateRange(query);
@@ -89,7 +90,7 @@ export class ExpensesService {
     query: TExpenseCategoryQuery,
   ): Promise<ExpenseCategoryOption[]> {
     const currencyId = query.currencyId ?? user.defaultCurrencyId;
-    const range = this.resolveDateRange(query);
+    const range: DateRange = {};
     const totals = await this.getTotalsByCategory(user.id, currencyId, range);
 
     return totals.categories;

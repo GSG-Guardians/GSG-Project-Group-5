@@ -4,14 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository, Between } from 'typeorm';
+import { Repository, Between } from 'typeorm';
 import { Bill } from '../../../database/entities/bills.entities';
 import { GroupInvoice } from '../../../database/entities/group-invoice.entities';
-import {
-  BillStatus,
-  GroupInvoiceStatus,
-  UserRole,
-} from '../../../database/enums';
+import { BillStatus, GroupInvoiceStatus } from '../../../database/enums';
 import { type TCreateBillRequest, type TUpdateBillRequest } from './dto';
 import {
   toMonthlyBillSummary,
@@ -29,7 +25,10 @@ export class BillsService {
     private readonly groupInvoiceRepository: Repository<GroupInvoice>,
   ) {}
 
-  async listBills(params: { type?: BillType; page: number; limit: number }) {
+  async listBills(
+    userId: string,
+    params: { type?: BillType; page: number; limit: number },
+  ) {
     const { type, page, limit } = params;
     const safePage = Number.isFinite(page) && page > 0 ? page : 1;
     const safeLimit = Number.isFinite(limit) && limit > 0 ? limit : 10;
@@ -37,6 +36,7 @@ export class BillsService {
 
     if (type === 'individual') {
       const [items, total] = await this.billRepository.findAndCount({
+        where: { userId },
         order: { dueDate: 'DESC' },
         skip,
         take: safeLimit,
@@ -54,6 +54,7 @@ export class BillsService {
 
     if (type === 'group') {
       const [items, total] = await this.groupInvoiceRepository.findAndCount({
+        where: { createdByUserId: userId },
         order: { dueDate: 'DESC' },
         skip,
         take: safeLimit,
@@ -72,10 +73,12 @@ export class BillsService {
     const takeForMerge = safePage * safeLimit;
     const [individual, group] = await Promise.all([
       this.billRepository.find({
+        where: { userId },
         order: { dueDate: 'DESC' },
         take: takeForMerge,
       }),
       this.groupInvoiceRepository.find({
+        where: { createdByUserId: userId },
         order: { dueDate: 'DESC' },
         take: takeForMerge,
       }),
@@ -101,15 +104,9 @@ export class BillsService {
     };
   }
 
-  async getBillDetails(id: string, userId: string, userRole: UserRole) {
-    const where: FindOptionsWhere<Bill> = { id };
-
-    if (userRole !== UserRole.ADMIN) {
-      where.userId = userId;
-    }
-
+  async getBillDetails(userId: string, id: string) {
     const bill = await this.billRepository.findOne({
-      where,
+      where: { id, userId },
       relations: ['currency', 'asset', 'reminder'],
     });
 
@@ -122,7 +119,7 @@ export class BillsService {
     }
 
     const groupInvoice = await this.groupInvoiceRepository.findOne({
-      where: { id },
+      where: { id, createdByUserId: userId },
       relations: [
         'currency',
         'asset',
@@ -204,7 +201,7 @@ export class BillsService {
     };
   }
 
-  async updateBill(id: string, userId: string, dto: TUpdateBillRequest) {
+  async updateBill(userId: string, id: string, dto: TUpdateBillRequest) {
     const bill = await this.billRepository.findOne({ where: { id, userId } });
     if (bill) {
       if (dto.name !== undefined) bill.name = dto.name;
@@ -223,7 +220,7 @@ export class BillsService {
     }
 
     const groupInvoice = await this.groupInvoiceRepository.findOne({
-      where: { id },
+      where: { id, createdByUserId: userId },
     });
     if (!groupInvoice) {
       throw new NotFoundException('Bill not found');
@@ -248,7 +245,7 @@ export class BillsService {
     };
   }
 
-  async deleteBill(id: string, userId: string) {
+  async deleteBill(userId: string, id: string) {
     const bill = await this.billRepository.findOne({ where: { id, userId } });
     if (bill) {
       await this.billRepository.remove(bill);
@@ -256,7 +253,7 @@ export class BillsService {
     }
 
     const groupInvoice = await this.groupInvoiceRepository.findOne({
-      where: { id },
+      where: { id, createdByUserId: userId },
     });
     if (!groupInvoice) {
       throw new NotFoundException('Bill not found');
@@ -267,8 +264,8 @@ export class BillsService {
   }
 
   async updateBillStatus(
-    id: string,
     userId: string,
+    id: string,
     status: 'paid' | 'unpaid',
   ) {
     const normalized = status.toLowerCase();
@@ -286,7 +283,7 @@ export class BillsService {
     }
 
     const groupInvoice = await this.groupInvoiceRepository.findOne({
-      where: { id },
+      where: { id, createdByUserId: userId },
     });
     if (!groupInvoice) {
       throw new NotFoundException('Bill not found');

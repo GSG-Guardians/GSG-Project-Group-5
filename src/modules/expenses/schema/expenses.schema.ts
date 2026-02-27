@@ -3,15 +3,20 @@ import { CategoryName } from '../../../../database/enums';
 
 const periodEnum = z.enum(['day', 'week', 'month', 'year']);
 
-const expensePeriodBaseSchema = z.object({
+const expenseCurrencyQuerySchema = z.object({
+  currencyId: z.string().uuid().optional(),
+});
+
+const expensePeriodBaseSchema = expenseCurrencyQuerySchema.extend({
   from: z.coerce.date().optional(),
   to: z.coerce.date().optional(),
   period: periodEnum.optional(),
   month: z.coerce.number().int().min(1).max(12).optional(),
-  currencyId: z.string().uuid().optional(),
 });
 
-export const ExpensePeriodQuerySchema = expensePeriodBaseSchema.refine(
+export const ExpenseTotalsQuerySchema = expenseCurrencyQuerySchema;
+
+export const ExpenseDonutQuerySchema = expensePeriodBaseSchema.refine(
   (val) => !(val.from && !val.to) && !(val.to && !val.from),
   {
     message: 'from and to must be provided together',
@@ -19,14 +24,9 @@ export const ExpensePeriodQuerySchema = expensePeriodBaseSchema.refine(
   },
 );
 
-export const ExpenseCategoryQuerySchema = expensePeriodBaseSchema
-  .extend({
-    type: z.literal('expense').optional(),
-  })
-  .refine((val) => !(val.from && !val.to) && !(val.to && !val.from), {
-    message: 'from and to must be provided together',
-    path: ['from'],
-  });
+export const ExpenseCategoryQuerySchema = expenseCurrencyQuerySchema.extend({
+  type: z.literal('expense').optional(),
+});
 
 export const CreateExpenseSchema = z.object({
   name: z.string().min(1).max(160),
