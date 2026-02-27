@@ -33,11 +33,8 @@ export class CreateBillSwaggerDto implements TCreateBillRequest {
   })
   description?: string | null;
 
-  @ApiPropertyOptional({
-    example: '123e4567-e89b-12d3-a456-426614174000',
-    nullable: true,
-  })
-  assetId?: string | null;
+  @ApiPropertyOptional({ type: 'string', format: 'binary', nullable: true })
+  image?: Express.Multer.File;
 }
 
 export class UpdateBillSwaggerDto implements TUpdateBillRequest {
@@ -64,11 +61,8 @@ export class UpdateBillSwaggerDto implements TUpdateBillRequest {
   })
   description?: string | null;
 
-  @ApiPropertyOptional({
-    example: '123e4567-e89b-12d3-a456-426614174000',
-    nullable: true,
-  })
-  assetId?: string | null;
+  @ApiPropertyOptional({ type: 'string', format: 'binary', nullable: true })
+  image?: Express.Multer.File;
 }
 
 export class UpdateBillStatusSwaggerDto implements TUpdateBillStatusRequest {

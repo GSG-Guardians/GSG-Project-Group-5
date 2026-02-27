@@ -4,10 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository, Between } from 'typeorm';
+import { FindOptionsWhere, Repository, Between, DataSource } from 'typeorm';
 import { Bill } from '../../../database/entities/bills.entities';
 import { GroupInvoice } from '../../../database/entities/group-invoice.entities';
 import {
+  AssetOwnerType,
   BillStatus,
   GroupInvoiceStatus,
   UserRole,
@@ -17,6 +18,9 @@ import {
   toMonthlyBillSummary,
   toMonthlyGroupBillSummary,
 } from './mappers/bills.mapper';
+import { AssetsService } from '../assets/assets.service';
+import { Asset } from '../../../database/entities/assets.entities';
+import { SideEffectQueue } from '../../utils/side-effects';
 
 export type BillType = 'individual' | 'group';
 
@@ -27,6 +31,8 @@ export class BillsService {
     private readonly billRepository: Repository<Bill>,
     @InjectRepository(GroupInvoice)
     private readonly groupInvoiceRepository: Repository<GroupInvoice>,
+    private readonly dataSource: DataSource,
+    private readonly assetsService: AssetsService,
   ) {}
 
   async listBills(params: { type?: BillType; page: number; limit: number }) {
@@ -153,7 +159,11 @@ export class BillsService {
     };
   }
 
-  async createBill(userId: string, dto: TCreateBillRequest) {
+  async createBill(
+    userId: string,
+    dto: TCreateBillRequest,
+    file?: Express.Multer.File,
+  ) {
     if (!dto.type) {
       throw new BadRequestException('type is required');
     }
@@ -163,22 +173,40 @@ export class BillsService {
         throw new BadRequestException('currencyId is required');
       }
 
-      const bill = this.billRepository.create({
-        userId,
-        name: dto.name,
-        amount: dto.amount.toString(),
-        dueDate: dto.date,
-        currencyId: dto.currencyId,
-        description: dto.description ?? null,
-        assetId: dto.assetId ?? null,
-        status: BillStatus.UNPAID,
+      const savedBill = await this.dataSource.transaction(async (tx) => {
+        const bill = tx.create(Bill, {
+          userId,
+          name: dto.name,
+          amount: dto.amount.toString(),
+          dueDate: dto.date,
+          currencyId: dto.currencyId,
+          description: dto.description ?? null,
+          status: BillStatus.UNPAID,
+        });
+        const saved = await tx.save(bill);
+
+        if (file) {
+          const sideEffect = new SideEffectQueue();
+          const assetData = this.assetsService.createFileAssetData(
+            file,
+            userId,
+            AssetOwnerType.BILL,
+            saved.id,
+          );
+          const asset = tx.create(Asset, assetData);
+          const savedAsset = await tx.save(asset);
+          saved.assetId = savedAsset.id;
+          await tx.save(saved);
+          await sideEffect.runAll();
+        }
+
+        return saved;
       });
 
-      const saved = await this.billRepository.save(bill);
       return {
         type: 'individual',
-        ...saved,
-        status: this.mapBillStatus(saved.status),
+        ...savedBill,
+        status: this.mapBillStatus(savedBill.status),
       };
     }
 
@@ -204,15 +232,55 @@ export class BillsService {
     };
   }
 
-  async updateBill(id: string, userId: string, dto: TUpdateBillRequest) {
+  async updateBill(
+    id: string,
+    userId: string,
+    dto: TUpdateBillRequest,
+    file?: Express.Multer.File,
+  ) {
     const bill = await this.billRepository.findOne({ where: { id, userId } });
     if (bill) {
+      if (file) {
+        const sideEffect = new SideEffectQueue();
+        await this.dataSource.transaction(async (tx) => {
+          await this.assetsService.deleteAsset(
+            tx,
+            userId,
+            sideEffect,
+            AssetOwnerType.BILL,
+            id,
+          );
+          const assetData = this.assetsService.createFileAssetData(
+            file,
+            userId,
+            AssetOwnerType.BILL,
+            id,
+          );
+          const asset = tx.create(Asset, assetData);
+          const savedAsset = await tx.save(asset);
+          bill.assetId = savedAsset.id;
+
+          if (dto.name !== undefined) bill.name = dto.name;
+          if (dto.amount !== undefined) bill.amount = dto.amount.toString();
+          if (dto.date !== undefined) bill.dueDate = dto.date;
+          if (dto.currencyId !== undefined) bill.currencyId = dto.currencyId;
+          if (dto.description !== undefined) bill.description = dto.description;
+
+          await tx.save(bill);
+        });
+        await sideEffect.runAll();
+        return {
+          type: 'individual',
+          ...bill,
+          status: this.mapBillStatus(bill.status),
+        };
+      }
+
       if (dto.name !== undefined) bill.name = dto.name;
       if (dto.amount !== undefined) bill.amount = dto.amount.toString();
       if (dto.date !== undefined) bill.dueDate = dto.date;
       if (dto.currencyId !== undefined) bill.currencyId = dto.currencyId;
       if (dto.description !== undefined) bill.description = dto.description;
-      if (dto.assetId !== undefined) bill.assetId = dto.assetId;
 
       const saved = await this.billRepository.save(bill);
       return {
@@ -238,7 +306,6 @@ export class BillsService {
     if (dto.description !== undefined) {
       groupInvoice.description = dto.description;
     }
-    if (dto.assetId !== undefined) groupInvoice.assetId = dto.assetId;
 
     const saved = await this.groupInvoiceRepository.save(groupInvoice);
     return {
@@ -251,7 +318,18 @@ export class BillsService {
   async deleteBill(id: string, userId: string) {
     const bill = await this.billRepository.findOne({ where: { id, userId } });
     if (bill) {
-      await this.billRepository.remove(bill);
+      const sideEffect = new SideEffectQueue();
+      await this.dataSource.transaction(async (tx) => {
+        await this.assetsService.deleteAsset(
+          tx,
+          userId,
+          sideEffect,
+          AssetOwnerType.BILL,
+          id,
+        );
+        await tx.remove(bill);
+      });
+      await sideEffect.runAll();
       return { deleted: true };
     }
 
