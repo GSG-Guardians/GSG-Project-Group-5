@@ -13,6 +13,8 @@ import {
   Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { FolderInterceptor } from '../../interceptors/assetFolder.interceptor';
+import { AssetCleanupInterceptor } from '../../interceptors/assetCleanup.interceptor';
 import {
   ApiTags,
   ApiOperation,
@@ -109,6 +111,12 @@ export class BillsController {
   }
 
   @Post()
+  @UseInterceptors(
+    FileInterceptor('image'),
+    FolderInterceptor('BILL'),
+    AssetCleanupInterceptor,
+  )
+  @ApiConsumes('multipart/form-data')
   @ApiOperation({
     summary: 'Create a new bill',
     description: 'Create a new bill record (individual or group)',
@@ -118,11 +126,18 @@ export class BillsController {
   async createBill(
     @Body(new ZodValidationPipe(CreateBillSchema)) dto: TCreateBillRequest,
     @Req() req: Request,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
-    return this.billsService.createBill(req.user!.id, dto);
+    return this.billsService.createBill(req.user!.id, dto, file);
   }
 
   @Put(':id')
+  @UseInterceptors(
+    FileInterceptor('image'),
+    FolderInterceptor('BILL'),
+    AssetCleanupInterceptor,
+  )
+  @ApiConsumes('multipart/form-data')
   @ApiOperation({
     summary: 'Update bill',
     description: 'Update bill name, amount, or settings',
@@ -134,8 +149,9 @@ export class BillsController {
     @Param('id') id: string,
     @Body(new ZodValidationPipe(UpdateBillSchema)) dto: TUpdateBillRequest,
     @Req() req: Request,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
-    return this.billsService.updateBill(id, req.user!.id, dto);
+    return this.billsService.updateBill(id, req.user!.id, dto, file);
   }
 
   @Delete(':id')
