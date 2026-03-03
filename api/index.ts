@@ -1,14 +1,19 @@
 import 'reflect-metadata';
+import { RequestMethod } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from '../src/app.module';
 import express from 'express';
 import cookieParser from 'cookie-parser';
+import {
+  HttpExceptionFilter,
+  TypeOrmExceptionFilter,
+  UncaughtExceptionFilter,
+  ZodExceptionFilter,
+} from '../src/error/exception.filter';
 
 let cachedServer: any;
-
-import { RequestMethod } from '@nestjs/common';
 
 async function bootstrap() {
   const expressApp = express();
@@ -45,6 +50,13 @@ async function bootstrap() {
       'https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js',
     ],
   });
+
+  nestApp.useGlobalFilters(
+    new HttpExceptionFilter(),
+    new ZodExceptionFilter(),
+    new TypeOrmExceptionFilter(),
+    new UncaughtExceptionFilter(),
+  );
 
   await nestApp.init();
 
