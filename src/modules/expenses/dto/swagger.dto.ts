@@ -66,10 +66,19 @@ export class CreateExpenseRequestSwaggerDto implements TCreateExpenseRequest {
   @ApiProperty({ example: '2026-02-01' })
   dueDate: string;
 
-  @ApiPropertyOptional({ example: 'Weekly grocery run', nullable: true })
+  @ApiPropertyOptional({
+    type: String,
+    example: 'Weekly grocery run',
+    nullable: true,
+  })
   description?: string | null;
 
-  @ApiPropertyOptional({ format: 'uuid', nullable: true })
+  @ApiPropertyOptional({
+    type: String,
+    format: 'uuid',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    nullable: true,
+  })
   assetId?: string | null;
 }
 
