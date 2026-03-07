@@ -34,13 +34,22 @@ export class CreateIncomeRequestSwaggerDto implements CreateIncomeDto {
   @ApiProperty({ enum: IncomeSource, example: IncomeSource.SALARY })
   source: IncomeSource;
 
-  @ApiPropertyOptional({ example: 'Monthly salary', nullable: true })
+  @ApiPropertyOptional({
+    type: String,
+    example: 'Monthly salary',
+    nullable: true,
+  })
   description?: string | null;
 
   @ApiProperty({ example: '2026-02-01', type: 'string', format: 'date' })
   incomeDate: string;
 
-  @ApiPropertyOptional({ format: 'uuid', nullable: true })
+  @ApiPropertyOptional({
+    type: String,
+    format: 'uuid',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    nullable: true,
+  })
   assetId?: string | null;
 
   @ApiPropertyOptional({ type: CreateIncomeRecurringRequestSwaggerDto })
@@ -57,13 +66,22 @@ export class UpdateIncomeRequestSwaggerDto implements UpdateIncomeDto {
   @ApiPropertyOptional({ enum: IncomeSource, example: IncomeSource.FREELANCE })
   source?: IncomeSource;
 
-  @ApiPropertyOptional({ example: 'Updated income note', nullable: true })
+  @ApiPropertyOptional({
+    type: String,
+    example: 'Updated income note',
+    nullable: true,
+  })
   description?: string | null;
 
   @ApiPropertyOptional({ example: '2026-02-02', format: 'date' })
   incomeDate?: string;
 
-  @ApiPropertyOptional({ format: 'uuid', nullable: true })
+  @ApiPropertyOptional({
+    type: String,
+    format: 'uuid',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    nullable: true,
+  })
   assetId?: string | null;
 }
 
